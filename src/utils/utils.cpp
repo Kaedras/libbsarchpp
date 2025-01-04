@@ -99,7 +99,7 @@ void changeSlashesToBackslashes(std::u16string &str) noexcept
     }
 }
 
-bool comparePaths(const std::filesystem::path &lhs, const std::filesystem::path &rhs) noexcept(false)
+bool comparePaths(const std::filesystem::path &lhs, const std::filesystem::path &rhs) noexcept
 {
     const string lhsStr = lhs.generic_string();
     const string rhsStr = rhs.generic_string();
@@ -298,8 +298,8 @@ bool comparePaths(const std::filesystem::path &lhs, const std::filesystem::path 
             return l == '~';
         }
 
-        // unexpected character, this should not happen
-        throw runtime_error(format("{}: internal error, characters are {} and {}", __FUNCTION__, l, r));
+        // unhandled characters, just return l < r
+        return l < r;
     }
 
     return lhsStr.length() < rhsStr.length();

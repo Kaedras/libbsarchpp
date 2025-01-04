@@ -1,6 +1,8 @@
 # libbsarchpp
 
-This is a reimplementation of xEdit's BSArchive in C++ with a focus on cross-platform compatibility. It has been tested
+This is a reimplementation of
+xEdit's [BSArchive](https://github.com/TES5Edit/TES5Edit/blob/1fcec21b354786fd6e023d1d38360770557e5a74/Core/wbBSArchive.pas)
+in C++ with a focus on cross-platform compatibility. It has been tested
 on Linux and Windows.
 For the most part I just copied the Delphi code, converted it to C++, and then made some modifications.
 

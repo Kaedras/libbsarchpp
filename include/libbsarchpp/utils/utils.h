@@ -25,7 +25,6 @@ void changeSlashesToBackslashes(std::u16string &str) noexcept;
 
 /**
  * @brief This function is used to sort paths alphabetically.
- * @throw std::runtime_error If one string contains a character that is not accounted for
  */
-[[nodiscard]] DLL_PUBLIC bool comparePaths(const std::filesystem::path &lhs, const std::filesystem::path &rhs) noexcept(false);
+[[nodiscard]] DLL_PUBLIC bool comparePaths(const std::filesystem::path &lhs, const std::filesystem::path &rhs) noexcept;
 } // namespace libbsarchpp
