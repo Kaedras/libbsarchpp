@@ -210,6 +210,7 @@ TEST(CreateArchive, FilesListEmpty)
     EXPECT_THROW(Bsa("test.bsa", libbsarchpp::TES4, filesList), std::runtime_error);
 }
 
+/* the archive files for these tests have not been properly created yet
 void run(const string &file, ArchiveType type, const char *checksum)
 {
     // this directory is deleted after running the test, so we require it to be empty to prevent deletion of unrelated files
@@ -255,6 +256,7 @@ TEST(Fast, tes4)
 {
     run("tes4.bsa", TES4, "28508a8760bb662a5a4aeba2521bdfbe689cb601b376ba03816387a89b7219c8");
 }
+*/
 
 void run(const string &game, const string &archive, bool compressed, bool shared)
 {
