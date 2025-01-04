@@ -1,0 +1,77 @@
+#pragma once
+
+#include <filesystem>
+#include <unordered_map>
+
+#cmakedefine TESTS_TES3_ENABLE
+#cmakedefine TESTS_TES4_ENABLE
+#cmakedefine TESTS_TES5_ENABLE
+#cmakedefine TESTS_SSE_ENABLE
+#cmakedefine TESTS_SKYRIMVR_ENABLE
+#cmakedefine TESTS_FO3_ENABLE
+#cmakedefine TESTS_FONV_ENABLE
+#cmakedefine TESTS_FO4_ENABLE
+#cmakedefine TESTS_FO4VR_ENABLE
+#cmakedefine TESTS_SF_ENABLE
+
+#cmakedefine TESTS_MULTITHREADED_EXTRACTION
+#cmakedefine TESTS_MULTITHREADED_PACKING
+
+static const std::filesystem::path WORKDIR = "@TESTS_WORKDIR@";
+static const std::filesystem::path DATADIR = "@TESTS_DATADIR@";
+
+#ifndef TESTS_TES3_DATADIR
+    #define TESTS_TES3_DATADIR DATADIR / "tes3"
+#endif
+#ifndef TESTS_TES4_DATADIR
+    #define TESTS_TES4_DATADIR DATADIR / "tes4"
+#endif
+#ifndef TESTS_TES5_DATADIR
+    #define TESTS_TES5_DATADIR DATADIR / "tes5"
+#endif
+#ifndef TESTS_SSE_DATADIR
+    #define TESTS_SSE_DATADIR DATADIR / "sse"
+#endif
+#ifndef TESTS_SKYRIMVR_DATADIR
+    #define TESTS_SKYRIMVR_DATADIR DATADIR / "skyrimvr"
+#endif
+#ifndef TESTS_FO3_DATADIR
+    #define TESTS_FO3_DATADIR DATADIR / "fo3"
+#endif
+#ifndef TESTS_FONV_DATADIR
+    #define TESTS_FONV_DATADIR DATADIR / "fnv"
+#endif
+#ifndef TESTS_FO4_DATADIR
+    #define TESTS_FO4_DATADIR DATADIR / "fo4"
+#endif
+#ifndef TESTS_FO4VR_DATADIR
+    #define TESTS_FO4VR_DATADIR DATADIR / "fo4vr"
+#endif
+#ifndef TESTS_SF_DATADIR
+    #define TESTS_SF_DATADIR DATADIR / "sf"
+#endif
+
+std::unordered_map<std::string, std::filesystem::path> dataDirs = {
+    {"tes3", TESTS_TES3_DATADIR},
+    {"tes4", TESTS_TES4_DATADIR},
+    {"tes5", TESTS_TES5_DATADIR},
+    {"sse", TESTS_SSE_DATADIR},
+    {"skyrimvr", TESTS_SKYRIMVR_DATADIR},
+    {"fo3", TESTS_FO3_DATADIR},
+    {"fnv", TESTS_FONV_DATADIR},
+    {"fo4", TESTS_FO4_DATADIR},
+    {"fo4vr", TESTS_FO4VR_DATADIR},
+    {"sf", TESTS_SF_DATADIR}
+};
+
+#ifdef TESTS_MULTITHREADED_PACKING
+inline constexpr bool multithreadedPacking = true;
+#else
+inline constexpr bool multithreadedPacking = false;
+#endif
+
+#ifdef TESTS_MULTITHREADED_EXTRACTION
+inline constexpr bool multithreadedExtracting = true;
+#else
+inline constexpr bool multithreadedExtracting = false;
+#endif

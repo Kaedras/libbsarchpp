@@ -1,0 +1,16 @@
+{
+  "dependencies" : [ "lz4", "openssl", "zlib" ],
+  "features" : {
+    "testing" : {
+      "description" : "Build tests.",
+      "dependencies" : [ "gtest" ]
+    }
+  },
+  "vcpkg-configuration" : {
+    "default-registry" : {
+      "kind" : "git",
+      "repository" : "https://github.com/Microsoft/vcpkg",
+      "baseline" : "c8582b4d83dbd36e1bebc08bf166b5eb807996b0"
+    }
+  }
+}

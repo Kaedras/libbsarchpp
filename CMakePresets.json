@@ -1,0 +1,86 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "cmake-dev",
+      "errors": {
+        "deprecated": true
+      },
+      "hidden": true,
+      "warnings": {
+        "deprecated": true,
+        "dev": true
+      },
+      "cacheVariables": {
+        "USE_VCPKG": true
+      }
+    },
+    {
+      "name": "vcpkg",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_NO_DEFAULT_FEATURES": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      },
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "hidden": true
+    },
+    {
+      "name": "vcpkg-dev",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "testing"
+        }
+      },
+      "hidden": true,
+      "inherits": ["vcpkg"]
+    },
+    {
+      "name": "vs2022-windows",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-static-md"
+        }
+      },
+      "generator": "Visual Studio 17 2022",
+      "inherits": ["cmake-dev", "vcpkg-dev"],
+      "toolset": "v143",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "linux",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux"
+        }
+      },
+      "generator": "Ninja Multi-Config",
+      "inherits": ["cmake-dev", "vcpkg-dev"],
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "vs2022-windows",
+      "configurePreset": "vs2022-windows"
+    },
+    {
+      "name": "linux",
+      "configurePreset": "linux"
+    }
+  ]
+}
