@@ -8,7 +8,6 @@
 #include <filesystem>
 #include <iosfwd>
 #include <memory>
-#include <openssl/evp.h>
 #include <string_view>
 #include <variant>
 #include <vector>
@@ -34,7 +33,7 @@ using filePtr = std::unique_ptr<FILE, fileDeleter>;
 
 using Magic4 = std::array<char, 4>; // fourCC
 using Buffer = std::vector<uint8_t>;
-using PackedDataHash = std::array<unsigned char, EVP_MAX_MD_SIZE>;
+using PackedDataHash = std::array<unsigned char, 64>;
 
 namespace typeSizes {
 inline constexpr uint32_t DDS_PIXELFORMAT = 32;

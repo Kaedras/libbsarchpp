@@ -4,7 +4,7 @@
 #include "utils.h"
 #include <array>
 #include <cstddef>
-#include <gsl/gsl-lite.hpp>
+#include <gsl-lite/gsl-lite.hpp>
 #include <string>
 
 using namespace std;
@@ -61,7 +61,7 @@ uint64_t CreateHashTES4(const std::filesystem::path &fileName, const bool isDire
             name = fileName.u16string();
         }
 
-        const auto length = gsl::narrow<uint32_t>(name.length());
+        const auto length = gsl_lite::narrow<uint32_t>(name.length());
 
         for (uint32_t i = 0; i < length; i++)
         {

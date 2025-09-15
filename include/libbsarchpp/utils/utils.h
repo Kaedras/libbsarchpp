@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../types.h"
 #include "../dllexport.h"
+#include "../types.h"
 #include <cstdint>
 #include <filesystem>
 #include <string>

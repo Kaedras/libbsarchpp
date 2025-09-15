@@ -15,7 +15,7 @@
 #include <exception>
 #include <execution>
 #include <format>
-#include <gsl/gsl-lite.hpp>
+#include <gsl-lite/gsl-lite.hpp>
 #include <iostream>
 #include <lz4.h>
 #include <lz4frame.h>
@@ -219,7 +219,7 @@ void Bsa::write(const std::filesystem::path &data) noexcept(false)
 
         for (const auto &c : str)
         {
-            if (fputc(gsl::narrow<uint8_t>(c), m_file.get()) == EOF)
+            if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF)
             {
                 const int error = errno;
                 throw runtime_error("Read error: "s + strerror(error));
@@ -231,7 +231,7 @@ void Bsa::write(const std::filesystem::path &data) noexcept(false)
             throw runtime_error("Read error: "s + strerror(error));
         }
     }
-    catch (const gsl::narrowing_error &ex)
+    catch (const gsl_lite::narrowing_error &ex)
     {
         throw runtime_error(ex.what());
     }
@@ -245,7 +245,7 @@ void Bsa::writeStringLen8(const std::filesystem::path &data, const bool terminat
         static bool shouldUseBackslashes = useBackslashes();
 
         u16string str = data.generic_u16string();
-        auto length = gsl::narrow<uint8_t>(str.length());
+        auto length = gsl_lite::narrow<uint8_t>(str.length());
         if (terminated)
         {
             length++;
@@ -260,7 +260,7 @@ void Bsa::writeStringLen8(const std::filesystem::path &data, const bool terminat
 
         for (const auto &c : str)
         {
-            if (fputc(gsl::narrow<uint8_t>(c), m_file.get()) == EOF)
+            if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF)
             {
                 const int error = errno;
                 throw runtime_error("Error writing to file: "s + strerror(error));
@@ -275,7 +275,7 @@ void Bsa::writeStringLen8(const std::filesystem::path &data, const bool terminat
             }
         }
     }
-    catch (const gsl::narrowing_error &ex)
+    catch (const gsl_lite::narrowing_error &ex)
     {
         throw runtime_error(ex.what());
     }
@@ -293,7 +293,7 @@ void Bsa::writeStringLen16(const std::filesystem::path &data) noexcept(false)
         static bool shouldUseBackslashes = useBackslashes();
 
         u16string str = data.generic_u16string();
-        write(gsl::narrow<uint16_t>(str.length()));
+        write(gsl_lite::narrow<uint16_t>(str.length()));
 
         // we use forward slashes internally, so we have to change them when writing
         if (shouldUseBackslashes)
@@ -303,14 +303,14 @@ void Bsa::writeStringLen16(const std::filesystem::path &data) noexcept(false)
 
         for (const auto &c : str)
         {
-            if (fputc(gsl::narrow<uint8_t>(c), m_file.get()) == EOF)
+            if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF)
             {
                 const int error = errno;
                 throw runtime_error("Write error: "s + strerror(error));
             }
         }
     }
-    catch (const gsl::narrowing_error &ex)
+    catch (const gsl_lite::narrowing_error &ex)
     {
         throw runtime_error(ex.what());
     }
@@ -859,8 +859,8 @@ void Bsa::createArchiveTES3(std::vector<std::filesystem::path> &fileList) noexce
                    len;                                                       // Filename records
 
     // stored as minus 12 (for header size)
-    headerTES3.hashOffset = gsl::narrow<uint32_t>(m_dataOffset - sizeof(Magic4) - sizeof(HeaderTES3));
-    headerTES3.fileCount = gsl::narrow<uint32_t>(fileList.size());
+    headerTES3.hashOffset = gsl_lite::narrow<uint32_t>(m_dataOffset - sizeof(Magic4) - sizeof(HeaderTES3));
+    headerTES3.fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
 
     // offset to files data
     m_dataOffset = m_dataOffset + 8 * m_files.size(); // Hash table
@@ -991,7 +991,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
             m_files.emplace_back(folderTES4);
 
             // calculate folder names length
-            headerTES4.folderNamesLength += gsl::narrow<uint32_t>(
+            headerTES4.folderNamesLength += gsl_lite::narrow<uint32_t>(
                 folderTES4.name.string().length() + 1); // + terminator only, length prefix is not counted
         }
         FileTES4 fileTES4;
@@ -1006,9 +1006,9 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
         // calculate file names length
         // NOTE: u16string is required to get the correct length for non-ASCII file names
         // when using string, "dlc2mq05__0003c745_1 .fuz" length would be 26 instead of 25
-        headerTES4.fileNamesLength += gsl::narrow<uint32_t>(fileTES4.name.u16string().length() + 1);
+        headerTES4.fileNamesLength += gsl_lite::narrow<uint32_t>(fileTES4.name.u16string().length() + 1);
     }
-    headerTES4.folderCount = gsl::narrow<uint32_t>(m_files.size());
+    headerTES4.folderCount = gsl_lite::narrow<uint32_t>(m_files.size());
 
     // calculate folders offsets
     // at the end fDataOffset will hold the total size of header, folder and file records
@@ -1078,7 +1078,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path> &fileList) noexcep
         // sort files alphabetically
         sort(std::execution::par_unseq, fileList.begin(), fileList.end(), comparePaths);
 
-        getHeaderFO4().fileCount = gsl::narrow<uint32_t>(fileList.size());
+        getHeaderFO4().fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
         m_files.reserve(fileList.size());
         for (const auto &file : fileList)
         {
@@ -1532,9 +1532,9 @@ void Bsa::addFileDDS(FileFO4 *file, const Buffer &data) noexcept(false)
         // DDS file parameters
         const auto *const ddsHeader = reinterpret_cast<const DDSHeader *>(data.data());
         uint32_t offset = sizeof(DDSHeader); // offset to image data
-        file->width = gsl::narrow<uint16_t>(ddsHeader->width);
-        file->height = gsl::narrow<uint16_t>(ddsHeader->height);
-        file->numMips = gsl::narrow<uint8_t>(ddsHeader->mipMapCount);
+        file->width = gsl_lite::narrow<uint16_t>(ddsHeader->width);
+        file->height = gsl_lite::narrow<uint16_t>(ddsHeader->height);
+        file->numMips = gsl_lite::narrow<uint8_t>(ddsHeader->mipMapCount);
         // no mipmaps is equal to a single one
         if (file->numMips == 0)
         {
@@ -1567,7 +1567,7 @@ void Bsa::addFileDDS(FileFO4 *file, const Buffer &data) noexcept(false)
         ddsInfo.height = file->height;
         ddsInfo.mipMaps = file->numMips;
 
-        const auto count = gsl::narrow<uint16_t>(getDDSMipChunkCount(ddsInfo));
+        const auto count = gsl_lite::narrow<uint16_t>(getDDSMipChunkCount(ddsInfo));
 
         file->texChunks.reserve(count);
 
@@ -1609,7 +1609,7 @@ void Bsa::addFileDDS(FileFO4 *file, const Buffer &data) noexcept(false)
             MipSize /= 4;
         }
     }
-    catch (const gsl::narrowing_error &ex)
+    catch (const gsl_lite::narrowing_error &ex)
     {
         throw runtime_error(ex.what());
     }
@@ -1857,7 +1857,7 @@ void Bsa::decompressData(const Buffer &compressed, uint8_t *uncompressed, uint32
             uncompress(uncompressed,
                        reinterpret_cast<uLongf *>(&dstSize),
                        compressed.data(),
-                       gsl::narrow<uLong>(compressed.size()));
+                       gsl_lite::narrow<uLong>(compressed.size()));
 
             if (dstSize != uncompressedSize)
             {
@@ -1919,8 +1919,8 @@ void Bsa::decompressData(const Buffer &compressed, uint8_t *uncompressed, uint32
         case lz4Block:
             LZ4_decompress_safe(reinterpret_cast<const char *>(compressed.data()),
                                 reinterpret_cast<char *>(uncompressed),
-                                gsl::narrow<int>(compressed.size()),
-                                gsl::narrow<int>(uncompressedSize));
+                                gsl_lite::narrow<int>(compressed.size()),
+                                gsl_lite::narrow<int>(uncompressedSize));
 
             break;
     }
@@ -2095,14 +2095,14 @@ void Bsa::save() noexcept(false)
             {
                 const auto &file = get<FileTES3>(_file);
                 write(file.size);
-                write(file.offset - gsl::narrow<uint32_t>(m_dataOffset)); // offsets are relative
+                write(file.offset - gsl_lite::narrow<uint32_t>(m_dataOffset)); // offsets are relative
             }
             // Archive directory/name offsets
             uint32_t j = 0;
             for (const auto &file : m_files)
             {
                 write(j);
-                j += gsl::narrow<uint32_t>(get<FileTES3>(file).name.string().length()) + 1; // including terminator
+                j += gsl_lite::narrow<uint32_t>(get<FileTES3>(file).name.string().length()) + 1; // including terminator
             }
             // Filename records
             for (const auto &file : m_files)
@@ -2153,7 +2153,7 @@ void Bsa::save() noexcept(false)
                 }
                 else
                 {
-                    write(gsl::narrow<uint32_t>(folder.offset));
+                    write(gsl_lite::narrow<uint32_t>(folder.offset));
                 }
             }
             // folder names and file records
@@ -2278,7 +2278,7 @@ void Bsa::save() noexcept(false)
                 write(file.ext);
                 write(file.dirHash);
                 write(file.unknownTex);
-                write(gsl::narrow<uint8_t>(file.texChunks.size()));
+                write(gsl_lite::narrow<uint8_t>(file.texChunks.size()));
                 write(sizes::chunkHeader);
                 write(file.height);
                 write(file.width);
@@ -2351,7 +2351,7 @@ Buffer Bsa::extractFileData(const FileRecord_t &fileRecord) noexcept(false)
     {
         case TES3: {
             const auto *fileTES3 = get<FileTES3 *>(fileRecord);
-            seek(gsl::narrow<int64_t>(m_dataOffset + fileTES3->offset));
+            seek(gsl_lite::narrow<int64_t>(m_dataOffset + fileTES3->offset));
             retVal = read<uint8_t>(fileTES3->size);
             break;
         }
@@ -2375,7 +2375,7 @@ Buffer Bsa::extractFileData(const FileRecord_t &fileRecord) noexcept(false)
             // skip embedded file name + length prefix
             if ((m_type == FO3 || m_type == SSE) && ((header.flags & flags::archive::EMBEDNAME) != 0U))
             {
-                const auto length = gsl::narrow<uint32_t>(readStringLen(false).u16string().length());
+                const auto length = gsl_lite::narrow<uint32_t>(readStringLen(false).u16string().length());
                 size -= length + 1;
             }
 
@@ -2745,9 +2745,9 @@ void Bsa::packData(const FileRecord_t &fileRecord,
 
                 try
                 {
-                    file->offset = gsl::narrow<uint32_t>(position);
+                    file->offset = gsl_lite::narrow<uint32_t>(position);
                 }
-                catch (const gsl::narrowing_error &)
+                catch (const gsl_lite::narrowing_error &)
                 {
                     // xEdit allows creating archives > 4GiB which I assume is an error
                     m_abort.store(true);
@@ -2763,10 +2763,10 @@ void Bsa::packData(const FileRecord_t &fileRecord,
 
                 try
                 {
-                    file->offset = gsl::narrow<uint32_t>(position);
-                    file->size = gsl::narrow<uint32_t>(_ftelli64(m_file.get()) - position);
+                    file->offset = gsl_lite::narrow<uint32_t>(position);
+                    file->size = gsl_lite::narrow<uint32_t>(_ftelli64(m_file.get()) - position);
                 }
-                catch (const gsl::narrowing_error &)
+                catch (const gsl_lite::narrowing_error &)
                 {
                     // xEdit allows creating archives > 4GiB which I assume is an error
                     throw runtime_error("Error packing data: Archive exceeds 4GiB");
@@ -2787,7 +2787,7 @@ void Bsa::packData(const FileRecord_t &fileRecord,
                 file->size = uncompressedSize;
                 if (compress)
                 {
-                    file->packedSize = gsl::narrow<uint32_t>(size);
+                    file->packedSize = gsl_lite::narrow<uint32_t>(size);
                 }
                 break;
             }
@@ -2799,7 +2799,7 @@ void Bsa::packData(const FileRecord_t &fileRecord,
                 chunk->size = uncompressedSize;
                 if (compress)
                 {
-                    chunk->packedSize = gsl::narrow<uint32_t>(size);
+                    chunk->packedSize = gsl_lite::narrow<uint32_t>(size);
                 }
                 break;
             }
@@ -2832,10 +2832,10 @@ Buffer Bsa::compressData(const uint8_t *data, size_t length) const noexcept(fals
     {
         case zlib: {
             // get worst case output size
-            uLong size = compressBound(gsl::narrow<uLong>(length));
+            uLong size = compressBound(gsl_lite::narrow<uLong>(length));
             dst.resize(size);
 
-            int result = compress2(dst.data(), &size, data, gsl::narrow<uLong>(length), m_compressionLevel);
+            int result = compress2(dst.data(), &size, data, gsl_lite::narrow<uLong>(length), m_compressionLevel);
 
             if (result != Z_OK)
             {
@@ -2892,7 +2892,7 @@ Buffer Bsa::compressData(const uint8_t *data, size_t length) const noexcept(fals
                 throw runtime_error("Compression error: data size > LZ4MAX_INPUT_SIZE");
             }
 
-            const int srcSize = gsl::narrow<int>(length);
+            const int srcSize = gsl_lite::narrow<int>(length);
 
             // get worst case output size
             const int bound = LZ4_compressBound(srcSize);
@@ -3004,9 +3004,9 @@ DDSInfo Bsa::getDDSInfo(const std::filesystem::path &filePath) const noexcept(fa
     }
 
     DDSInfo info;
-    info.height = gsl::narrow<int32_t>(header.height);
-    info.width = gsl::narrow<int32_t>(header.width);
-    info.mipMaps = gsl::narrow<int32_t>(header.mipMapCount);
+    info.height = gsl_lite::narrow<int32_t>(header.height);
+    info.width = gsl_lite::narrow<int32_t>(header.width);
+    info.mipMaps = gsl_lite::narrow<int32_t>(header.mipMapCount);
 
     return info;
 }

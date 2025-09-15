@@ -1,6 +1,5 @@
 #pragma once
 
-#include "directx/dxgiformat.h"
 #include "dllexport.h"
 #include "enums.h"
 #include "types.h"
@@ -10,10 +9,10 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <directx/dxgiformat.h>
 #include <filesystem>
 #include <functional>
 #include <mutex>
-#include <openssl/types.h>
 #include <optional>
 #include <stdexcept>
 #include <string>
