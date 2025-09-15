@@ -157,7 +157,7 @@ TEST(Misc, Sorting)
     ASSERT_EQ(paths.size(), target.size())
         << "Paths and Target are of unequal length, " << paths.size() << ", " << target.size();
 
-    for (int i = 0; i < paths.size(); i++)
+    for (size_t i = 0; i < paths.size(); i++)
     {
         SCOPED_TRACE(i);
         ASSERT_EQ(paths[i], target[i]);
@@ -182,7 +182,7 @@ TEST(Misc, IterateFiles)
 
 TEST(GSL, exceptionOnNarrow)
 {
-    EXPECT_THROW(auto tmp = gsl::narrow<int8_t>(200), gsl::narrowing_error);
+    EXPECT_THROW([[maybe_unused]] auto tmp = gsl::narrow<int8_t>(200), gsl::narrowing_error);
 }
 
 TEST(Hash, TES3)
