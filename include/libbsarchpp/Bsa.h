@@ -22,6 +22,9 @@
 
 static_assert(std::endian::native == std::endian::little);
 
+// forward declaration
+typedef struct evp_md_st EVP_MD;
+
 namespace libbsarchpp {
 
 using std::string_literals::operator""s;
