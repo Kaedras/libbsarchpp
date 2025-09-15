@@ -4,7 +4,7 @@ This is a reimplementation of
 xEdit's [BSArchive](https://github.com/TES5Edit/TES5Edit/blob/1fcec21b354786fd6e023d1d38360770557e5a74/Core/wbBSArchive.pas)
 in C++ with a focus on cross-platform compatibility. It has been tested
 on Linux and Windows.
-For the most part I just copied the Delphi code, converted it to C++, and then made some modifications.
+For the most part, I just copied the Delphi code, converted it to C++, and then made some modifications.
 
 ## Limitations / differences compared to xEdit
 
@@ -13,7 +13,7 @@ For the most part I just copied the Delphi code, converted it to C++, and then m
     - FO4 VR: extracting "Fallout4 - Misc - Debug.ba2" will create "scripts/Hardcore" directory, using xEdit may
       create "scripts/hardcore" instead.
 - Multithreaded packing produces indeterministic results, as the file order in the data section may change, which causes
-  the unit tests to fail, but improves performance. xEdit also exhibits this behaviour.
+  the unit tests to fail but improves performance. xEdit also exhibits this behaviour.
 - LZ4 compressed archives (SSE, SkyrimVR, SFdds) differ from ones created with xEdit (it apparently uses lz4 r127,
   which is almost a decade old).
 - xEdit can create bsa archives > 4GiB, while libbsarchpp will throw an exception because the file offset (uint32_t)
@@ -161,9 +161,9 @@ using [Doxygen](https://github.com/doxygen/doxygen).
 The unit tests unpack and repack the bsa/ba2 files of most Bethesda games and validate the checksums.
 Run ``ccmake build`` or ``cmake-gui build`` after the initial cmake configuration and set at least TESTS_DATADIR and
 TESTS_WORKDIR. You can enable/disable individual games and set the data paths for each game.
-If no game specific directories are provided, they default to ``TESTS_DATADIR/<game name>`` e.g. ``/opt/archives/tes3``
+If no game-specific directories are provided, they default to ``TESTS_DATADIR/<game name>`` e.g. ``/opt/archives/tes3``
 
-The checksums were created by unpacking game files, and repacking them with xEdit.
+The checksums were created by unpacking game files and repacking them with xEdit.
 The scripts used can be found in tests/utils.
 
 ### Notes:
@@ -172,7 +172,7 @@ The scripts used can be found in tests/utils.
 - Linux specific:
     - You may get ENOSPC (No space left on device) if you leave the work directory at the default value and your distro
       uses tmpfs for temporary files.
-    - To improve performance you should consider setting the work directory to tmpfs for improved performance (10GiB
+    - To improve performance, you should consider setting the work directory to tmpfs for improved performance (10GiB
       recommended if running tests for Skyrim and later titles, 20GiB for Starfield) by running
       ``sudo mount -t tmpfs -o size=20g tmpfs <path>``. There does not seem to be a tmpfs equivalent for Windows.
 
