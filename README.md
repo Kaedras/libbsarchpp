@@ -26,6 +26,7 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 - zlib (tested with 1.3.1)
 - GTest if building tests (tested with 1.14.0 and 1.15.2)
 - C++23 compatible compiler (e.g. GCC 14, clang 18, Visual Studio 2022)
+- when using GCC or clang: TBB 2022.1.0
 
 ## Building
 

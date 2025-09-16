@@ -1,5 +1,15 @@
 {
-  "dependencies" : [ "directx-headers", "lz4", "openssl", "zlib", "gsl-lite" ],
+  "dependencies" : [
+    "directx-headers",
+    "gsl-lite",
+    "lz4",
+    "openssl",
+    {
+      "name": "tbb",
+      "platform": "linux"
+    },
+    "zlib"
+  ],
   "features" : {
     "testing" : {
       "description" : "Build tests.",
