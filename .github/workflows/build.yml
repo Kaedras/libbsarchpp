@@ -23,6 +23,11 @@ jobs:
 
       - uses: actions/checkout@v5
 
+      - if: runner.os == 'Linux'
+        name: Install build dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y libtbb-dev
+
       - name: Configure libbsarchpp build
         run: |
           cmake --preset ${{ matrix.preset }} "-DCMAKE_INSTALL_PREFIX=install"
