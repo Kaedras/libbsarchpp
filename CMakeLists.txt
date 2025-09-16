@@ -13,7 +13,7 @@ if (USE_VCPKG)
     find_package(OpenSSL REQUIRED)
     find_package(lz4 CONFIG CONFIG REQUIRED)
     find_package(ZLIB REQUIRED)
-    find_package(mo2-dxgiformat-header CONFIG REQUIRED)
+    find_package(directx-headers CONFIG REQUIRED)
 else()
     # fetch dxgiformat.h
     file(DOWNLOAD
@@ -54,7 +54,7 @@ target_include_directories(libbsarchpp PRIVATE
 
 if (USE_VCPKG)
     target_link_libraries(libbsarchpp PRIVATE
-        gsl::gsl-lite gsl::gsl-lite-v1 OpenSSL::SSL OpenSSL::Crypto lz4::lz4 ZLIB::ZLIB mo2::dxgiformat-header)
+        gsl::gsl-lite gsl::gsl-lite-v1 OpenSSL::SSL OpenSSL::Crypto lz4::lz4 ZLIB::ZLIB Microsoft::DirectX-Headers)
 else ()
     target_link_libraries(libbsarchpp PRIVATE ssl lz4 z)
 endif ()

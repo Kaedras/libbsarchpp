@@ -1,5 +1,5 @@
 {
-  "dependencies" : [ "lz4", "openssl", "zlib", "gsl-lite", "mo2-dxgiformat-header" ],
+  "dependencies" : [ "directx-headers", "lz4", "openssl", "zlib", "gsl-lite" ],
   "features" : {
     "testing" : {
       "description" : "Build tests.",
@@ -11,14 +11,6 @@
       "kind" : "git",
       "repository" : "https://github.com/Microsoft/vcpkg",
       "baseline" : "c8582b4d83dbd36e1bebc08bf166b5eb807996b0"
-    },
-    "registries": [
-      {
-        "kind": "git",
-        "repository": "https://github.com/Kaedras/vcpkg-registry",
-        "baseline": "81ddb7d30417c0e8ed86682968674447b3d734b1",
-        "packages": [ "mo2-*" ]
-      }
-    ]
+    }
   }
 }
