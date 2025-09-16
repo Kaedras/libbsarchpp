@@ -28,12 +28,6 @@
     },
     {
       "name": "vcpkg-dev",
-      "cacheVariables": {
-        "VCPKG_MANIFEST_FEATURES": {
-          "type": "STRING",
-          "value": "testing"
-        }
-      },
       "hidden": true,
       "inherits": ["vcpkg"]
     },
