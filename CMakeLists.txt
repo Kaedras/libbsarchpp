@@ -8,27 +8,11 @@ set(CMAKE_CXX_STANDARD 23)
 add_library(libbsarchpp SHARED)
 
 find_package(OpenSSL REQUIRED)
+find_package(ZLIB REQUIRED)
 
 # USE_VCPKG gets set by CMakePresets
 if (USE_VCPKG)
-    find_package(gsl-lite CONFIG REQUIRED)
     find_package(lz4 CONFIG REQUIRED)
-    find_package(ZLIB REQUIRED)
-    find_package(directx-headers CONFIG REQUIRED)
-else()
-    # fetch dxgiformat.h
-    file(DOWNLOAD
-            https://github.com/microsoft/DirectX-Headers/raw/refs/tags/v1.611.0/include/directx/dxgiformat.h
-            deps/directx/dxgiformat.h
-            EXPECTED_HASH SHA512=004be604e28a60f8f6195144e678a82d10894fc4d1cfea10e7efa72eb7d7cd15efbd03d21ec80a65579c00eec8aa77b09809ade3f1b9198901757ebe7a63401c
-    )
-    # fetch gsl-lite.hpp
-    file(DOWNLOAD
-            https://github.com/gsl-lite/gsl-lite/raw/refs/tags/v1.0.1/include/gsl-lite/gsl-lite.hpp
-            deps/gsl-lite/gsl-lite.hpp
-            EXPECTED_HASH SHA512=54e49559d3b07b1523589428d8c3864a5865b290d8330bae8b29b174469bf56cac41d5e2ed6cfb5fb7cc22adb372f4660938df6dda889c058d5fa39d2f3f7332
-    )
-    target_include_directories(libbsarchpp PRIVATE ${CMAKE_BINARY_DIR}/deps)
 endif ()
 
 target_sources(libbsarchpp
@@ -52,15 +36,18 @@ target_sources(libbsarchpp
 )
 target_include_directories(libbsarchpp PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils
+        ${CMAKE_CURRENT_SOURCE_DIR}/deps
+)
 
 target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
+target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB)
+
 if (USE_VCPKG)
-    target_link_libraries(libbsarchpp PRIVATE
-        gsl::gsl-lite gsl::gsl-lite-v1 OpenSSL::SSL OpenSSL::Crypto lz4::lz4 ZLIB::ZLIB Microsoft::DirectX-Headers)
+    target_link_libraries(libbsarchpp PRIVATE lz4::lz4)
 else ()
-    target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto lz4 z)
+    target_link_libraries(libbsarchpp PRIVATE lz4)
 endif ()
 
 set_target_properties(libbsarchpp PROPERTIES

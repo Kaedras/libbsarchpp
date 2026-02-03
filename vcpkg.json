@@ -1,7 +1,5 @@
 {
   "dependencies" : [
-    "directx-headers",
-    "gsl-lite",
     "lz4",
     "openssl",
     "zlib"
