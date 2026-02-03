@@ -389,19 +389,19 @@ void Bsa::setCompressionLevel(int value) noexcept
 {
     if (m_compressionType == zlib)
     {
-        // check if compression level is valid
+        // check if the compression level is valid
         if (value >= Z_BEST_SPEED && value <= Z_BEST_COMPRESSION)
         {
             m_compressionLevel = value;
         }
         else if (m_compressionLevel > Z_BEST_COMPRESSION)
         {
-            // set to Z_BEST_COMPRESSION if value is too large
+            // set to Z_BEST_COMPRESSION if the value is too large
             m_compressionLevel = Z_BEST_COMPRESSION;
         }
         else
         {
-            // set to Z_DEFAULT_COMPRESSION if value is too small
+            // set to Z_DEFAULT_COMPRESSION if the value is too small
             m_compressionLevel = Z_DEFAULT_COMPRESSION;
         }
     }
@@ -433,7 +433,7 @@ void Bsa::readFO4FileTable() noexcept(false)
         // read file names
         seek(headerFO4.fileTableOffset);
 
-        // this map stores all directories, key is lowercase
+        // this map stores all directories, the key is lowercase
         unordered_map<string, string> pathMap;
 
         for (auto &_file : m_files)
@@ -445,7 +445,7 @@ void Bsa::readFO4FileTable() noexcept(false)
             size_t oldPos = 0;
             size_t pos = 0;
 
-            // iterate over all subfolders starting at root directory
+            // iterate over all subfolders starting at the root directory
             // if a folder already exists in pathMap replace the path with the one stored there
             while (pos != string::npos)
             {
@@ -457,7 +457,7 @@ void Bsa::readFO4FileTable() noexcept(false)
                 const auto [iterator, wasInserted] = pathMap.try_emplace(ToLower(subStr), subStr);
                 if (!wasInserted)
                 {
-                    // directory already exists in map
+                    // directory already exists in the map
                     size_t charsToReplace = pos - oldPos;
                     parentPath.replace(oldPos, charsToReplace, iterator->second, oldPos, charsToReplace);
                 }
@@ -497,7 +497,7 @@ void Bsa::readBa2GNRL() noexcept(false)
         file.packedSize = read<uint32_t>();
         file.size = read<uint32_t>();
 
-        // next value is a constant, so we can use it to check for errors
+        // the next value is a constant, so we can use it to check for errors
         if (auto footer = read<uint32_t>(); footer != FileFO4Footer)
         {
             throw runtime_error(format("Read error: expected 0xBAADF00D, got {:#x}", footer));
@@ -536,7 +536,7 @@ void Bsa::readBa2DX10() noexcept(false)
 
         auto texChunkSize = read<uint8_t>();
         file.texChunks.reserve(texChunkSize);
-        // next value is a constant, so we can use it to check for errors
+        // the next value is a constant, so we can use it to check for errors
         if (auto chunkHeaderSize = read<uint16_t>(); chunkHeaderSize != sizes::chunkHeader)
         {
             throw runtime_error(format("Read error: expected 0x0018, got {:#x}", sizes::chunkHeader));
@@ -550,7 +550,7 @@ void Bsa::readBa2DX10() noexcept(false)
         for (uint8_t j = 0; j < texChunkSize; j++)
         {
             file.texChunks.emplace_back(read<TexChunkRec>());
-            // next value is a constant, so we can use it to check for errors
+            // the next value is a constant, so we can use it to check for errors
             if (auto footer = read<uint32_t>(); footer != FileFO4Footer)
             {
                 throw runtime_error(format("Read error: expected 0xBAADF00D, got {:#x}", footer));
@@ -670,7 +670,7 @@ void Bsa::determineArchiveVersion() noexcept(false)
         case headerVersions::FO4v1:
         case headerVersions::FO4NGv7:
         case headerVersions::FO4NGv8: {
-            // read ahead to get subtype
+            // read ahead to get the subtype
             auto magic = read<uint32_t>();
             if (magic == magic::GNRL)
             {
@@ -991,7 +991,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
 
     // calculate folders offsets
     // at the end fDataOffset will hold the total size of header, folder and file records
-    // in other words the start of files data
+    // in other words, the start of files data
     m_dataOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4) + 16 * m_files.size();
     // SSE folder record is 8 bytes larger
     if (m_type == SSE)
@@ -1018,7 +1018,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
     {
         headerTES4.fileFlags &= ~flags::file::MISC;
     }
-    // embedded names in texture only archives
+    // embedded names in texture-only archives
     // except Skyrim SE: crashing engine bug if texture is uncompressed and file name is embedded
     if (headerTES4.fileFlags == flags::file::DDS && m_type != SSE)
     {
@@ -1029,7 +1029,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
     {
         headerTES4.flags |= flags::archive::STARTUPSTR;
     }
-    // retain name flag in archives with sounds
+    // retain the name flag in archives with sounds
     if ((headerTES4.fileFlags & flags::file::WAV) != 0)
     {
         headerTES4.flags |= flags::archive::RETAINNAME;
@@ -1039,7 +1039,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
     {
         headerTES4.fileFlags &= ~(flags::file::XML | flags::file::TXT | flags::file::FNT);
     }
-    // set compression flag if needed
+    // set the compression flag if needed
     if (m_compressed)
     {
         headerTES4.flags |= flags::archive::COMPRESS;
@@ -1097,7 +1097,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path> &fileList) noexcep
                 throw runtime_error(format("{} was called with wrong archive type {}", __FUNCTION__, (int) m_type));
         }
 
-        // file records have fixed length in general archive
+        // file records have fixed length in a general archive
         if (m_type == FO4 || m_type == SF)
         {
             m_dataOffset += sizes::fileRecordGNRL * m_files.size();
@@ -1289,7 +1289,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path &filePath) noex
     fs::path dir;
     if (!filePath.has_extension())
     {
-        // treat as directory
+        // treat as a directory
         dir = filePath;
     }
     else
@@ -1301,7 +1301,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path &filePath) noex
     for (auto &_folder : m_files)
     {
         auto &folder = get<FolderTES4>(_folder);
-        // since table is sorted by hash, we can abort when our hash is lesser
+        // since the table is sorted by hash, we can abort when our hash is lesser
         if (dirHash < folder.hash)
         {
             return nullptr;
@@ -1312,7 +1312,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path &filePath) noex
             const uint64_t fileHash = CreateHashTES4(filePath.filename(), false);
             for (uint32_t j = 0; j < folder.fileCount; j++)
             {
-                // since table is sorted by hash, we can abort when our hash is lesser
+                // since the table is sorted by hash, we can abort when our hash is lesser
                 if (fileHash < folder.files[j].hash)
                 {
                     return nullptr;
@@ -1541,7 +1541,7 @@ void Bsa::addFileDDS(FileFO4 *file, const Buffer &data) noexcept(false)
         }
         DDSInfo ddsInfo;
 
-        // number of chunks to store in file record
+        // number of chunks to store in the file record
         ddsInfo.width = file->width;
         ddsInfo.height = file->height;
         ddsInfo.mipMaps = file->numMips;
@@ -1562,7 +1562,7 @@ void Bsa::addFileDDS(FileFO4 *file, const Buffer &data) noexcept(false)
             }
             else
             {
-                // last chunk stores all remaining mipmaps
+                // the last chunk stores all remaining mipmaps
                 texChunk.endMip = file->numMips - 1;
                 MipSize = data.size() - offset;
             }
@@ -2054,7 +2054,7 @@ void Bsa::save() noexcept(false)
     switch (m_type)
     {
         case TES3: {
-            // check that all files from files table have saved data
+            // check that all files from the files table have saved data
             for (const auto &_file : m_files)
             {
                 const auto &file = get<FileTES3>(_file);
@@ -2101,7 +2101,7 @@ void Bsa::save() noexcept(false)
         case TES4:
         case FO3:
         case SSE: {
-            // check that all files from files table have saved data
+            // check that all files from the files table have saved data
             for (const auto &_folder : m_files)
             {
                 const auto &folder = get<FolderTES4>(_folder);
@@ -2160,7 +2160,7 @@ void Bsa::save() noexcept(false)
         }
         case FO4:
         case SF: {
-            // check that all files from files table have saved data
+            // check that all files from the files table have saved data
             for (const auto &_file : m_files)
             {
                 const auto &file = get<FileFO4>(_file);
@@ -2215,7 +2215,7 @@ void Bsa::save() noexcept(false)
 
         case FO4dds:
         case SFdds: {
-            // check that all files from files table have saved data
+            // check that all files from the files table have saved data
             for (const auto &_file : m_files)
             {
                 const auto &file = get<FileFO4>(_file);
@@ -2708,7 +2708,7 @@ void Bsa::packData(const FileRecord_t &fileRecord,
             writeStringLen8(filePath, false);
         }
 
-        // if compressed then write uncompressed size first for Oblivion/Fallout 3/NV/Skyrim/Skyrim SE
+        // if compressed, then write uncompressed size first for Oblivion/Fallout 3/NV/Skyrim/Skyrim SE
         if ((m_type == TES4 || m_type == FO3 || m_type == SSE) && compress)
         {
             write(uncompressedSize);
@@ -2750,8 +2750,8 @@ void Bsa::packData(const FileRecord_t &fileRecord,
                     // xEdit allows creating archives > 4GiB which I assume is an error
                     throw runtime_error("Error packing data: Archive exceeds 4GiB");
                 }
-                // compress flag in Size inverts compression status from the header
-                // set it if archive's compression doesn't match file's compression
+                // the compress flag in Size inverts compression status from the header
+                // set it if archive's compression doesn't match the file's compression
                 if (m_compressed ^ compress)
                 {
                     file->size |= flags::file::SIZE_COMPRESS;
@@ -2834,7 +2834,7 @@ Buffer Bsa::compressData(const uint8_t *data, size_t length) const noexcept(fals
             {
                 if (m_compressionLevel == 0)
                 {
-                    // compression level has not been set, use default value
+                    // compression level has not been set, use the default value
                     preferences.compressionLevel = lz4CompressionLevel;
                 }
                 preferences.frameInfo.blockSizeID = LZ4F_max4MB;

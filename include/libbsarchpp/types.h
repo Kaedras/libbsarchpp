@@ -221,7 +221,7 @@ struct PackedDataInfo
 struct BsaCreationSettings
 {
     /**
-     * Enable multithreading. Increases performance, but produces indeterministic results.
+     * Enable multithreading. Increases performance but produces indeterministic results.
      */
     bool multithreaded = false;
     /**
@@ -233,7 +233,7 @@ struct BsaCreationSettings
      * Identical files will only be written once. May reduce filesize and may either reduce or increase performance.
      */
     bool shareData = false;
-    bool ignoreExtensionlessFiles = true; /**< don't add files without extensions to archive */
+    bool ignoreExtensionlessFiles = true; /**< don't add files without extensions to the archive */
     std::vector<std::string> extensionBlacklist{".exe", ".bsa", ".ba2", ".db"};
 };
 } // namespace libbsarchpp

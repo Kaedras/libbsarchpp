@@ -1,11 +1,11 @@
 #pragma once
 
-// modified version of example from https://gcc.gnu.org/wiki/Visibility
+// modified version of the example from https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
 #define DLL_PUBLIC __attribute__((dllexport))
 #else
-#define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+#define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also support this syntax.
 #endif
 #define DLL_LOCAL
 #else
