@@ -13,6 +13,10 @@ find_package(ZLIB REQUIRED)
 # USE_VCPKG gets set by CMakePresets
 if (USE_VCPKG)
     find_package(lz4 CONFIG REQUIRED)
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
+    add_library(lz4::lz4 ALIAS PkgConfig::lz4)
 endif ()
 
 target_sources(libbsarchpp
@@ -42,13 +46,7 @@ target_include_directories(libbsarchpp PRIVATE
 
 target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
-target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB)
-
-if (USE_VCPKG)
-    target_link_libraries(libbsarchpp PRIVATE lz4::lz4)
-else ()
-    target_link_libraries(libbsarchpp PRIVATE lz4)
-endif ()
+target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB lz4::lz4)
 
 set_target_properties(libbsarchpp PROPERTIES
         DEBUG_POSTFIX "d"
