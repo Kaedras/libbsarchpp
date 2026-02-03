@@ -3,7 +3,6 @@
 #include "constants.h"
 #include "enums.h"
 #include "hash.h"
-#include "timer.h"
 #include "types.h"
 #include "utils.h"
 #include <algorithm>
@@ -3057,7 +3056,6 @@ void Bsa::extract(const filesystem::path &archivePath,
                   const filesystem::path &outputDirectory,
                   const bool multithreaded) noexcept(false)
 {
-    [[maybe_unused]] timer t(format("{}", __FUNCTION__));
     Bsa bsa(archivePath, true);
     auto files = bsa.getFileList();
 
@@ -3097,7 +3095,6 @@ void Bsa::create(const std::filesystem::path &archivePath,
                  const std::filesystem::path &inputDirectory,
                  BsaCreationSettings settings) noexcept(false)
 {
-    [[maybe_unused]] timer t(format("{}", __FUNCTION__));
     if (exists(archivePath))
     {
         throw runtime_error("Archive file " + archivePath.string() + " already exists");
