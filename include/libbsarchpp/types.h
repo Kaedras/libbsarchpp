@@ -1,6 +1,5 @@
 #pragma once
 
-#include "constants.h"
 #include "enums.h"
 #include <array>
 #include <cstdint>
