@@ -7,9 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_library(libbsarchpp SHARED)
 
-if(UNIX)
-    find_package(TBB CONFIG REQUIRED)
-endif()
 find_package(OpenSSL REQUIRED)
 
 # USE_VCPKG gets set by CMakePresets
@@ -61,10 +58,6 @@ if (USE_VCPKG)
         gsl::gsl-lite gsl::gsl-lite-v1 OpenSSL::SSL OpenSSL::Crypto lz4::lz4 ZLIB::ZLIB Microsoft::DirectX-Headers)
 else ()
     target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto lz4 z)
-endif ()
-if (UNIX)
-    # tbb is required for parallelization when using gcc or clang
-    target_link_libraries(libbsarchpp PRIVATE TBB::tbb)
 endif ()
 
 set_target_properties(libbsarchpp PROPERTIES

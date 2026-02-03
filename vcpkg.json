@@ -4,10 +4,6 @@
     "gsl-lite",
     "lz4",
     "openssl",
-    {
-      "name": "tbb",
-      "platform": "linux"
-    },
     "zlib"
   ],
   "features" : {
