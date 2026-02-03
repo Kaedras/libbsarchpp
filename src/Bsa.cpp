@@ -1329,7 +1329,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path &filePath) noex
 
 void Bsa::addToFileMap(const std::filesystem::path &filePath, FilePtr_t file) noexcept(false)
 {
-    lock_guard guard(m_fileMapMtx);
+    scoped_lock guard(m_fileMapMtx);
     if (!m_fileMap.try_emplace(filePath, file).second)
     {
         throw runtime_error(format("Could not add \"{}\" to file map", filePath.string()));
@@ -3052,7 +3052,7 @@ void Bsa::extract(const filesystem::path &archivePath,
             catch (const runtime_error &ex)
             {
                 // std::terminate is called if exceptions are not caught inside for_each
-                lock_guard guard(mtx);
+                scoped_lock guard(mtx);
                 exceptions.emplace_back(ex.what());
             }
         });
@@ -3128,7 +3128,7 @@ void Bsa::create(const std::filesystem::path &archivePath,
                 catch (const runtime_error &ex)
                 {
                     // std::terminate is called if exceptions are not caught inside for_each
-                    lock_guard guard(mtx);
+                    scoped_lock guard(mtx);
                     exceptions.emplace_back(ex.what());
                 }
             });
