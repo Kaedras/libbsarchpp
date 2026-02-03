@@ -131,7 +131,7 @@ public:
      * @param data File data
      * @throw std::runtime_error
      */
-    DLL_PUBLIC void addFile(const std::filesystem::path &filePath, Buffer &data) noexcept(false);
+    DLL_PUBLIC void addFile(const std::filesystem::path &filePath, const Buffer &data) noexcept(false);
 
     /**
      * @brief Returns a pointer to the file data for the specified path.

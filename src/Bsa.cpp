@@ -1697,7 +1697,7 @@ DXGI_FORMAT Bsa::getDxgiFormat(const Buffer &data) noexcept(false)
     }
 }
 
-void Bsa::addFile(const std::filesystem::path &filePath, Buffer &data) noexcept(false)
+void Bsa::addFile(const std::filesystem::path &filePath, const Buffer &data) noexcept(false)
 {
     if (m_abort.load())
     {
