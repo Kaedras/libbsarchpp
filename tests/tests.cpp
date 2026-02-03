@@ -13,7 +13,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
-#include <gsl/gsl-lite.hpp>
+#include <gsl-lite/gsl-lite.hpp>
 #include <gtest/gtest.h>
 #include <iomanip>
 #include <openssl/crypto.h>
@@ -182,7 +182,7 @@ TEST(Misc, IterateFiles)
 
 TEST(GSL, exceptionOnNarrow)
 {
-    EXPECT_THROW([[maybe_unused]] auto tmp = gsl::narrow<int8_t>(200), gsl::narrowing_error);
+    EXPECT_THROW([[maybe_unused]] auto tmp = gsl_lite::narrow<int8_t>(200), gsl_lite::narrowing_error);
 }
 
 TEST(Hash, TES3)

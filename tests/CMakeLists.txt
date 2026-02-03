@@ -57,7 +57,7 @@ add_executable(
 )
 
 configure_file(settings.h.in settings.h @ONLY)
-target_include_directories(tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../deps")
 
 set_target_properties(tests PROPERTIES CXX_STANDARD 23)
 target_link_libraries(
