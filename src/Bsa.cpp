@@ -1094,7 +1094,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path> &fileList) noexcep
             case SF: m_dataOffset += sizeof(HeaderSF); break;
             case SFdds: m_dataOffset += sizeof(HeaderSFdds); break;
             default:
-                throw runtime_error(format("{} was called with wrong archive type {}", __FUNCTION__, (int) m_type));
+                throw runtime_error(format("createArchiveFO4 was called with wrong archive type {}", static_cast<int>(m_type)));
         }
 
         // file records have fixed length in a general archive
@@ -1872,10 +1872,10 @@ void Bsa::decompressData(const Buffer &compressed, uint8_t *uncompressed, uint32
             while (srcPtr < srcEnd && result != 0)
             {
                 size_t dstSize = uncompressedSize;
-                size_t srcSize = (const char *) srcEnd - (const char *) srcPtr;
+                size_t srcSize = static_cast<const char*>(srcEnd) - static_cast<const char*>(srcPtr);
                 result = LZ4F_decompress(dctx.get(), uncompressed, &dstSize, srcPtr, &srcSize, nullptr);
                 /* Update input */
-                srcPtr = (const char *) srcPtr + srcSize;
+                srcPtr = static_cast<const char*>(srcPtr) + srcSize;
             }
 
             if (LZ4F_isError(result) != 0U)
