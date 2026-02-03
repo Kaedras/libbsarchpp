@@ -581,14 +581,14 @@ void Bsa::readArchiveTes3() noexcept(false)
     // read names
     for (auto &_file : m_files)
     {
-        auto &file = std::get<FileTES3>(_file);
+        auto &file = get<FileTES3>(_file);
         file.name = read<fs::path>();
         addToFileMap(file.name, &file);
     }
     // read hashes
     for (auto &file : m_files)
     {
-        std::get<FileTES3>(file).hash = read<uint64_t>();
+        get<FileTES3>(file).hash = read<uint64_t>();
     }
     // remember binary data offset since stored files offsets are relative
     m_dataOffset = _ftelli64(m_file.get());
@@ -812,7 +812,7 @@ void Bsa::createArchiveTES3(std::vector<std::filesystem::path> &fileList) noexce
     }
 
     // sort by hash
-    sort(std::execution::par_unseq, fileList.begin(), fileList.end(), [&hashMap](const fs::path &a, const fs::path &b) {
+    sort(execution::par_unseq, fileList.begin(), fileList.end(), [&hashMap](const fs::path &a, const fs::path &b) {
         return hashMap.at(a) < hashMap.at(b);
     });
 
@@ -845,7 +845,7 @@ void Bsa::createArchiveTES3(std::vector<std::filesystem::path> &fileList) noexce
     m_dataOffset = m_dataOffset + 8 * m_files.size(); // Hash table
 
     // files are stored alphabetically in the data section of vanilla archives
-    sort(std::execution::par_unseq, fileList.begin(), fileList.end(), [](const fs::path &a, const fs::path &b) {
+    sort(execution::par_unseq, fileList.begin(), fileList.end(), [](const fs::path &a, const fs::path &b) {
         return a.string() < b.string();
     });
 }
@@ -862,7 +862,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
     headerTES4.fileNamesLength = 0;
 
     // path, directory hash, file hash
-    std::unordered_map<fs::path, pair<uint64_t, uint64_t>> hashMap;
+    unordered_map<fs::path, pair<uint64_t, uint64_t>> hashMap;
 
     // directories and files must be sorted by their hashes
     for (const auto &file : fileList)
@@ -941,7 +941,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path> &fileList) noexce
     }
 
     // sort files by hash
-    sort(std::execution::par_unseq, fileList.begin(), fileList.end(), [&hashMap](const fs::path &a, const fs::path &b) {
+    sort(execution::par_unseq, fileList.begin(), fileList.end(), [&hashMap](const fs::path &a, const fs::path &b) {
         const auto &hashA = hashMap.at(a);
         const auto &hashB = hashMap.at(b);
         if (hashA.first != hashB.first)
@@ -1055,7 +1055,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path> &fileList) noexcep
     try
     {
         // sort files alphabetically
-        sort(std::execution::par_unseq, fileList.begin(), fileList.end(), comparePaths);
+        sort(execution::par_unseq, fileList.begin(), fileList.end(), comparePaths);
 
         getHeaderFO4().fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
         m_files.reserve(fileList.size());
@@ -1067,7 +1067,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path> &fileList) noexcep
             }
 
             fs::path name = file.filename().stem();
-            std::string ext = file.extension().string();
+            string ext = file.extension().string();
             // remove leading '.'
             if (ext[0] == '.')
             {
@@ -1133,7 +1133,7 @@ Bsa::Bsa(const std::filesystem::path &archivePath,
          bool multithreaded) noexcept(false)
     : m_existingArchive(false)
     , m_type(type)
-    , m_ddsBasePath(ddsBasePath.value_or(std::filesystem::path()))
+    , m_ddsBasePath(ddsBasePath.value_or(fs::path()))
     , m_compressed(compressed)
     , m_shareData(shareData)
     , m_multithreaded(multithreaded)
@@ -3029,7 +3029,7 @@ HeaderFO4 &Bsa::getHeaderFO4() noexcept(false)
     {
         return get<HeaderSFdds>(m_header).fo4Header;
     }
-    throw std::runtime_error("Archive does not contain a FO4 Header");
+    throw runtime_error("Archive does not contain a FO4 Header");
 }
 
 void Bsa::extract(const filesystem::path &archivePath,
@@ -3044,7 +3044,7 @@ void Bsa::extract(const filesystem::path &archivePath,
         vector<string> exceptions;
         mutex mtx;
 
-        for_each(std::execution::par, files.begin(), files.end(), [&](const fs::path &file) {
+        for_each(execution::par, files.begin(), files.end(), [&](const fs::path &file) {
             try
             {
                 bsa.extractFile(file, outputDirectory / file);
@@ -3120,7 +3120,7 @@ void Bsa::create(const std::filesystem::path &archivePath,
         {
             vector<string> exceptions;
             mutex mtx;
-            for_each(std::execution::par, files.begin(), files.end(), [&](const auto &file) {
+            for_each(execution::par, files.begin(), files.end(), [&](const auto &file) {
                 try
                 {
                     bsa.addFile(inputDirectory, inputDirectory / file);

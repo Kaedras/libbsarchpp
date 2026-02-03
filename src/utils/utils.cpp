@@ -40,7 +40,7 @@ Magic4 StringToMagic(const std::string &str) noexcept
 
 std::string MagicToString(const Magic4 &magic) noexcept
 {
-    std::string str;
+    string str;
     for (const char c : magic)
     {
         str += c;
@@ -50,7 +50,7 @@ std::string MagicToString(const Magic4 &magic) noexcept
 
 std::string MagicToString(const uint32_t &value) noexcept
 {
-    std::string str;
+    string str;
     str += static_cast<char>(value & 0xFF);
     str += static_cast<char>(value >> 8 & 0xFF);
     str += static_cast<char>(value >> 16 & 0xFF);
@@ -72,15 +72,15 @@ std::string ToLower(const std::filesystem::path &str) noexcept
 
 void ToLowerInline(std::string &str) noexcept
 {
-    std::ranges::transform(str, str.begin(), ::tolower);
+    ranges::transform(str, str.begin(), ::tolower);
 }
 
 void normalizePath(std::string &str) noexcept
 {
     // replace '/' with '\\'
-    std::ranges::replace(str, '/', '\\');
+    ranges::replace(str, '/', '\\');
     // change string to lower characters
-    std::ranges::transform(str, str.begin(), ::tolower);
+    ranges::transform(str, str.begin(), ::tolower);
 }
 
 void changeSlashesToBackslashes(std::u16string &str) noexcept
