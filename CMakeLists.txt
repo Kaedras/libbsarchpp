@@ -37,6 +37,7 @@ target_sources(libbsarchpp
         src/types.cpp
         src/hash.cpp
         src/utils/utils.cpp
+        src/pch.h
         PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -52,6 +53,8 @@ target_sources(libbsarchpp
 target_include_directories(libbsarchpp PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp
         ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils)
+
+target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
 if (USE_VCPKG)
     target_link_libraries(libbsarchpp PRIVATE

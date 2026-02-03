@@ -5,26 +5,6 @@
 #include "hash.h"
 #include "types.h"
 #include "utils.h"
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <compare>
-#include <cstring>
-#include <directx/dxgiformat.h>
-#include <exception>
-#include <execution>
-#include <format>
-#include <gsl-lite/gsl-lite.hpp>
-#include <iostream>
-#include <lz4.h>
-#include <lz4frame.h>
-#include <memory>
-#include <mutex>
-#include <openssl/evp.h>
-#include <utility>
-#include <variant>
-#include <zconf.h>
-#include <zlib.h>
 
 namespace libbsarchpp {
 
