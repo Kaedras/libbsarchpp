@@ -1,7 +1,6 @@
 #include "types.h"
 
 #include "Bsa.h"
-#include <directx/dxgiformat.h>
 
 namespace libbsarchpp {
 inline constexpr std::array dxgiFormatNames = {"UNKNOWN",
