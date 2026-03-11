@@ -120,45 +120,40 @@ inline constexpr std::array dxgiFormatNames = {"UNKNOWN",
                                                "A8P8",
                                                "B4G4R4A4_UNORM"};
 
-std::string_view FileFO4::dxgiFormatName() const noexcept
-{
-    if (dxgiFormat < dxgiFormatNames.size())
-    {
-        return dxgiFormatNames.at(dxgiFormat);
-    }
-    switch (dxgiFormat)
-    {
-        case DXGI_FORMAT_P208: return "P208";
-        case DXGI_FORMAT_V208: return "V208";
-        case DXGI_FORMAT_V408: return "V408";
-        default: return "UNKNOWN";
-    }
+std::string_view FileFO4::dxgiFormatName() const noexcept {
+  if (dxgiFormat < dxgiFormatNames.size()) {
+    return dxgiFormatNames.at(dxgiFormat);
+  }
+  switch (dxgiFormat) {
+  case DXGI_FORMAT_P208:
+    return "P208";
+  case DXGI_FORMAT_V208:
+    return "V208";
+  case DXGI_FORMAT_V408:
+    return "V408";
+  default:
+    return "UNKNOWN";
+  }
 }
 
-bool FileFO4::compress(const Bsa *bsa) const noexcept
-{
-    if (packingCompression == PackingCompression_t::compressed)
-    {
-        return true;
-    }
-    if (packingCompression == PackingCompression_t::uncompressed)
-    {
-        return false;
-    }
-    return bsa->getCompressed();
+bool FileFO4::compress(const Bsa* bsa) const noexcept {
+  if (packingCompression == PackingCompression_t::compressed) {
+    return true;
+  }
+  if (packingCompression == PackingCompression_t::uncompressed) {
+    return false;
+  }
+  return bsa->getCompressed();
 }
 
-bool FileTES4::compress(const Bsa *bsa) const noexcept
-{
-    if (packingCompression == PackingCompression_t::compressed)
-    {
-        return true;
-    }
-    if (packingCompression == PackingCompression_t::uncompressed)
-    {
-        return false;
-    }
-    return bsa->getCompressed();
+bool FileTES4::compress(const Bsa* bsa) const noexcept {
+  if (packingCompression == PackingCompression_t::compressed) {
+    return true;
+  }
+  if (packingCompression == PackingCompression_t::uncompressed) {
+    return false;
+  }
+  return bsa->getCompressed();
 }
 
-} // namespace libbsarchpp
+}  // namespace libbsarchpp

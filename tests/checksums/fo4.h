@@ -21,7 +21,8 @@ static const std::unordered_map<std::string, std::string> fo4 = {
     {"ccBGSFO4019-ChineseStealthArmor - Main.ba2", "38072d3b0d4b58ae7d12e4ec2d7bf8d109a1eb664e21532527c50b939fcd38b2"},
     {"ccBGSFO4019-ChineseStealthArmor - Textures.ba2",
      "d28236e1b216b5810d63f070914b1c3631c6b3ef0dd4f46ceb1d8ac051ce239a"},
-    {"ccBGSFO4020-PowerArmorSkin(Black) - Main.ba2", "37133f9053839623156a01efba59b92e6d7cb4ac4da1e66c7d7599850f413142"},
+    {"ccBGSFO4020-PowerArmorSkin(Black) - Main.ba2",
+     "37133f9053839623156a01efba59b92e6d7cb4ac4da1e66c7d7599850f413142"},
     {"ccBGSFO4020-PowerArmorSkin(Black) - Textures.ba2",
      "b7f93dac8b9b206aacf5815d2a47cd9d7636545fadac7ae4fa57db40ff677979"},
     {"ccBGSFO4038-HorseArmor - Main.ba2", "6529ab20f82c5f72e31be842c4bc73ee59096420f615de67cdc1ad43b3684b76"},
@@ -89,4 +90,4 @@ static const std::unordered_map<std::string, std::string> fo4 = {
     {"Fallout4 - Textures8.ba2", "4b65d01e4ca29bd490857a3593e3ec3bf0ab74ac7cd2c29404b60f61ff7b3601"},
     {"Fallout4 - Textures9.ba2", "e3b087d8d35abbf21ae083c38884a611a9aab742521173d9b8066deab0078099"},
     {"Fallout4 - Voices.ba2", "941dbe8acb583f6c84ae94d9eae8c061757bda3706adc78a5820f82d03b8c8d8"}};
-} // namespace checksums
+}  // namespace checksums

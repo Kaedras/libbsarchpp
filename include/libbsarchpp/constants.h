@@ -16,114 +16,116 @@ inline constexpr const char* csBSAVersion = "0.9e";
 inline constexpr int lz4CompressionLevel = 8;
 
 namespace sizes {
-inline constexpr uint16_t fileRecordGNRL = 36;
-inline constexpr uint16_t fileRecordDDS = 24;
-inline constexpr uint16_t texChunk = 24;
-inline constexpr uint16_t chunkHeader = 24;
-/**
- * @brief Minimum size difference to actually enable compression
- */
-inline constexpr int compressionMinimumDifference = 32;
-/**
- * @brief Capacity to pre-allocate when @link Bsa::m_packedData @endlink has no capacity left.
- */
-inline constexpr int packedDataReserveCount = 2048;
-} // namespace sizes
+  inline constexpr uint16_t fileRecordGNRL = 36;
+  inline constexpr uint16_t fileRecordDDS  = 24;
+  inline constexpr uint16_t texChunk       = 24;
+  inline constexpr uint16_t chunkHeader    = 24;
+  /**
+   * @brief Minimum size difference to actually enable compression
+   */
+  inline constexpr int compressionMinimumDifference = 32;
+  /**
+   * @brief Capacity to pre-allocate when @link Bsa::m_packedData @endlink has no capacity left.
+   */
+  inline constexpr int packedDataReserveCount = 2048;
+}  // namespace sizes
 
-inline constexpr uint32_t DDSD_CAPS = 0x00000001;
-inline constexpr uint32_t DDSD_HEIGHT = 0x00000002;
-inline constexpr uint32_t DDSD_WIDTH = 0x00000004;
-inline constexpr uint32_t DDSD_PITCH = 0x00000008;
-inline constexpr uint32_t DDSD_PIXELFORMAT = 0x00001000;
-inline constexpr uint32_t DDSD_MIPMAPCOUNT = 0x00020000;
-inline constexpr uint32_t DDSD_LINEARSIZE = 0x00080000;
-inline constexpr uint32_t DDSD_DEPTH = 0x00800000;
-inline constexpr uint32_t DDSCAPS_COMPLEX = 0x00000008;
-inline constexpr uint32_t DDSCAPS_TEXTURE = 0x00001000;
-inline constexpr uint32_t DDSCAPS_MIPMAP = 0x00400000;
-inline constexpr uint32_t DDSCAPS2_CUBEMAP = 0x00000200;
+inline constexpr uint32_t DDSD_CAPS          = 0x00000001;
+inline constexpr uint32_t DDSD_HEIGHT        = 0x00000002;
+inline constexpr uint32_t DDSD_WIDTH         = 0x00000004;
+inline constexpr uint32_t DDSD_PITCH         = 0x00000008;
+inline constexpr uint32_t DDSD_PIXELFORMAT   = 0x00001000;
+inline constexpr uint32_t DDSD_MIPMAPCOUNT   = 0x00020000;
+inline constexpr uint32_t DDSD_LINEARSIZE    = 0x00080000;
+inline constexpr uint32_t DDSD_DEPTH         = 0x00800000;
+inline constexpr uint32_t DDSCAPS_COMPLEX    = 0x00000008;
+inline constexpr uint32_t DDSCAPS_TEXTURE    = 0x00001000;
+inline constexpr uint32_t DDSCAPS_MIPMAP     = 0x00400000;
+inline constexpr uint32_t DDSCAPS2_CUBEMAP   = 0x00000200;
 inline constexpr uint32_t DDSCAPS2_POSITIVEX = 0x00000400;
 inline constexpr uint32_t DDSCAPS2_NEGATIVEX = 0x00000800;
 inline constexpr uint32_t DDSCAPS2_POSITIVEY = 0x00001000;
 inline constexpr uint32_t DDSCAPS2_NEGATIVEY = 0x00002000;
 inline constexpr uint32_t DDSCAPS2_POSITIVEZ = 0x00004000;
 inline constexpr uint32_t DDSCAPS2_NEGATIVEZ = 0x00008000;
-inline constexpr uint32_t DDSCAPS2_VOLUME = 0x00200000;
-inline constexpr uint32_t DDPF_ALPHAPIXELS = 0x00000001;
-inline constexpr uint32_t DDPF_ALPHA = 0x00000002;
-inline constexpr uint32_t DDPF_FOURCC = 0x00000004;
-inline constexpr uint32_t DDPF_RGB = 0x00000040;
-inline constexpr uint32_t DDPF_YUV = 0x00000200;
-inline constexpr uint32_t DDPF_LUMINANCE = 0x00020000;
+inline constexpr uint32_t DDSCAPS2_VOLUME    = 0x00200000;
+inline constexpr uint32_t DDPF_ALPHAPIXELS   = 0x00000001;
+inline constexpr uint32_t DDPF_ALPHA         = 0x00000002;
+inline constexpr uint32_t DDPF_FOURCC        = 0x00000004;
+inline constexpr uint32_t DDPF_RGB           = 0x00000040;
+inline constexpr uint32_t DDPF_YUV           = 0x00000200;
+inline constexpr uint32_t DDPF_LUMINANCE     = 0x00020000;
 
 // DX10
-inline constexpr uint32_t DDS_DIMENSION_TEXTURE2D = 0x00000003;
+inline constexpr uint32_t DDS_DIMENSION_TEXTURE2D       = 0x00000003;
 inline constexpr uint32_t DDS_RESOURCE_MISC_TEXTURECUBE = 0x00000004;
 
 // Magic number type definition for 4 bytes
 namespace magic {
-inline constexpr uint32_t TES3 = 0x00000100; // 0100
-inline constexpr uint32_t BSA = 0x00415342;  // "BSA\0"
-inline constexpr uint32_t BTDX = 0x58445442;
-inline constexpr uint32_t GNRL = 0x4c524e47;
-inline constexpr uint32_t DX10 = 0x30315844;
-inline constexpr uint32_t DDS = 0x20534444; // "DDS "
-inline constexpr uint32_t DXT1 = 0x31545844;
-inline constexpr uint32_t DXT3 = 0x33545844;
-inline constexpr uint32_t DXT5 = 0x35545844;
-inline constexpr uint32_t ATI1 = 0x31495441;
-inline constexpr uint32_t ATI2 = 0x32495441;
-inline constexpr uint32_t BC4S = 0x53344342;
-inline constexpr uint32_t BC4U = 0x55344342;
-inline constexpr uint32_t BC5S = 0x53354342;
-inline constexpr uint32_t BC5U = 0x55354342;
-} // namespace magic
+  inline constexpr uint32_t TES3 = 0x00000100;  // 0100
+  inline constexpr uint32_t BSA  = 0x00415342;  // "BSA\0"
+  inline constexpr uint32_t BTDX = 0x58445442;
+  inline constexpr uint32_t GNRL = 0x4c524e47;
+  inline constexpr uint32_t DX10 = 0x30315844;
+  inline constexpr uint32_t DDS  = 0x20534444;  // "DDS "
+  inline constexpr uint32_t DXT1 = 0x31545844;
+  inline constexpr uint32_t DXT3 = 0x33545844;
+  inline constexpr uint32_t DXT5 = 0x35545844;
+  inline constexpr uint32_t ATI1 = 0x31495441;
+  inline constexpr uint32_t ATI2 = 0x32495441;
+  inline constexpr uint32_t BC4S = 0x53344342;
+  inline constexpr uint32_t BC4U = 0x55344342;
+  inline constexpr uint32_t BC5S = 0x53354342;
+  inline constexpr uint32_t BC5U = 0x55354342;
+}  // namespace magic
 
 inline constexpr uint32_t iFileFO4Unknown = 0x00100100;
-inline constexpr uint32_t FileFO4Footer = 0xBAADF00D;
+inline constexpr uint32_t FileFO4Footer   = 0xBAADF00D;
 
 // header versions
 namespace headerVersions {
-inline constexpr uint32_t TES4 = 0x67;    // Oblivion
-inline constexpr uint32_t FO3 = 0x68;     // FO3, FNV, TES5
-inline constexpr uint32_t SSE = 0x69;     // SSE
-inline constexpr uint32_t FO4v1 = 0x01;   // FO4
-inline constexpr uint32_t SF = 0x02;      // SF
-inline constexpr uint32_t SFdds = 0x03;   // SFdds
-inline constexpr uint32_t FO4NGv7 = 0x07; // FO4NG
-inline constexpr uint32_t FO4NGv8 = 0x08; // FO4NG2
-} // namespace headerVersions
+  inline constexpr uint32_t TES4    = 0x67;  // Oblivion
+  inline constexpr uint32_t FO3     = 0x68;  // FO3, FNV, TES5
+  inline constexpr uint32_t SSE     = 0x69;  // SSE
+  inline constexpr uint32_t FO4v1   = 0x01;  // FO4
+  inline constexpr uint32_t SF      = 0x02;  // SF
+  inline constexpr uint32_t SFdds   = 0x03;  // SFdds
+  inline constexpr uint32_t FO4NGv7 = 0x07;  // FO4NG
+  inline constexpr uint32_t FO4NGv8 = 0x08;  // FO4NG2
+}  // namespace headerVersions
 
 namespace flags {
-namespace archive {
-// archive flags
-inline constexpr uint32_t PATHNAMES = 0x0001;  // Include Directory Names. This bit is set in all official BSA files.
-inline constexpr uint32_t FILENAMES = 0x0002;  // Include File Names. This bit is set in all official BSA files.
-inline constexpr uint32_t COMPRESS = 0x0004;   // Compressed Archive.
-inline constexpr uint32_t RETAINDIR = 0x0008;  // Retain Directory Names.
-inline constexpr uint32_t RETAINNAME = 0x0010; // Retain File Names.
-inline constexpr uint32_t RETAINFOFF = 0x0020; // Retain File Name Offsets.
-inline constexpr uint32_t XBOX360 = 0x0040;    // Xbox360 archive.
-inline constexpr uint32_t STARTUPSTR = 0x0080; // Retain Strings During Startup.
-inline constexpr uint32_t EMBEDNAME = 0x0100;  // File data blocks begin with a string containing the full file path.
-inline constexpr uint32_t XMEM = 0x0200;       // XMem Codec. This is an Xbox 360 only compression algorithm.
-inline constexpr uint32_t UNKNOWN10 = 0x0400;
-} // namespace archive
-namespace file {
-// file flags
-inline constexpr uint32_t NIF = 0x0001;
-inline constexpr uint32_t DDS = 0x0002;
-inline constexpr uint32_t XML = 0x0004;
-inline constexpr uint32_t WAV = 0x0008;
-inline constexpr uint32_t MP3 = 0x0010;
-inline constexpr uint32_t TXT = 0x0020; // TXT, HTML, BAT, SCC
-inline constexpr uint32_t SPT = 0x0040;
-inline constexpr uint32_t FNT = 0x0080;  // TEX, FNT
-inline constexpr uint32_t MISC = 0x0100; // CTL and others
+  namespace archive {
+    // archive flags
+    inline constexpr uint32_t PATHNAMES =
+        0x0001;  // Include Directory Names. This bit is set in all official BSA files.
+    inline constexpr uint32_t FILENAMES  = 0x0002;  // Include File Names. This bit is set in all official BSA files.
+    inline constexpr uint32_t COMPRESS   = 0x0004;  // Compressed Archive.
+    inline constexpr uint32_t RETAINDIR  = 0x0008;  // Retain Directory Names.
+    inline constexpr uint32_t RETAINNAME = 0x0010;  // Retain File Names.
+    inline constexpr uint32_t RETAINFOFF = 0x0020;  // Retain File Name Offsets.
+    inline constexpr uint32_t XBOX360    = 0x0040;  // Xbox360 archive.
+    inline constexpr uint32_t STARTUPSTR = 0x0080;  // Retain Strings During Startup.
+    inline constexpr uint32_t EMBEDNAME =
+        0x0100;  // File data blocks begin with a string containing the full file path.
+    inline constexpr uint32_t XMEM      = 0x0200;  // XMem Codec. This is an Xbox 360 only compression algorithm.
+    inline constexpr uint32_t UNKNOWN10 = 0x0400;
+  }  // namespace archive
+  namespace file {
+    // file flags
+    inline constexpr uint32_t NIF  = 0x0001;
+    inline constexpr uint32_t DDS  = 0x0002;
+    inline constexpr uint32_t XML  = 0x0004;
+    inline constexpr uint32_t WAV  = 0x0008;
+    inline constexpr uint32_t MP3  = 0x0010;
+    inline constexpr uint32_t TXT  = 0x0020;  // TXT, HTML, BAT, SCC
+    inline constexpr uint32_t SPT  = 0x0040;
+    inline constexpr uint32_t FNT  = 0x0080;  // TEX, FNT
+    inline constexpr uint32_t MISC = 0x0100;  // CTL and others
 
-inline constexpr uint32_t SIZE_COMPRESS = 0x40000000; // Whether the file is compressed
-} // namespace file
-} // namespace flags
+    inline constexpr uint32_t SIZE_COMPRESS = 0x40000000;  // Whether the file is compressed
+  }  // namespace file
+}  // namespace flags
 
 inline constexpr std::array<uint32_t, 256> crc32table{
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832,
@@ -155,4 +157,4 @@ inline constexpr std::array<uint32_t, 256> crc32table{
     0x40df0b66, 0x37d83bf0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9, 0xbdbdf21c, 0xcabac28a, 0x53b39330,
     0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
     0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d};
-} // namespace libbsarchpp
+}  // namespace libbsarchpp

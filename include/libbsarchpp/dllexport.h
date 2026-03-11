@@ -5,7 +5,7 @@
 #ifdef __GNUC__
 #define DLL_PUBLIC __attribute__((dllexport))
 #else
-#define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also support this syntax.
+#define DLL_PUBLIC __declspec(dllexport)  // Note: actually gcc seems to also support this syntax.
 #endif
 #define DLL_LOCAL
 #else
