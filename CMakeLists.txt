@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 include(CMakePackageConfigHelpers)
 
-project(libbsarchpp LANGUAGES CXX VERSION 1.0.3)
+project(libbsarchpp LANGUAGES CXX VERSION 1.0.4)
 set(CMAKE_CXX_STANDARD 23)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
