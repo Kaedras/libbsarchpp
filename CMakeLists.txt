@@ -88,7 +88,7 @@ endif ()
 
 # install
 install(TARGETS libbsarchpp EXPORT libbsarchppTargets FILE_SET HEADERS)
-if (WIN32)
+if (MSVC AND BUILD_SHARED_LIBS)
     install(FILES $<TARGET_PDB_FILE:libbsarchpp> DESTINATION pdb OPTIONAL)
 endif ()
 install(EXPORT libbsarchppTargets
