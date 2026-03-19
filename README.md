@@ -25,11 +25,12 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 - zlib (tested with 1.3.1)
 - C++23 compatible compiler (e.g. GCC 14, clang 18, Visual Studio 2022)
 - if building tests:
-  - GTest (tested with 1.14.0 and 1.15.2)
-  - OpenSSL 3 (tested with 3.3.2)
+    - GTest (tested with 1.14.0 and 1.15.2)
+    - OpenSSL 3 (tested with 3.3.2)
 
 ## Building
 
+This library can be built as either shared or static library by setting `BUILD_SHARED_LIBS` to either `ON` or `OFF`
 [vcpkg](https://github.com/microsoft/vcpkg) can be used for automatic dependency configuration.
 
 See examples below.
@@ -171,6 +172,7 @@ The scripts used can be found in tests/utils.
 
 - The tests will fail if using multithreaded packing because of a limitation mentioned above.
 - Linux specific:
+    - Building as a shared library will lead to undefined references when linking
     - You may get ENOSPC (No space left on device) if you leave the work directory at the default value and your distro
       uses tmpfs for temporary files.
     - To improve performance, you should consider setting the work directory to tmpfs for improved performance (10GiB
@@ -185,7 +187,8 @@ found [here](https://github.com/TES5Edit/TES5Edit/blob/1fcec21b354786fd6e023d1d3
 CMakePresets.json and parts of the README from [here](https://github.com/ModOrganizer2/modorganizer/tree/dev/vcpkg) were
 used as a base.
 
-.clang-format is based on [this](https://github.com/ModOrganizer2/modorganizer/blob/2043d9931cb9baf1eef23240ea6061fc40fee67d/.clang-format).
+.clang-format is based
+on [this](https://github.com/ModOrganizer2/modorganizer/blob/2043d9931cb9baf1eef23240ea6061fc40fee67d/.clang-format).
 
 gsl-lite can be found [here](https://github.com/gsl-lite/gsl-lite).
 

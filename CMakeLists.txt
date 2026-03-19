@@ -5,7 +5,10 @@ include(CMakePackageConfigHelpers)
 project(libbsarchpp LANGUAGES CXX VERSION 1.0.2)
 set(CMAKE_CXX_STANDARD 23)
 
-add_library(libbsarchpp SHARED)
+option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+option(LIBBSARCHPP_TESTING "Build tests" OFF)
+
+add_library(libbsarchpp)
 
 find_package(ZLIB REQUIRED)
 
@@ -16,28 +19,39 @@ else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
     add_library(lz4::lz4 ALIAS PkgConfig::lz4)
-endif ()
+endif()
+
+if (BUILD_SHARED_LIBS)
+    target_compile_definitions(libbsarchpp PRIVATE -DSHARED)
+else()
+    target_compile_definitions(libbsarchpp PRIVATE -DSTATIC)
+endif()
 
 target_sources(libbsarchpp
-        PRIVATE
+    PRIVATE
         src/Bsa.cpp
         src/types.cpp
         src/hash.cpp
         src/utils/utils.cpp
-        src/pch.h
         src/md5.cpp
-        src/md5.h
-        PUBLIC
+
+    PRIVATE
+        FILE_SET privateHeaders
+        TYPE HEADERS
+        FILES
+            src/pch.h
+            src/md5.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/constants.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/hash.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils/utils.h
+
+    PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
         FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/Bsa.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/enums.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/constants.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/dllexport.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/types.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/hash.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils/utils.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/Bsa.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/enums.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/types.h
 )
 target_include_directories(libbsarchpp PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp
@@ -66,7 +80,10 @@ endif ()
 if (MSVC)
     target_compile_options(libbsarchpp PRIVATE /MP /W4)
 else ()
-    target_compile_options(libbsarchpp PRIVATE -Wall -Wextra -Wpedantic -fvisibility=hidden)
+    target_compile_options(libbsarchpp PRIVATE -Wall -Wextra -Wpedantic)
+    if(BUILD_SHARED_LIBS)
+        target_compile_options(libbsarchpp PRIVATE -fvisibility=hidden)
+    endif()
 endif ()
 
 # install
@@ -100,7 +117,6 @@ install(FILES
 )
 
 # tests
-option(LIBBSARCHPP_TESTING "Build tests" OFF)
 if (LIBBSARCHPP_TESTING)
     enable_testing()
     add_subdirectory(tests)

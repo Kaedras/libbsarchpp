@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../dllexport.h"
 #include "../types.h"
 #include <cstdint>
 #include <filesystem>
@@ -26,5 +25,5 @@ void changeSlashesToBackslashes(std::u16string& str) noexcept;
 /**
  * @brief This function is used to sort paths alphabetically.
  */
-[[nodiscard]] DLL_PUBLIC bool comparePaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept;
+[[nodiscard]] bool comparePaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept;
 }  // namespace libbsarchpp

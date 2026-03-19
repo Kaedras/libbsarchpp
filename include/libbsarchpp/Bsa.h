@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dllexport.h"
 #include "enums.h"
 #include "types.h"
 #include <atomic>
@@ -18,6 +17,22 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#ifndef DLLEXPORT
+#ifdef SHARED
+#ifdef __unix__
+#define DLLEXPORT __attribute__((visibility("default")))
+#else
+#define DLLEXPORT _declspec(dllexport)
+#endif
+#else
+#ifdef __unix__
+#define DLLEXPORT
+#else
+#define DLLEXPORT _declspec(dllimport)
+#endif
+#endif
+#endif
 
 static_assert(std::endian::native == std::endian::little);
 
@@ -39,7 +54,7 @@ public:
    * @param multithreaded Enable multithreading
    * @throw std::runtime_error
    */
-  DLL_PUBLIC static void extract(const std::filesystem::path& archivePath, const std::filesystem::path& outputDirectory,
+  DLLEXPORT static void extract(const std::filesystem::path& archivePath, const std::filesystem::path& outputDirectory,
                                  bool multithreaded = false) noexcept(false);
 
   /**
@@ -50,7 +65,7 @@ public:
    * @param settings Settings to use when creating archive
    * @throw std::runtime_error
    */
-  DLL_PUBLIC static void create(const std::filesystem::path& archivePath, ArchiveType type,
+  DLLEXPORT static void create(const std::filesystem::path& archivePath, ArchiveType type,
                                 const std::filesystem::path& inputDirectory,
                                 BsaCreationSettings settings = {}) noexcept(false);
 
@@ -60,7 +75,7 @@ public:
    * @return Type of archive
    * @throw std::runtime_error
    */
-  DLL_PUBLIC [[nodiscard]] static ArchiveType getArchiveType(const std::filesystem::path& archivePath) noexcept(false);
+  DLLEXPORT [[nodiscard]] static ArchiveType getArchiveType(const std::filesystem::path& archivePath) noexcept(false);
 
   /**
    * @brief Opens an existing archive.
@@ -68,7 +83,7 @@ public:
    * @param multithreaded Enable multithreaded extraction
    * @throw std::runtime_error
    */
-  DLL_PUBLIC explicit Bsa(const std::filesystem::path& archivePath, bool multithreaded = false) noexcept(false);
+  DLLEXPORT explicit Bsa(const std::filesystem::path& archivePath, bool multithreaded = false) noexcept(false);
 
   /**
    * @brief Creates a new archive.
@@ -81,7 +96,7 @@ public:
    * @param multithreaded Enable multithreaded packing. Increases performance, but produces indeterministic results
    * @throw std::runtime_error
    */
-  DLL_PUBLIC Bsa(const std::filesystem::path& archivePath, ArchiveType type,
+  DLLEXPORT Bsa(const std::filesystem::path& archivePath, ArchiveType type,
                  std::vector<std::filesystem::path>& fileList, const std::optional<std::filesystem::path>& ddsBasePath,
                  bool compressed, bool shareData, bool multithreaded) noexcept(false);
 
@@ -94,18 +109,18 @@ public:
    * @param ddsBasePath Base path for dds files, only required for FO4dds and SFdds archives
    * @throw std::runtime_error
    */
-  DLL_PUBLIC Bsa(const std::filesystem::path& archivePath, ArchiveType type,
+  DLLEXPORT Bsa(const std::filesystem::path& archivePath, ArchiveType type,
                  std::vector<std::filesystem::path>& fileList,
                  const std::optional<std::filesystem::path>& ddsBasePath = std::nullopt) noexcept(false);
 
-  DLL_PUBLIC ~Bsa();
+  DLLEXPORT ~Bsa();
 
   /**
    * @brief Finalizes a newly created archive.
    * @pre All files have been added
    * @throw std::runtime_error
    */
-  DLL_PUBLIC void save() noexcept(false);
+  DLLEXPORT void save() noexcept(false);
 
   /**
    * @brief Adds a file to the archive. It has to be present in the file list provided to the constructor.
@@ -113,7 +128,7 @@ public:
    * @param filePath File to add
    * @throw std::runtime_error
    */
-  DLL_PUBLIC void addFile(const std::filesystem::path& rootDirectory,
+  DLLEXPORT void addFile(const std::filesystem::path& rootDirectory,
                           const std::filesystem::path& filePath) noexcept(false);
 
   /**
@@ -122,7 +137,7 @@ public:
    * @param data File data
    * @throw std::runtime_error
    */
-  DLL_PUBLIC void addFile(const std::filesystem::path& filePath, const Buffer& data) noexcept(false);
+  DLLEXPORT void addFile(const std::filesystem::path& filePath, const Buffer& data) noexcept(false);
 
   /**
    * @brief Returns a pointer to the file data for the specified path.
@@ -130,7 +145,7 @@ public:
    * @return Pointer to file
    * @throw std::runtime_error
    */
-  DLL_PUBLIC [[nodiscard]] FileRecord_t findFileRecord(const std::filesystem::path& fileName) noexcept;
+  DLLEXPORT [[nodiscard]] FileRecord_t findFileRecord(const std::filesystem::path& fileName) noexcept;
 
   /**
    * @brief Extracts the specified file into a buffer.
@@ -138,7 +153,7 @@ public:
    * @return Buffer containing the file data
    * @throw std::runtime_error
    */
-  DLL_PUBLIC [[nodiscard]] Buffer extractFileData(const FileRecord_t& fileRecord) noexcept(false);
+  DLLEXPORT [[nodiscard]] Buffer extractFileData(const FileRecord_t& fileRecord) noexcept(false);
 
   /**
    * @brief Extracts the specified file into a buffer.
@@ -146,7 +161,7 @@ public:
    * @return Buffer containing the file data
    * @throw std::runtime_error
    */
-  DLL_PUBLIC [[nodiscard]] Buffer extractFileData(const std::filesystem::path& fileName) noexcept(false);
+  DLLEXPORT [[nodiscard]] Buffer extractFileData(const std::filesystem::path& fileName) noexcept(false);
 
   /**
    * @brief Extracts the specified file and saves it to disk.
@@ -154,7 +169,7 @@ public:
    * @param saveAs Target path
    * @throw std::runtime_error
    */
-  DLL_PUBLIC void extractFile(const std::filesystem::path& filePath,
+  DLLEXPORT void extractFile(const std::filesystem::path& filePath,
                               const std::filesystem::path& saveAs) noexcept(false);
 
   /**
@@ -162,12 +177,12 @@ public:
    * @param function Function to call
    * @param data Optional data to provide to function calls
    */
-  DLL_PUBLIC void iterateFiles(const FileIterationFunction& function, void* data = nullptr) noexcept;
+  DLLEXPORT void iterateFiles(const FileIterationFunction& function, void* data = nullptr) noexcept;
 
   /**
    * @brief Checks if a specified file exists inside the archive.
    */
-  DLL_PUBLIC [[nodiscard]] bool fileExists(const std::filesystem::path& filePath) noexcept;
+  DLLEXPORT [[nodiscard]] bool fileExists(const std::filesystem::path& filePath) noexcept;
 
   /**
    * @brief Returns a vector containing all file paths inside the archive. If the optional parameter is provided, only
@@ -175,94 +190,94 @@ public:
    * @param directoryName Optionally restrict file list to files inside this directory
    * @return Filelist
    */
-  DLL_PUBLIC [[nodiscard]] std::vector<std::filesystem::path>
+  DLLEXPORT [[nodiscard]] std::vector<std::filesystem::path>
   getFileList(const std::optional<std::filesystem::path>& directoryName = std::nullopt) const noexcept;
 
   /**
    * @brief Returns the archive file name.
    */
-  DLL_PUBLIC [[nodiscard]] std::filesystem::path getFileName() const noexcept;
+  DLLEXPORT [[nodiscard]] std::filesystem::path getFileName() const noexcept;
 
   /**
    * @brief Returns the archive type.
    */
-  DLL_PUBLIC [[nodiscard]] ArchiveType getArchiveType() const noexcept;
+  DLLEXPORT [[nodiscard]] ArchiveType getArchiveType() const noexcept;
 
   /**
    * @brief Returns the header version. Values can be found in namespace headerVersions inside constants.h.
    */
-  DLL_PUBLIC [[nodiscard]] uint32_t getVersion() const noexcept;
+  DLLEXPORT [[nodiscard]] uint32_t getVersion() const noexcept;
 
   /**
    * @brief Returns a string describing the archive format.
    */
-  DLL_PUBLIC [[nodiscard]] std::string getArchiveFormatName() const noexcept;
+  DLLEXPORT [[nodiscard]] std::string getArchiveFormatName() const noexcept;
 
   /**
    * @brief Returns the number of files inside the archive.
    */
-  DLL_PUBLIC [[nodiscard]] uint32_t getFileCount() const noexcept;
+  DLLEXPORT [[nodiscard]] uint32_t getFileCount() const noexcept;
 
   /**
    * @brief Returns the current size of a created archive.
    */
-  DLL_PUBLIC [[nodiscard]] int64_t getCreatedArchiveSize() const noexcept;
+  DLLEXPORT [[nodiscard]] int64_t getCreatedArchiveSize() const noexcept;
 
   /**
    * @brief Returns archive flags. A list of flags can be found in namespace flags::archive inside constants.h.
    */
-  DLL_PUBLIC [[nodiscard]] uint32_t getArchiveFlags() const noexcept;
+  DLLEXPORT [[nodiscard]] uint32_t getArchiveFlags() const noexcept;
 
   /**
    * @brief Sets archive flags.
    * @throw std::runtime_error If flags are not supported for the current archive type
    */
-  DLL_PUBLIC void setArchiveFlags(uint32_t flags) noexcept(false);
+  DLLEXPORT void setArchiveFlags(uint32_t flags) noexcept(false);
 
   /**
    * @brief Returns whether archive data is compressed.
    */
-  DLL_PUBLIC [[nodiscard]] bool getCompressed() const noexcept;
+  DLLEXPORT [[nodiscard]] bool getCompressed() const noexcept;
 
   /**
    * @brief Sets archive compression.
    */
-  DLL_PUBLIC void setCompressed(bool value) noexcept;
+  DLLEXPORT void setCompressed(bool value) noexcept;
 
   /**
    * @brief Returns whether shared data is enabled.
    */
-  DLL_PUBLIC [[nodiscard]] bool getShareData() const noexcept;
+  DLLEXPORT [[nodiscard]] bool getShareData() const noexcept;
 
   /**
    * @brief Sets shared data.
    */
-  DLL_PUBLIC void setShareData(bool value) noexcept;
+  DLLEXPORT void setShareData(bool value) noexcept;
 
   /**
    * @brief Sets dds base path. This is required for FO4dds and SFdds archives.
    */
-  DLL_PUBLIC void setDDSBasePath(const std::filesystem::path& path) noexcept;
+  DLLEXPORT void setDDSBasePath(const std::filesystem::path& path) noexcept;
 
   /**
    * @brief Returns whether multithreading is enabled.
    */
-  DLL_PUBLIC [[nodiscard]] bool isMultithreaded() const noexcept;
+  DLLEXPORT [[nodiscard]] bool isMultithreaded() const noexcept;
 
   /**
    * @brief Sets multithreading. Only call this function before extracting or creating an archive.
    */
-  DLL_PUBLIC void setMultithreading(bool value) noexcept;
+  DLLEXPORT void setMultithreading(bool value) noexcept;
 
   /**
    * @brief Returns compression level.
    */
-  DLL_PUBLIC [[nodiscard]] int getCompressionLevel() const noexcept;
+  DLLEXPORT [[nodiscard]] int getCompressionLevel() const noexcept;
 
   /**
    * @brief Sets compression level.
    */
-  DLL_PUBLIC void setCompressionLevel(int value) noexcept;
+  DLLEXPORT void setCompressionLevel(int value) noexcept;
 
 private:
   std::unique_ptr<FILE, fileDeleter> m_file;
