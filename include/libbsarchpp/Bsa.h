@@ -21,9 +21,6 @@
 
 static_assert(std::endian::native == std::endian::little);
 
-// forward declaration
-typedef struct evp_md_st EVP_MD;
-
 namespace libbsarchpp {
 
 using std::string_literals::operator""s;
@@ -299,8 +296,6 @@ private:
   uint64_t m_dataOffset     = 0;
   std::vector<PackedDataInfo> m_packedData;
 
-  EVP_MD* m_md = nullptr;
-
   /**
    * @brief Adds a file to @link m_fileMap @endlink.
    * @param filePath File path
@@ -320,7 +315,7 @@ private:
    * @param length Buffer length
    * @return MD5 of buffer
    */
-  PackedDataHash calcDataHash(const uint8_t* data, uint32_t length) const noexcept;
+  static PackedDataHash calcDataHash(const uint8_t* data, uint32_t length) noexcept;
 
   /**
    * @brief Checks if there is an identical file in @link m_files @endlink. This also sets size and offset of the

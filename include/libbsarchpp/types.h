@@ -31,7 +31,7 @@ using filePtr      = std::unique_ptr<FILE, fileDeleter>;
 
 using Magic4         = std::array<char, 4>;  // fourCC
 using Buffer         = std::vector<uint8_t>;
-using PackedDataHash = std::array<unsigned char, 64>;
+using PackedDataHash = std::array<unsigned char, 16>;
 
 namespace typeSizes {
   inline constexpr uint32_t DDS_PIXELFORMAT = 32;

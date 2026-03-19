@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "enums.h"
 #include "hash.h"
+#include "md5.h"
 #include "types.h"
 #include "utils.h"
 
@@ -595,7 +596,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
 }
 
 Bsa::Bsa(const std::filesystem::path& archivePath, bool multithreaded) noexcept(false)
-    : m_existingArchive(true), m_multithreaded(multithreaded), m_md(EVP_MD_fetch(nullptr, "MD5", nullptr)) {
+    : m_existingArchive(true), m_multithreaded(multithreaded) {
   m_file.reset(fopen(archivePath.string().c_str(), "rb"));
 
   if (m_file == nullptr) {
@@ -951,7 +952,7 @@ Bsa::Bsa(const std::filesystem::path& archivePath, ArchiveType type, std::vector
          const std::optional<std::filesystem::path>& ddsBasePath, bool compressed, bool shareData,
          bool multithreaded) noexcept(false)
     : m_existingArchive(false), m_type(type), m_ddsBasePath(ddsBasePath.value_or(fs::path())), m_compressed(compressed),
-      m_shareData(shareData), m_multithreaded(multithreaded), m_md(EVP_MD_fetch(nullptr, "MD5", nullptr)) {
+      m_shareData(shareData), m_multithreaded(multithreaded) {
   try {
     switch (type) {
     case TES3:
@@ -1075,9 +1076,7 @@ Bsa::Bsa(const filesystem::path& archivePath, ArchiveType type, std::vector<std:
   }
 }
 
-Bsa::~Bsa() {
-  EVP_MD_free(m_md);
-}
+Bsa::~Bsa() = default;
 
 std::string Bsa::getArchiveFormatName() const noexcept {
   return ToString(m_type);
@@ -1137,18 +1136,17 @@ int Bsa::getDDSMipChunkCount(const DDSInfo& DDSInfo) const noexcept {
   return count;
 }
 
-PackedDataHash Bsa::calcDataHash(const uint8_t* data, const uint32_t length) const noexcept {
+PackedDataHash Bsa::calcDataHash(const uint8_t* data, const uint32_t length) noexcept {
   // calculate md5
-  EVP_MD_CTX* context = EVP_MD_CTX_new();
-  PackedDataHash md_value{};
-  unsigned int md_len = 0;
+  PackedDataHash result{};
 
-  EVP_DigestInit_ex2(context, m_md, nullptr);
-  EVP_DigestUpdate(context, data, length);
-  EVP_DigestFinal_ex(context, md_value.data(), &md_len);
-  EVP_MD_CTX_free(context);
+  MD5Context ctx;
+  md5Update(&ctx, data, length);
+  md5Finalize(&ctx);
 
-  return md_value;
+  ranges::copy(ctx.digest, result.begin());
+
+  return result;
 }
 
 bool Bsa::findPackedData(const uint32_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept {

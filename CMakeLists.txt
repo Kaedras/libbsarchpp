@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_library(libbsarchpp SHARED)
 
-find_package(OpenSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 
 # USE_VCPKG gets set by CMakePresets
@@ -26,6 +25,8 @@ target_sources(libbsarchpp
         src/hash.cpp
         src/utils/utils.cpp
         src/pch.h
+        src/md5.cpp
+        src/md5.h
         PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -46,7 +47,7 @@ target_include_directories(libbsarchpp PRIVATE
 
 target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
-target_link_libraries(libbsarchpp PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB lz4::lz4)
+target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4)
 
 set_target_properties(libbsarchpp PROPERTIES
         DEBUG_POSTFIX "d"

@@ -1,14 +1,14 @@
 {
   "dependencies": [
     "lz4",
-    "openssl",
     "zlib"
   ],
   "features": {
     "testing": {
       "description": "Build tests.",
       "dependencies": [
-        "gtest"
+        "gtest",
+        "openssl"
       ]
     }
   },

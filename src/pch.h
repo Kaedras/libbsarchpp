@@ -19,7 +19,6 @@
 #include <lz4frame.h>
 #include <memory>
 #include <mutex>
-#include <openssl/evp.h>
 #include <stdexcept>
 #include <string>
 #include <utility>
