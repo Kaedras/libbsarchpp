@@ -88,7 +88,7 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in
 
 write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/libbsarchpp-config-version.cmake"
-        VERSION "1.0.0"
+        VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion
         ARCH_INDEPENDENT
 )
