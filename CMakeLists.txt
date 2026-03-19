@@ -14,9 +14,13 @@ add_library(libbsarchpp)
 find_package(ZLIB REQUIRED)
 
 # lz4
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
-add_library(lz4::lz4 ALIAS PkgConfig::lz4)
+if (WIN32)
+    find_package(lz4 CONFIG REQUIRED)
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
+    add_library(lz4::lz4 ALIAS PkgConfig::lz4)
+endif()
 
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(libbsarchpp PRIVATE -DSHARED)
