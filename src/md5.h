@@ -3,7 +3,7 @@
 // modified version of https://github.com/Zunawe/md5-c
 
 struct MD5Context {
-  uint64_t size;       // Size of input in bytes
+  uint64_t size;                   // Size of input in bytes
   std::array<uint32_t, 4> buffer;  // Current accumulation of hash
   std::array<uint8_t, 64> input;   // Input to be used in the next step
   std::array<uint8_t, 16> digest;  // Result of algorithm

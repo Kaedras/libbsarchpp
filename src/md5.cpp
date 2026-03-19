@@ -16,27 +16,29 @@ static constexpr uint32_t B = 0xefcdab89;
 static constexpr uint32_t C = 0x98badcfe;
 static constexpr uint32_t D = 0x10325476;
 
-static constexpr array<uint32_t, 64> S = {7,  12, 17, 22, 7,  12, 17, 22, 7,  12, 17, 22, 7,  12, 17, 22, 5,  9,  14, 20, 5,  9,
-                       14, 20, 5,  9,  14, 20, 5,  9,  14, 20, 4,  11, 16, 23, 4,  11, 16, 23, 4,  11, 16, 23,
-                       4,  11, 16, 23, 6,  10, 15, 21, 6,  10, 15, 21, 6,  10, 15, 21, 6,  10, 15, 21};
+static constexpr array<uint32_t, 64> S = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+                                          5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20,
+                                          4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+                                          6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
-static constexpr array<uint32_t, 64> K = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
-                       0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
-                       0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
-                       0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
-                       0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
-                       0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
-                       0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
-                       0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
+static constexpr array<uint32_t, 64> K = {
+    0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+    0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+    0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+    0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+    0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+    0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+    0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+    0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
 
 /*
  * Padding used to make the size (in bits) of the input congruent to 448 mod 512
  */
-static constexpr array<uint8_t, 64> PADDING = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static constexpr array<uint8_t, 64> PADDING = {
+    0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /*
  * Bit-manipulation functions defined by the MD5 algorithm
@@ -47,10 +49,10 @@ inline uint32_t F(const uint32_t X, const uint32_t Y, const uint32_t Z) {
 inline uint32_t G(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return (X & Z) | (Y & ~Z);
 }
-inline uint32_t H(const uint32_t  X, const uint32_t  Y, const uint32_t Z) {
+inline uint32_t H(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return X ^ Y ^ Z;
 }
-inline uint32_t I(const uint32_t  X, const uint32_t  Y, const uint32_t  Z) {
+inline uint32_t I(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return Y ^ (X | ~Z);
 }
 
@@ -82,7 +84,7 @@ void md5Init(MD5Context* ctx) {
  * and save the result in the buffer. Also updates the overall size.
  */
 void md5Update(MD5Context* ctx, const uint8_t* input_buffer, const size_t input_len) {
-  array<uint32_t, 16> input; // NOLINT(*-pro-type-member-init)
+  array<uint32_t, 16> input;  // NOLINT(*-pro-type-member-init)
   unsigned int offset = ctx->size % 64;
   ctx->size += input_len;
 
@@ -99,7 +101,8 @@ void md5Update(MD5Context* ctx, const uint8_t* input_buffer, const size_t input_
         // Convert to little-endian
         // The local variable `input` our 512-bit chunk separated into 32-bit words
         // we can use in calculations
-        input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 | static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
+        input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 |
+                   static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
                    static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8 | static_cast<uint32_t>(ctx->input[(j * 4)]);
       }
       md5Step(ctx->buffer, input);
@@ -113,7 +116,7 @@ void md5Update(MD5Context* ctx, const uint8_t* input_buffer, const size_t input_
  * and save the result of the final iteration into digest.
  */
 void md5Finalize(MD5Context* ctx) {
-  array<uint32_t, 16> input; // NOLINT(*-pro-type-member-init)
+  array<uint32_t, 16> input;  // NOLINT(*-pro-type-member-init)
   const size_t offset         = ctx->size % 64;
   const size_t padding_length = offset < 56 ? 56 - offset : 56 + 64 - offset;
 
@@ -124,7 +127,8 @@ void md5Finalize(MD5Context* ctx) {
   // Do a final update (internal to this function)
   // Last two 32-bit words are the two halves of the size (converted from bytes to bits)
   for (unsigned int j = 0; j < 14; ++j) {
-    input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 | static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
+    input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 |
+               static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
                static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8 | static_cast<uint32_t>(ctx->input[(j * 4)]);
   }
   input[14] = static_cast<uint32_t>(ctx->size * 8);
@@ -144,7 +148,7 @@ void md5Finalize(MD5Context* ctx) {
 /*
  * Step on 512 bits of input with the main MD5 algorithm.
  */
-void md5Step(std::array<uint32_t, 4>& buffer, const std::array<uint32_t, 16>& input){
+void md5Step(std::array<uint32_t, 4>& buffer, const std::array<uint32_t, 16>& input) {
   uint32_t AA = buffer[0];
   uint32_t BB = buffer[1];
   uint32_t CC = buffer[2];
@@ -175,10 +179,10 @@ void md5Step(std::array<uint32_t, 4>& buffer, const std::array<uint32_t, 16>& in
     }
 
     const uint32_t temp = DD;
-    DD            = CC;
-    CC            = BB;
-    BB            = BB + rotateLeft(AA + E + K[i] + input[j], S[i]);
-    AA            = temp;
+    DD                  = CC;
+    CC                  = BB;
+    BB                  = BB + rotateLeft(AA + E + K[i] + input[j], S[i]);
+    AA                  = temp;
   }
 
   buffer[0] += AA;
@@ -196,14 +200,14 @@ std::array<uint8_t, 16> md5String(const std::string_view input) {
   md5Update(&ctx, reinterpret_cast<const uint8_t*>(input.data()), input.size());
   md5Finalize(&ctx);
 
-  std::array<uint8_t, 16> result; // NOLINT(*-pro-type-member-init)
+  std::array<uint8_t, 16> result;  // NOLINT(*-pro-type-member-init)
   ranges::copy(ctx.digest, result.begin());
   return result;
 }
 
 void md5File(FILE* file, uint8_t* result) {
   std::array<uint8_t, 1024> input_buffer{};
-  size_t input_size  = 0;
+  size_t input_size = 0;
 
   MD5Context ctx;
 

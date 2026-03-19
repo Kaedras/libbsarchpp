@@ -55,7 +55,7 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT static void extract(const std::filesystem::path& archivePath, const std::filesystem::path& outputDirectory,
-                                 bool multithreaded = false) noexcept(false);
+                                bool multithreaded = false) noexcept(false);
 
   /**
    * @brief Creates a new archive with specified type from files inside a specified input directory.
@@ -66,8 +66,8 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT static void create(const std::filesystem::path& archivePath, ArchiveType type,
-                                const std::filesystem::path& inputDirectory,
-                                BsaCreationSettings settings = {}) noexcept(false);
+                               const std::filesystem::path& inputDirectory,
+                               BsaCreationSettings settings = {}) noexcept(false);
 
   /**
    * @brief Reads the header of specified archive file and returns the archive type.
@@ -97,8 +97,8 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT Bsa(const std::filesystem::path& archivePath, ArchiveType type,
-                 std::vector<std::filesystem::path>& fileList, const std::optional<std::filesystem::path>& ddsBasePath,
-                 bool compressed, bool shareData, bool multithreaded) noexcept(false);
+                std::vector<std::filesystem::path>& fileList, const std::optional<std::filesystem::path>& ddsBasePath,
+                bool compressed, bool shareData, bool multithreaded) noexcept(false);
 
   /**
    * @copybrief Bsa(const std::filesystem::path&, ArchiveType, std::vector<std::filesystem::path>&, const
@@ -110,8 +110,8 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT Bsa(const std::filesystem::path& archivePath, ArchiveType type,
-                 std::vector<std::filesystem::path>& fileList,
-                 const std::optional<std::filesystem::path>& ddsBasePath = std::nullopt) noexcept(false);
+                std::vector<std::filesystem::path>& fileList,
+                const std::optional<std::filesystem::path>& ddsBasePath = std::nullopt) noexcept(false);
 
   DLLEXPORT ~Bsa();
 
@@ -129,7 +129,7 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT void addFile(const std::filesystem::path& rootDirectory,
-                          const std::filesystem::path& filePath) noexcept(false);
+                         const std::filesystem::path& filePath) noexcept(false);
 
   /**
    * @copybrief addFile(const std::filesystem::path&, const std::filesystem::path&)
@@ -170,7 +170,7 @@ public:
    * @throw std::runtime_error
    */
   DLLEXPORT void extractFile(const std::filesystem::path& filePath,
-                              const std::filesystem::path& saveAs) noexcept(false);
+                             const std::filesystem::path& saveAs) noexcept(false);
 
   /**
    * @brief Iterates over all files inside the archive and calls the provided function.
