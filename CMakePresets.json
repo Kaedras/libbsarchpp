@@ -55,7 +55,7 @@
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
-          "value": "x64-linux-dynamic"
+          "value": "x64-linux"
         }
       },
       "generator": "Ninja Multi-Config",
@@ -64,6 +64,16 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-dynamic",
+      "inherits": [ "linux" ],
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux-dynamic"
+        }
       }
     }
   ],
@@ -75,6 +85,10 @@
     {
       "name": "linux",
       "configurePreset": "linux"
+    },
+    {
+      "name": "linux-dynamic",
+      "configurePreset": "linux-dynamic"
     }
   ]
 }
