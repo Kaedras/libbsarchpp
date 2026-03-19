@@ -184,7 +184,7 @@ found [here](https://github.com/TES5Edit/TES5Edit/blob/1fcec21b354786fd6e023d1d3
 CMakePresets.json and parts of the README from [here](https://github.com/ModOrganizer2/modorganizer/tree/dev/vcpkg) were
 used as a base.
 
-.clang-format was copied from [here](https://github.com/ModOrganizer2/libbsarch/blob/master/.clang-format).
+.clang-format is based on [this](https://github.com/ModOrganizer2/modorganizer/blob/2043d9931cb9baf1eef23240ea6061fc40fee67d/.clang-format).
 
 gsl-lite can be found [here](https://github.com/gsl-lite/gsl-lite).
 
