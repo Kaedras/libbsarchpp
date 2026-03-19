@@ -21,11 +21,12 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 
 ## Dependencies
 
-- OpenSSL 3 (tested with 3.3.2)
 - lz4 (tested with 1.10)
 - zlib (tested with 1.3.1)
-- GTest if building tests (tested with 1.14.0 and 1.15.2)
 - C++23 compatible compiler (e.g. GCC 14, clang 18, Visual Studio 2022)
+- if building tests:
+  - GTest (tested with 1.14.0 and 1.15.2)
+  - OpenSSL 3 (tested with 3.3.2)
 
 ## Building
 
