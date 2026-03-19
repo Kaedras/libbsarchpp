@@ -55,7 +55,7 @@
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
-          "value": "x64-linux"
+          "value": "x64-linux-dynamic"
         }
       },
       "generator": "Ninja Multi-Config",
