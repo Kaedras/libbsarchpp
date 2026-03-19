@@ -15,7 +15,7 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 - Multithreaded packing produces indeterministic results, as the file order in the data section may change, which causes
   the unit tests to fail but improves performance. xEdit also exhibits this behaviour.
 - LZ4 compressed archives (SSE, SkyrimVR, SFdds) differ from ones created with xEdit (it apparently uses lz4 r127,
-  which is almost a decade old).
+  which was released in 2014).
 - xEdit can create bsa archives > 4GiB, while libbsarchpp will throw an exception because the file offset (uint32_t)
   would overflow.
 
