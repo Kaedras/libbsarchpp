@@ -7,10 +7,13 @@
 #include "types.h"
 #include "utils.h"
 
+using namespace std;
+namespace fs = std::filesystem;
+
 namespace libbsarchpp {
+namespace {
 #ifdef __unix__
 // On Windows long is only 32-bit, so we can't use ftell there. On POSIX systems it's 64-bit
-namespace {
   long _ftelli64(FILE* stream) {
     return ftell(stream);
   }
@@ -19,11 +22,79 @@ namespace {
   int _fseeki64(FILE* stream, long offset, int whence) {
     return fseek(stream, offset, whence);
   }
-}  // namespace
 #endif
 
-using namespace std;
-namespace fs = std::filesystem;
+/**
+ * @brief Returns the dxgi format of the given file.
+ * @param data Buffer containing file data.
+ * @throw std::runtime_error
+ */
+
+DXGI_FORMAT getDxgiFormat(const Buffer& data) noexcept(false) {
+  const auto* ddsHeader = reinterpret_cast<const DDSHeader*>(data.data());
+
+  switch (ddsHeader->ddspf.fourCC) {
+  case magic::DXT1:
+    return DXGI_FORMAT_BC1_UNORM;
+    break;
+  case magic::DXT3:
+    return DXGI_FORMAT_BC2_UNORM;
+    break;
+  case magic::DXT5:
+    return DXGI_FORMAT_BC3_UNORM;
+    break;
+  case magic::ATI1:
+  case magic::BC4U:
+    return DXGI_FORMAT_BC4_UNORM;
+    break;
+  case magic::BC4S:
+    return DXGI_FORMAT_BC4_SNORM;
+    break;
+  case magic::ATI2:
+  case magic::BC5U:
+    return DXGI_FORMAT_BC5_UNORM;
+    break;
+  case magic::BC5S:
+    return DXGI_FORMAT_BC5_SNORM;
+    break;
+  case magic::DX10: {
+    const auto* ddsHeaderDX10 = reinterpret_cast<const DDSHeaderDX10*>(&data[sizeof(DDSHeader)]);
+    return static_cast<DXGI_FORMAT>(ddsHeaderDX10->dxgiFormat);
+    break;
+  }
+  default:
+    switch (ddsHeader->ddspf.RGBBitCount) {
+  case 32:
+      if ((ddsHeader->ddspf.flags & DDPF_ALPHAPIXELS) == 0) {
+        return DXGI_FORMAT_B8G8R8X8_UNORM;
+      }
+      if (ddsHeader->ddspf.RBitMask == 0x000000FF) {
+        return DXGI_FORMAT_R8G8B8A8_UNORM;
+      }
+      return DXGI_FORMAT_B8G8R8A8_UNORM;
+
+  case 16:
+      if (ddsHeader->ddspf.RBitMask == 0xF800 && ddsHeader->ddspf.GBitMask == 0x07E0 &&
+          ddsHeader->ddspf.BBitMask == 0x001F && ddsHeader->ddspf.ABitMask == 0x0000) {
+        return DXGI_FORMAT_B5G6R5_UNORM;
+          }
+      if (ddsHeader->ddspf.RBitMask == 0x7C00 && ddsHeader->ddspf.GBitMask == 0x03E0 &&
+          ddsHeader->ddspf.BBitMask == 0x001F && ddsHeader->ddspf.ABitMask == 0x8000) {
+        return DXGI_FORMAT_B5G5R5A1_UNORM;
+          }
+      return DXGI_FORMAT_R8G8_UNORM;
+
+  case 8:
+      if ((ddsHeader->ddspf.flags & DDPF_ALPHA) != 0) {
+        return DXGI_FORMAT_A8_UNORM;
+      }
+      return DXGI_FORMAT_R8_UNORM;
+  default:
+      throw runtime_error("Unsupported uncompressed DDS format");
+    }
+  }
+}
+}  // namespace
 
 template <>
 char Bsa::read() noexcept(false) {
@@ -1385,71 +1456,6 @@ int Bsa::bitsPerPixel(uint8_t format) noexcept(false) {
 
   default:
     throw runtime_error("Unsupported DDS format");
-  }
-}
-
-DXGI_FORMAT Bsa::getDxgiFormat(const Buffer& data) noexcept(false) {
-  const auto* ddsHeader = reinterpret_cast<const DDSHeader*>(data.data());
-
-  switch (ddsHeader->ddspf.fourCC) {
-  case magic::DXT1:
-    return DXGI_FORMAT_BC1_UNORM;
-    break;
-  case magic::DXT3:
-    return DXGI_FORMAT_BC2_UNORM;
-    break;
-  case magic::DXT5:
-    return DXGI_FORMAT_BC3_UNORM;
-    break;
-  case magic::ATI1:
-  case magic::BC4U:
-    return DXGI_FORMAT_BC4_UNORM;
-    break;
-  case magic::BC4S:
-    return DXGI_FORMAT_BC4_SNORM;
-    break;
-  case magic::ATI2:
-  case magic::BC5U:
-    return DXGI_FORMAT_BC5_UNORM;
-    break;
-  case magic::BC5S:
-    return DXGI_FORMAT_BC5_SNORM;
-    break;
-  case magic::DX10: {
-    const auto* ddsHeaderDX10 = reinterpret_cast<const DDSHeaderDX10*>(&data[sizeof(DDSHeader)]);
-    return static_cast<DXGI_FORMAT>(ddsHeaderDX10->dxgiFormat);
-    break;
-  }
-  default:
-    switch (ddsHeader->ddspf.RGBBitCount) {
-    case 32:
-      if ((ddsHeader->ddspf.flags & DDPF_ALPHAPIXELS) == 0) {
-        return DXGI_FORMAT_B8G8R8X8_UNORM;
-      }
-      if (ddsHeader->ddspf.RBitMask == 0x000000FF) {
-        return DXGI_FORMAT_R8G8B8A8_UNORM;
-      }
-      return DXGI_FORMAT_B8G8R8A8_UNORM;
-
-    case 16:
-      if (ddsHeader->ddspf.RBitMask == 0xF800 && ddsHeader->ddspf.GBitMask == 0x07E0 &&
-          ddsHeader->ddspf.BBitMask == 0x001F && ddsHeader->ddspf.ABitMask == 0x0000) {
-        return DXGI_FORMAT_B5G6R5_UNORM;
-      }
-      if (ddsHeader->ddspf.RBitMask == 0x7C00 && ddsHeader->ddspf.GBitMask == 0x03E0 &&
-          ddsHeader->ddspf.BBitMask == 0x001F && ddsHeader->ddspf.ABitMask == 0x8000) {
-        return DXGI_FORMAT_B5G5R5A1_UNORM;
-      }
-      return DXGI_FORMAT_R8G8_UNORM;
-
-    case 8:
-      if ((ddsHeader->ddspf.flags & DDPF_ALPHA) != 0) {
-        return DXGI_FORMAT_A8_UNORM;
-      }
-      return DXGI_FORMAT_R8_UNORM;
-    default:
-      throw runtime_error("Unsupported uncompressed DDS format");
-    }
   }
 }
 

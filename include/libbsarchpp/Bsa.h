@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <directx/dxgiformat.h>
 #include <filesystem>
 #include <functional>
 #include <mutex>
@@ -506,13 +505,6 @@ private:
    * @throw std::runtime_error
    */
   static int bitsPerPixel(uint8_t format) noexcept(false);
-
-  /**
-   * @brief Returns the dxgi format of the given file.
-   * @param data Buffer containing file data.
-   * @throw std::runtime_error
-   */
-  static DXGI_FORMAT getDxgiFormat(const Buffer& data) noexcept(false);
 
   /**
    * @name IO Functions
