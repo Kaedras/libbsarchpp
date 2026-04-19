@@ -5,6 +5,9 @@
 
 #include "md5.h"
 
+#include <algorithm>  // for __copy_fn, copy
+#include <cstring>    // for memcpy
+
 using namespace std;
 
 /*

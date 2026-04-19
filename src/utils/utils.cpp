@@ -1,6 +1,8 @@
 #include "utils.h"
-
-#include "types.h"
+#include "types.h"    // for Magic4
+#include <algorithm>  // for __transform_fn, transform, __replace_fn, replace
+#include <cctype>     // for tolower, isalpha, isdigit, isascii
+#include <cstring>    // for memcpy, size_t
 
 using namespace std;
 

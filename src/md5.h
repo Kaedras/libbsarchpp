@@ -1,5 +1,10 @@
 #pragma once
 
+#include <array>        // for array
+#include <cstdint>      // for uint8_t, uint32_t, uint64_t
+#include <cstdio>       // for FILE, size_t
+#include <string_view>  // for string_view
+
 // modified version of https://github.com/Zunawe/md5-c
 
 struct MD5Context {

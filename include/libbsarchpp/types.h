@@ -1,15 +1,16 @@
 #pragma once
 
-#include "enums.h"
-#include <array>
-#include <cstdint>
-#include <cstdio>
-#include <filesystem>
-#include <iosfwd>
-#include <memory>
-#include <string_view>
-#include <variant>
-#include <vector>
+#include "enums.h"      // for PackingCompression_t
+#include <array>        // for array
+#include <cstdint>      // for uint32_t, uint16_t, int32_t, uint64_t, uint8_t
+#include <cstdio>       // for FILE, fclose
+#include <filesystem>   // for path
+#include <memory>       // for unique_ptr
+#include <string>       // for basic_string, string
+#include <string_view>  // for string_view
+#include <variant>      // for variant
+#include <vector>       // for vector
+#include <version>      // for nullptr_t
 
 namespace libbsarchpp {
 
@@ -17,7 +18,6 @@ namespace libbsarchpp {
 class Bsa;
 struct TexChunkRec;
 struct FileTES3;
-struct FolderTES4;
 struct FileTES4;
 struct FileFO4;
 

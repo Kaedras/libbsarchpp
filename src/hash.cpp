@@ -1,7 +1,12 @@
 #include "hash.h"
 
-#include "constants.h"
-#include "utils.h"
+#include "constants.h"            // for crc32table
+#include "gsl-lite/gsl-lite.hpp"  // for narrow
+#include "utils.h"                // for normalizePath
+#include <array>                  // for array
+#include <climits>                // for CHAR_MAX, UCHAR_MAX
+#include <cstddef>                // for size_t
+#include <string>                 // for basic_string, operator==, char_traits
 
 using namespace std;
 

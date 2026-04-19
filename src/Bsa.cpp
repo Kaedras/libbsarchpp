@@ -1,11 +1,30 @@
 #include "Bsa.h"
-
-#include "constants.h"
-#include "enums.h"
-#include "hash.h"
-#include "md5.h"
-#include "types.h"
-#include "utils.h"
+#include "constants.h"                     // for DX10, DDPF_FOURCC, DDSD_PITCH
+#include "directx/dxgiformat.h"            // for DXGI_FORMAT
+#include "enums.h"                         // for ArchiveType, CompressionType
+#include "gsl-lite/gsl-lite.hpp"           // for narrow, narrowing_error
+#include "hash.h"                          // for CreateHashTES4, CreateHashFO4
+#include "md5.h"                           // for MD5Context, md5Finalize
+#include "types.h"                         // for FileFO4, FolderTES4, FileTES3
+#include "utils.h"                         // for ToLower, MagicToString
+#include <algorithm>                       // for __copy_fn, copy
+#include <array>                           // for array
+#include <compare>                         // for operator<
+#include <exception>                       // for exception
+#include <format>                          // for format
+#include <lz4.h>                           // for LZ4_compressBound, LZ4_com...
+#include <lz4frame.h>                      // for LZ4F_getErrorName, LZ4F_is...
+#include <pstl/algorithm_impl.h>           // for __pattern_sort, __pattern_...
+#include <pstl/execution_defs.h>           // for par_unseq, par
+#include <pstl/execution_impl.h>           // for __select_backend
+#include <pstl/glue_algorithm_impl.h>      // for sort, for_each
+#include <pstl/glue_execution_defs.h>      // for par_unseq, par
+#include <pstl/parallel_backend_serial.h>  // for __parallel_stable_sort
+#include <ranges>                          // for pair, __find_fn, find
+#include <utility>                         // for pair, get, make_pair, move
+#include <version>                         // for nullptr_t
+#include <zconf.h>                         // for uLong, uLongf
+#include <zlib.h>                          // for Z_BEST_COMPRESSION, compress2
 
 using namespace std;
 namespace fs = std::filesystem;

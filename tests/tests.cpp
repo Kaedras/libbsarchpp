@@ -1,31 +1,30 @@
-#include "checksums/sha256sums.h"
-#include "libbsarchpp/Bsa.h"
-#include "libbsarchpp/enums.h"
-#include "libbsarchpp/hash.h"
-#include "libbsarchpp/utils/utils.h"
-#include "settings.h"
-
-#include <bits/ranges_algo.h>
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <filesystem>
-#include <format>
-#include <fstream>
-#include <gsl-lite/gsl-lite.hpp>
-#include <gtest/gtest.h>
-#include <iomanip>
-#include <openssl/crypto.h>
-#include <openssl/evp.h>
-#include <openssl/sha.h>
-#include <openssl/types.h>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <vector>
+#include <gtest/gtest.h>              // for Test, Message, TestPartResult
+#include <openssl/crypto.h>           // for OPENSSL_free, OPENSSL_malloc
+#include <openssl/evp.h>              // for EVP_sha256, EVP_DigestFinal_ex
+#include <openssl/sha.h>              // for SHA256_DIGEST_LENGTH
+#include <openssl/types.h>            // for EVP_MD_CTX
+#include <algorithm>                  // for sort, __sort_fn
+#include <cassert>                    // for assert
+#include <cstddef>                    // for size_t
+#include <cstdint>                    // for int8_t
+#include <filesystem>                 // for path, operator/, exists, file_size
+#include <format>                     // for format
+#include <fstream>                    // for basic_ifstream, basic_ostream
+#include <gsl-lite/gsl-lite.hpp>      // for narrow, narrowing_error
+#include <iomanip>                    // for operator<<, setfill, setw
+#include <sstream>                    // for basic_stringstream
+#include <stdexcept>                  // for runtime_error
+#include <string>                     // for basic_string, allocator, char_t...
+#include <tuple>                      // for tuple, get
+#include <unordered_map>              // for unordered_map
+#include <variant>                    // for tuple
+#include <vector>                     // for vector
+#include "checksums/sha256sums.h"     // for sha256sums
+#include "libbsarchpp/Bsa.h"          // for Bsa, FileIterationFunction
+#include "libbsarchpp/enums.h"        // for ArchiveType
+#include "libbsarchpp/hash.h"         // for CreateHashTES4, CreateHashFO4
+#include "libbsarchpp/utils/utils.h"  // for comparePaths
+#include "settings.h"                 // for WORKDIR, dataDirs, multithreade...
 
 namespace {
 

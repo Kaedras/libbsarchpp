@@ -1,21 +1,23 @@
 #pragma once
 
-#include "enums.h"
-#include "types.h"
-#include <atomic>
-#include <bit>
-#include <cerrno>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <filesystem>
-#include <functional>
-#include <mutex>
-#include <optional>
-#include <stdexcept>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "enums.h"        // for ArchiveType, CompressionType, SeekDirection
+#include "types.h"        // for FileFO4, FolderTES4, FileTES3, fileDeleter
+#include <atomic>         // for atomic
+#include <bit>            // for endian
+#include <cerrno>         // for errno
+#include <cstdint>        // for uint32_t, uint8_t, int32_t, int64_t, uint64_t
+#include <cstdio>         // for feof, fread, fwrite, size_t, FILE
+#include <cstring>        // for strerror
+#include <filesystem>     // for path, hash
+#include <functional>     // for function
+#include <memory>         // for unique_ptr
+#include <mutex>          // for mutex
+#include <optional>       // for optional, nullopt, nullopt_t
+#include <stdexcept>      // for runtime_error
+#include <string>         // for operator+, operator""s, string, u16string
+#include <unordered_map>  // for unordered_map
+#include <variant>        // for variant
+#include <vector>         // for vector
 
 #ifndef DLLEXPORT
 #ifdef SHARED
