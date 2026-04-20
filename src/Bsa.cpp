@@ -9,20 +9,12 @@
 #include "utils.h"                         // for ToLower, MagicToString
 #include <algorithm>                       // for __copy_fn, copy
 #include <array>                           // for array
-#include <compare>                         // for operator<
 #include <exception>                       // for exception
 #include <format>                          // for format
 #include <lz4.h>                           // for LZ4_compressBound, LZ4_com...
 #include <lz4frame.h>                      // for LZ4F_getErrorName, LZ4F_is...
-#include <pstl/algorithm_impl.h>           // for __pattern_sort, __pattern_...
-#include <pstl/execution_defs.h>           // for par_unseq, par
-#include <pstl/execution_impl.h>           // for __select_backend
-#include <pstl/glue_algorithm_impl.h>      // for sort, for_each
-#include <pstl/glue_execution_defs.h>      // for par_unseq, par
-#include <pstl/parallel_backend_serial.h>  // for __parallel_stable_sort
 #include <ranges>                          // for pair, __find_fn, find
 #include <utility>                         // for pair, get, make_pair, move
-#include <version>                         // for nullptr_t
 #include <zconf.h>                         // for uLong, uLongf
 #include <zlib.h>                          // for Z_BEST_COMPRESSION, compress2
 
