@@ -59,18 +59,18 @@ public:
                       bool multithreaded = false) noexcept(false);
 
   /**
-   * @brief Creates a new archive with specified type from files inside a specified input directory.
+   * @brief Creates a new archive with the specified type from files inside a specified input directory.
    * @param archivePath Output file path
    * @param type Archive type
    * @param inputDirectory Base directory of input files
-   * @param settings Settings to use when creating archive
+   * @param settings Settings to use when creating the archive
    * @throw std::runtime_error
    */
   static void create(const std::filesystem::path& archivePath, ArchiveType type,
                      const std::filesystem::path& inputDirectory, BsaCreationSettings settings = {}) noexcept(false);
 
   /**
-   * @brief Reads the header of specified archive file and returns the archive type.
+   * @brief Reads the header of the specified archive file and returns the archive type.
    * @param archivePath Archive to check
    * @return Type of archive
    * @throw std::runtime_error
@@ -93,7 +93,7 @@ public:
    * @param ddsBasePath Base path for dds files, only required for FO4dds and SFdds archives
    * @param compressed Enable compression
    * @param shareData Identical files will only be written once. Potentially reduces filesize while reducing performance
-   * @param multithreaded Enable multithreaded packing. Increases performance, but produces indeterministic results
+   * @param multithreaded Enable multithreaded packing. Increases performance but produces indeterministic results
    * @throw std::runtime_error
    */
   Bsa(const std::filesystem::path& archivePath, ArchiveType type, std::vector<std::filesystem::path>& fileList,
@@ -184,7 +184,7 @@ public:
   /**
    * @brief Returns a vector containing all file paths inside the archive. If the optional parameter is provided, only
    * files inside the specified directory are returned.
-   * @param directoryName Optionally restrict file list to files inside this directory
+   * @param directoryName Optionally restrict the file list to files inside this directory
    * @return Filelist
    */
   [[nodiscard]] std::vector<std::filesystem::path>
@@ -322,7 +322,7 @@ private:
   int getDDSMipChunkCount(const DDSInfo& DDSInfo) const noexcept;
 
   /**
-   * @brief Calculates MD5 of provided buffer.
+   * @brief Calculates MD5 of the provided buffer.
    * @param data Buffer
    * @param length Buffer length
    * @return MD5 of buffer
@@ -330,18 +330,18 @@ private:
   static PackedDataHash calcDataHash(const uint8_t* data, uint32_t length) noexcept;
 
   /**
-   * @brief Checks if there is an identical file in @link m_files @endlink. This also sets size and offset of the
+   * @brief Checks if there is an identical file in @link m_files @endlink. This also sets the size and offset of the
    * provided file.
    * @param size Data size
    * @param hash Data hash
    * @param fileRecord File record
-   * @return Whether identical file exists in @link m_files @endlink. Always returns false if @link m_shareData @endlink
+   * @return Whether an identical file exists in @link m_files @endlink. Always returns false if @link m_shareData @endlink
    * is false.
    */
   bool findPackedData(uint32_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept;
 
   /**
-   * @brief Adds provided file to @link m_packedData @endlink. Does not do anything if @link m_shareData @endlink is
+   * @brief Adds the provided file to @link m_packedData @endlink. Does not do anything if @link m_shareData @endlink is
    * false.
    * @param size Data size
    * @param hash Data hash
@@ -355,6 +355,7 @@ private:
    * @param filePath File path
    * @param dataHash File hash. Only used if @link m_shareData @endlink is true.
    * @param data File data
+   * @param size Data size
    * @param compress Compress
    * @param doCompress Force compression
    * @throw std::runtime_error
@@ -363,7 +364,7 @@ private:
                 const uint8_t* data, uint32_t size, bool compress, bool doCompress = false) noexcept(false);
 
   /**
-   * @brief Compresses the provided buffer. Compression algorithm is dependent on archive type.
+   * @brief Compresses the provided buffer. Compression algorithm is dependent on the archive type.
    * @param data Uncompressed data
    * @return Compressed data
    * @throw std::runtime_error
@@ -371,7 +372,7 @@ private:
   [[nodiscard]] Buffer compressData(const Buffer& data) const noexcept(false);
 
   /**
-   * @brief Compresses the provided buffer. Compression algorithm is dependent on archive type.
+   * @copybrief compressData(const Buffer&)
    * @param data Uncompressed buffer
    * @param length Buffer length
    * @return Compressed data
@@ -398,7 +399,7 @@ private:
   void decompressData(const Buffer& compressed, uint8_t* uncompressed, uint32_t uncompressedSize) const noexcept(false);
 
   /**
-   * @brief Reads dds info from provided file.
+   * @brief Reads dds info from the provided file.
    * @param filePath Path to dds file
    * @throw std::runtime_error
    */
@@ -415,7 +416,7 @@ private:
   void unlock() noexcept;
 
   /**
-   * @brief Returns whether strings written to file should contain backslashes instead of slashes.
+   * @brief Returns whether strings written should contain backslashes instead of slashes.
    */
   bool useBackslashes() const noexcept { return m_type != FO4 && m_type != FO4dds && m_type != SF && m_type != SFdds; }
 
@@ -429,12 +430,12 @@ private:
 
   /**
    * @brief Returns HeaderFO4 structure from @link m_header @endlink.
-   * @throw std::runtime_error If archive does not contain a FO4 header
+   * @throw std::runtime_error If the archive does not contain a FO4 header
    */
   HeaderFO4& getHeaderFO4() noexcept(false);
 
   /**
-   * @brief This function is called by @link Bsa::findFileRecord @endlink if archive type is TES4.
+   * @brief This function is called by @link Bsa::findFileRecord @endlink if the archive type is TES4.
    */
   [[nodiscard]] FileRecord_t findFileRecordTES4(const std::filesystem::path& filePath) noexcept;
 
@@ -487,13 +488,13 @@ private:
   void readBa2DX10() noexcept(false);
 
   /**
-   * @brief Determines exact archive version.
+   * @brief Determines the exact archive version.
    * @throw std::runtime_error
    */
   void determineArchiveVersion() noexcept(false);
 
   /**
-   * @brief This function is called by @link Bsa::addFile @endlink if archive type is FO4dds or SFdds.
+   * @brief This function is called by @link Bsa::addFile @endlink if the archive type is FO4dds or SFdds.
    * @throw std::runtime_error
    */
   void addFileDDS(FileFO4* file, const Buffer& data) noexcept(false);
@@ -509,7 +510,7 @@ private:
    */
   ///@{
   /**
-   * @brief Reads a value from file.
+   * @brief Reads data.
    * @tparam T Data type to read
    * @return Read value
    * @throw std::runtime_error
@@ -530,7 +531,7 @@ private:
   }
 
   /**
-   * @brief Reads an array from file.
+   * @brief Reads an array.
    * @param length array length
    * @return std::vector<@p T> containing the read data
    * @throw std::runtime_error
@@ -551,7 +552,7 @@ private:
   }
 
   /**
-   * @brief Reads an array from file into an existing array. Memory must already be allocated.
+   * @brief Reads an array from the open file into an existing array. Memory must already be allocated.
    * @param data Array to write into
    * @param length Elements to read
    * @throw std::runtime_error
@@ -589,7 +590,7 @@ private:
   std::filesystem::path readStringLen16() noexcept(false);
 
   /**
-   * @brief Writes data to file.
+   * @brief Writes data.
    * @throw std::runtime_error
    */
   template <typename T>
@@ -600,7 +601,7 @@ private:
   }
 
   /**
-   * @brief Writes data to file.
+   * @copybrief write(const T&)
    * @throw std::runtime_error
    */
   template <typename T>
@@ -611,7 +612,7 @@ private:
   }
 
   /**
-   * @brief Writes data to file.
+   * @copybrief write(const T&)
    * @throw std::runtime_error
    */
   template <typename T>
