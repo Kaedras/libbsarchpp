@@ -88,18 +88,19 @@ else ()
 endif ()
 
 # install
+include(GNUInstallDirs)
 install(TARGETS libbsarchpp EXPORT libbsarchppTargets FILE_SET HEADERS)
 if (MSVC AND BUILD_SHARED_LIBS)
     install(FILES $<TARGET_PDB_FILE:libbsarchpp> DESTINATION pdb OPTIONAL)
 endif ()
 install(EXPORT libbsarchppTargets
         FILE libbsarchpp-targets.cmake
-        DESTINATION lib/cmake/libbsarchpp
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/libbsarchpp"
 )
 
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake.in
         "${CMAKE_CURRENT_BINARY_DIR}/libbsarchpp-config.cmake"
-        INSTALL_DESTINATION "lib/cmake/libbsarchpp"
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/libbsarchpp"
         NO_SET_AND_CHECK_MACRO
         NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
@@ -114,7 +115,7 @@ write_basic_package_version_file(
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/libbsarchpp-config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/libbsarchpp-config-version.cmake
-        DESTINATION lib/cmake/libbsarchpp
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/libbsarchpp"
 )
 
 # tests
