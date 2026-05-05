@@ -62,7 +62,7 @@ target_include_directories(libbsarchpp PRIVATE
 
 target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
-target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4)
+target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4 $<$<CXX_COMPILER_ID:GNU>:tbb>)
 
 set_target_properties(libbsarchpp PROPERTIES
         DEBUG_POSTFIX "d"
