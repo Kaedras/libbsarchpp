@@ -23,9 +23,9 @@ else()
 endif()
 
 if (BUILD_SHARED_LIBS)
-    target_compile_definitions(libbsarchpp PRIVATE -DSHARED)
+    target_compile_definitions(libbsarchpp PRIVATE -DLIBSARCHPP_BUILD_SHARED)
 else()
-    target_compile_definitions(libbsarchpp PRIVATE -DSTATIC)
+    target_compile_definitions(libbsarchpp PRIVATE -DLIBSARCHPP_BUILD_STATIC)
 endif()
 
 target_sources(libbsarchpp

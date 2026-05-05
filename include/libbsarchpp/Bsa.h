@@ -19,20 +19,20 @@
 #include <variant>        // for variant
 #include <vector>         // for vector
 
-#ifndef DLLEXPORT
-#ifdef SHARED
 #ifdef __unix__
-#define DLLEXPORT __attribute__((visibility("default")))
+#define EXPORT __attribute__((visibility("default")))
+#define IMPORT
 #else
-#define DLLEXPORT _declspec(dllexport)
+#define EXPORT _declspec(dllexport)
+#define IMPORT _declspec(dllimport)
 #endif
-#else
-#ifdef __unix__
+
+#ifdef LIBSARCHPP_BUILD_SHARED
+#define DLLEXPORT EXPORT
+#elifdef LIBSARCHPP_BUILD_STATIC
 #define DLLEXPORT
 #else
-#define DLLEXPORT _declspec(dllimport)
-#endif
-#endif
+#define DLLEXPORT IMPORT
 #endif
 
 static_assert(std::endian::native == std::endian::little);
