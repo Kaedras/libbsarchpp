@@ -327,7 +327,7 @@ private:
    * @param length Buffer length
    * @return MD5 of buffer
    */
-  static PackedDataHash calcDataHash(const uint8_t* data, uint32_t length) noexcept;
+  static PackedDataHash calcDataHash(const uint8_t* data, size_t length) noexcept;
 
   /**
    * @brief Checks if there is an identical file in @link m_files @endlink. This also sets the size and offset of the
@@ -338,7 +338,7 @@ private:
    * @return Whether an identical file exists in @link m_files @endlink. Always returns false if @link m_shareData @endlink
    * is false.
    */
-  bool findPackedData(uint32_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept;
+  bool findPackedData(size_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept;
 
   /**
    * @brief Adds the provided file to @link m_packedData @endlink. Does not do anything if @link m_shareData @endlink is
@@ -361,7 +361,7 @@ private:
    * @throw std::runtime_error
    */
   void packData(const FileRecord_t& fileRecord, const std::filesystem::path& filePath, const PackedDataHash& dataHash,
-                const uint8_t* data, uint32_t size, bool compress, bool doCompress = false) noexcept(false);
+                const uint8_t* data, size_t size, bool compress, bool doCompress = false) noexcept(false);
 
   /**
    * @brief Compresses the provided buffer. Compression algorithm is dependent on the archive type.

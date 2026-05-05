@@ -1219,7 +1219,7 @@ int Bsa::getDDSMipChunkCount(const DDSInfo& DDSInfo) const noexcept {
   return count;
 }
 
-PackedDataHash Bsa::calcDataHash(const uint8_t* data, const uint32_t length) noexcept {
+PackedDataHash Bsa::calcDataHash(const uint8_t* data, const size_t length) noexcept {
   // calculate md5
   PackedDataHash result{};
 
@@ -1232,7 +1232,7 @@ PackedDataHash Bsa::calcDataHash(const uint8_t* data, const uint32_t length) noe
   return result;
 }
 
-bool Bsa::findPackedData(const uint32_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept {
+bool Bsa::findPackedData(const size_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept {
   if (!m_shareData) {
     return false;
   }
@@ -2300,7 +2300,7 @@ Buffer Bsa::extractFileData(const FileRecord_t& fileRecord) noexcept(false) {
 }
 
 void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& filePath, const PackedDataHash& dataHash,
-                   const uint8_t* data, uint32_t size, bool compress, const bool doCompress) noexcept(false) {
+                   const uint8_t* data, size_t size, bool compress, const bool doCompress) noexcept(false) {
   // check if data already exists
   if (findPackedData(size, dataHash, fileRecord)) {
     return;
