@@ -10,6 +10,7 @@
 #include <algorithm>                       // for __copy_fn, copy
 #include <array>                           // for array
 #include <exception>                       // for exception
+#include <execution>                       // for execution
 #include <format>                          // for format
 #include <lz4.h>                           // for LZ4_compressBound, LZ4_com...
 #include <lz4frame.h>                      // for LZ4F_getErrorName, LZ4F_is...
