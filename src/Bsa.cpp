@@ -21,6 +21,7 @@
 
 using namespace std;
 namespace fs = std::filesystem;
+using gsl_lite::narrow;
 
 namespace libbsarchpp {
 namespace {
@@ -1370,7 +1371,7 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
     }
 
     // DXGI detection
-    file->dxgiFormat = getDxgiFormat(data);
+    file->dxgiFormat = narrow<uint8_t>(getDxgiFormat(data));
 
     // MipMap size detection
     int bpp = bitsPerPixel(file->dxgiFormat);
@@ -1403,7 +1404,7 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
       } else {
         // the last chunk stores all remaining mipmaps
         texChunk.endMip = file->numMips - 1;
-        MipSize         = data.size() - offset;
+        MipSize         = narrow<uint32_t>(data.size() - offset);
       }
 
       PackedDataHash dataHash;
@@ -1521,7 +1522,7 @@ void Bsa::addFile(const std::filesystem::path& filePath, const Buffer& data) noe
       auto* fileFO4 = get<FileFO4*>(file);
 
       fileFO4->offset = _ftelli64(m_file.get());
-      fileFO4->size   = data.size();
+      fileFO4->size   = narrow<uint32_t>(data.size());
 
       packData(fileFO4, fileFO4->name, dataHash, data.data(), data.size(), fileFO4->compress(this));
       break;
@@ -2307,7 +2308,7 @@ void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& fileP
   }
 
   // uncompressed size in case the provided data gets compressed
-  const uint32_t uncompressedSize = size;
+  const uint32_t uncompressedSize = narrow<uint32_t>(size);
 
   Buffer compressedBuffer;
 
