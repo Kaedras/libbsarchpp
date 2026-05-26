@@ -22,6 +22,12 @@ else()
     add_library(lz4::lz4 ALIAS PkgConfig::lz4)
 endif()
 
+# tbb, required for parallel loops
+if (UNIX)
+    find_package(TBB CONFIG REQUIRED)
+    target_link_libraries(libbsarchpp PRIVATE TBB::tbb)
+endif()
+
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(libbsarchpp PRIVATE -DLIBSARCHPP_BUILD_SHARED)
 else()
@@ -62,7 +68,7 @@ target_include_directories(libbsarchpp PRIVATE
 
 target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
-target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4 $<$<BOOL:UNIX>:tbb>)
+target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4)
 
 set_target_properties(libbsarchpp PROPERTIES
         DEBUG_POSTFIX "d"
