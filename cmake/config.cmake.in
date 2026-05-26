@@ -3,9 +3,9 @@
 find_dependency(ZLIB REQUIRED)
 
 if (WIN32)
-    find_dependency(lz4 CONFIG REQUIRED)
+    find_dependency(lz4 REQUIRED)
 else()
-    find_dependency(TBB config REQUIRED)
+    find_dependency(TBB REQUIRED)
     find_dependency(PkgConfig REQUIRED)
     pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
     add_library(lz4::lz4 ALIAS PkgConfig::lz4)
