@@ -1,5 +1,9 @@
 {
   "dependencies": [
+    {
+      "name": "tbb",
+      "platform": "linux | freebsd | openbsd"
+    },
     "lz4",
     "zlib"
   ],
