@@ -40,17 +40,14 @@ See examples below.
 Install missing dependencies with your package manager. Exact package names are dependent on your distro.
 
 ```shell
-# create and enter build directory
-mkdir build && cd build
-
-# configure, append -DLIBBSARCHPP_TESTING=ON to enable tests
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
+# configure, optionally append -DLIBBSARCHPP_TESTING=ON to enable tests
+cmake -B build
 
 # optionally configure tests using ccmake or cmake-gui if they were included in previous step
-ccmake .
+ccmake build
 
 # compile with $(nproc) jobs
-make -j$(nproc)
+cmake --build build -j$(nproc)
 ```
 
 #### With vcpkg
@@ -59,7 +56,7 @@ make -j$(nproc)
 # set to the appropriate path for VCPKG
 export VCPKG_ROOT=/usr/share/vcpkg
 
-# configure, append -DLIBBSARCHPP_TESTING=ON to enable tests
+# configure, optionally append -DLIBBSARCHPP_TESTING=ON to enable tests
 cmake --preset linux
 
 # optionally configure tests using ccmake or cmake-gui if they were included in previous step
