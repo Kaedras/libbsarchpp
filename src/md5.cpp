@@ -194,21 +194,15 @@ void md5Step(std::array<uint32_t, 4>& buffer, const std::array<uint32_t, 16>& in
   buffer[3] += DD;
 }
 
-/*
- * Functions that run the algorithm on the provided input and put the digest into result.
- * result should be able to store 16 bytes.
- */
 std::array<uint8_t, 16> md5String(const std::string_view input) {
   MD5Context ctx;
   md5Update(&ctx, reinterpret_cast<const uint8_t*>(input.data()), input.size());
   md5Finalize(&ctx);
 
-  std::array<uint8_t, 16> result;  // NOLINT(*-pro-type-member-init)
-  ranges::copy(ctx.digest, result.begin());
-  return result;
+  return ctx.digest;
 }
 
-void md5File(FILE* file, uint8_t* result) {
+std::array<uint8_t, 16> md5File(FILE* file) {
   std::array<uint8_t, 1024> input_buffer{};
   size_t input_size = 0;
 
@@ -220,5 +214,5 @@ void md5File(FILE* file, uint8_t* result) {
 
   md5Finalize(&ctx);
 
-  memcpy(result, ctx.digest.data(), 16);
+  return ctx.digest;
 }
