@@ -335,8 +335,8 @@ private:
    * @param size Data size
    * @param hash Data hash
    * @param fileRecord File record
-   * @return Whether an identical file exists in @link m_files @endlink. Always returns false if @link m_shareData @endlink
-   * is false.
+   * @return Whether an identical file exists in @link m_files @endlink. Always returns false if @link m_shareData
+   * @endlink is false.
    */
   bool findPackedData(size_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept;
 
@@ -498,12 +498,6 @@ private:
    * @throw std::runtime_error
    */
   void addFileDDS(FileFO4* file, const Buffer& data) noexcept(false);
-
-  /**
-   * @brief Returns the bits per pixel for the given format.
-   * @throw std::runtime_error
-   */
-  static int bitsPerPixel(uint8_t format) noexcept(false);
 
   /**
    * @name IO Functions

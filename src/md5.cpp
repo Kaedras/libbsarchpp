@@ -5,26 +5,24 @@
 
 #include "md5.h"
 
-#include <algorithm>  // for __copy_fn, copy
-#include <cstring>    // for memcpy
-
 using namespace std;
 
+namespace {
 /*
  * Constants defined by the MD5 algorithm
  */
 
-static constexpr uint32_t A = 0x67452301;
-static constexpr uint32_t B = 0xefcdab89;
-static constexpr uint32_t C = 0x98badcfe;
-static constexpr uint32_t D = 0x10325476;
+constexpr uint32_t A = 0x67452301;
+constexpr uint32_t B = 0xefcdab89;
+constexpr uint32_t C = 0x98badcfe;
+constexpr uint32_t D = 0x10325476;
 
-static constexpr array<uint32_t, 64> S = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-                                          5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20,
-                                          4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-                                          6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
+constexpr array<uint32_t, 64> S = {7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+                                   5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20, 5, 9,  14, 20,
+                                   4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+                                   6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
-static constexpr array<uint32_t, 64> K = {
+constexpr array<uint32_t, 64> K = {
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
     0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
     0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
@@ -37,34 +35,36 @@ static constexpr array<uint32_t, 64> K = {
 /*
  * Padding used to make the size (in bits) of the input congruent to 448 mod 512
  */
-static constexpr array<uint8_t, 64> PADDING = {
-    0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+constexpr array<uint8_t, 64> PADDING = {0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /*
  * Bit-manipulation functions defined by the MD5 algorithm
  */
-inline uint32_t F(const uint32_t X, const uint32_t Y, const uint32_t Z) {
+uint32_t F(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return (X & Y) | (~X & Z);
 }
-inline uint32_t G(const uint32_t X, const uint32_t Y, const uint32_t Z) {
+uint32_t G(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return (X & Z) | (Y & ~Z);
 }
-inline uint32_t H(const uint32_t X, const uint32_t Y, const uint32_t Z) {
+uint32_t H(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return X ^ Y ^ Z;
 }
-inline uint32_t I(const uint32_t X, const uint32_t Y, const uint32_t Z) {
+uint32_t I(const uint32_t X, const uint32_t Y, const uint32_t Z) {
   return Y ^ (X | ~Z);
 }
 
 /*
  * Rotates a 32-bit word left by n bits
  */
-inline uint32_t rotateLeft(const uint32_t x, const uint32_t n) {
+uint32_t rotateLeft(const uint32_t x, const uint32_t n) {
   return (x << n) | (x >> (32 - n));
 }
+
+}  // namespace
 
 MD5Context::MD5Context() : size(0), buffer({A, B, C, D}), input({}), digest({}) {}
 
@@ -86,14 +86,14 @@ void md5Init(MD5Context* ctx) {
  * If the input fills out a block of 512 bits, apply the algorithm (md5Step)
  * and save the result in the buffer. Also updates the overall size.
  */
-void md5Update(MD5Context* ctx, const uint8_t* input_buffer, const size_t input_len) {
+void md5Update(MD5Context* ctx, const uint8_t* inputBuffer, const size_t inputLen) {
   array<uint32_t, 16> input;  // NOLINT(*-pro-type-member-init)
   unsigned int offset = ctx->size % 64;
-  ctx->size += input_len;
+  ctx->size += inputLen;
 
   // Copy each byte in input_buffer into the next space in our context input
-  for (unsigned int i = 0; i < input_len; ++i) {
-    ctx->input[offset++] = static_cast<uint8_t>(*(input_buffer + i));
+  for (unsigned int i = 0; i < inputLen; ++i) {
+    ctx->input[offset++] = static_cast<uint8_t>(*(inputBuffer + i));
 
     // If we've filled our context input, copy it into our local array input
     // then reset the offset to 0 and fill in a new buffer.
@@ -120,12 +120,12 @@ void md5Update(MD5Context* ctx, const uint8_t* input_buffer, const size_t input_
  */
 void md5Finalize(MD5Context* ctx) {
   array<uint32_t, 16> input;  // NOLINT(*-pro-type-member-init)
-  const size_t offset         = ctx->size % 64;
-  const size_t padding_length = offset < 56 ? 56 - offset : 56 + 64 - offset;
+  const size_t offset        = ctx->size % 64;
+  const size_t paddingLength = offset < 56 ? 56 - offset : 56 + 64 - offset;
 
   // Fill in the padding and undo the changes to size that resulted from the update
-  md5Update(ctx, PADDING.data(), padding_length);
-  ctx->size -= padding_length;
+  md5Update(ctx, PADDING.data(), paddingLength);
+  ctx->size -= paddingLength;
 
   // Do a final update (internal to this function)
   // Last two 32-bit words are the two halves of the size (converted from bytes to bits)
@@ -203,13 +203,13 @@ std::array<uint8_t, 16> md5String(const std::string_view input) {
 }
 
 std::array<uint8_t, 16> md5File(FILE* file) {
-  std::array<uint8_t, 1024> input_buffer{};
-  size_t input_size = 0;
+  std::array<uint8_t, 1024> inputBuffer{};
+  size_t inputSize = 0;
 
   MD5Context ctx;
 
-  while ((input_size = fread(input_buffer.data(), 1, 1024, file)) > 0) {
-    md5Update(&ctx, input_buffer.data(), input_size);
+  while ((inputSize = fread(inputBuffer.data(), 1, 1024, file)) > 0) {
+    md5Update(&ctx, inputBuffer.data(), inputSize);
   }
 
   md5Finalize(&ctx);

@@ -1,23 +1,23 @@
 #include "Bsa.h"
-#include "constants.h"                     // for DX10, DDPF_FOURCC, DDSD_PITCH
-#include "directx/dxgiformat.h"            // for DXGI_FORMAT
-#include "enums.h"                         // for ArchiveType, CompressionType
-#include "gsl-lite/gsl-lite.hpp"           // for narrow, narrowing_error
-#include "hash.h"                          // for CreateHashTES4, CreateHashFO4
-#include "md5.h"                           // for MD5Context, md5Finalize
-#include "types.h"                         // for FileFO4, FolderTES4, FileTES3
-#include "utils.h"                         // for ToLower, MagicToString
-#include <algorithm>                       // for __copy_fn, copy
-#include <array>                           // for array
-#include <exception>                       // for exception
-#include <execution>                       // for execution
-#include <format>                          // for format
-#include <lz4.h>                           // for LZ4_compressBound, LZ4_com...
-#include <lz4frame.h>                      // for LZ4F_getErrorName, LZ4F_is...
-#include <ranges>                          // for pair, __find_fn, find
-#include <utility>                         // for pair, get, make_pair, move
-#include <zconf.h>                         // for uLong, uLongf
-#include <zlib.h>                          // for Z_BEST_COMPRESSION, compress2
+#include "constants.h"            // for DX10, DDPF_FOURCC, DDSD_PITCH
+#include "directx/dxgiformat.h"   // for DXGI_FORMAT
+#include "enums.h"                // for ArchiveType, CompressionType
+#include "gsl-lite/gsl-lite.hpp"  // for narrow, narrowing_error
+#include "hash.h"                 // for CreateHashTES4, CreateHashFO4
+#include "md5.h"                  // for MD5Context, md5Finalize
+#include "types.h"                // for FileFO4, FolderTES4, FileTES3
+#include "utils.h"                // for ToLower, MagicToString
+#include <algorithm>              // for __copy_fn, copy
+#include <array>                  // for array
+#include <exception>              // for exception
+#include <execution>              // for execution
+#include <format>                 // for format
+#include <lz4.h>                  // for LZ4_compressBound, LZ4_com...
+#include <lz4frame.h>             // for LZ4F_getErrorName, LZ4F_is...
+#include <ranges>                 // for pair, __find_fn, find
+#include <utility>                // for pair, get, make_pair, move
+#include <zconf.h>                // for uLong, uLongf
+#include <zlib.h>                 // for Z_BEST_COMPRESSION, compress2
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -107,6 +107,55 @@ namespace {
       }
     }
   }
+
+  /**
+   * @brief Returns the bits per pixel for the given format.
+   * @throw std::runtime_error
+   */
+  uint8_t bitsPerPixel(uint8_t format) noexcept(false) {
+    switch (format) {
+    case DXGI_FORMAT_BC1_UNORM:
+    case DXGI_FORMAT_BC1_UNORM_SRGB:
+    case DXGI_FORMAT_BC4_UNORM:
+    case DXGI_FORMAT_BC4_SNORM:
+      return 4;
+    case DXGI_FORMAT_BC2_UNORM:
+    case DXGI_FORMAT_BC2_UNORM_SRGB:
+    case DXGI_FORMAT_BC3_UNORM:
+    case DXGI_FORMAT_BC3_UNORM_SRGB:
+    case DXGI_FORMAT_BC5_UNORM:
+    case DXGI_FORMAT_BC5_SNORM:
+    case DXGI_FORMAT_BC6H_SF16:
+    case DXGI_FORMAT_BC6H_UF16:
+    case DXGI_FORMAT_BC7_UNORM:
+    case DXGI_FORMAT_BC7_UNORM_SRGB:
+    case DXGI_FORMAT_A8_UNORM:
+    case DXGI_FORMAT_R8_SINT:
+    case DXGI_FORMAT_R8_SNORM:
+    case DXGI_FORMAT_R8_UINT:
+    case DXGI_FORMAT_R8_UNORM:
+      return 8;
+    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_B5G5R5A1_UNORM:
+    case DXGI_FORMAT_R8G8_SINT:
+    case DXGI_FORMAT_R8G8_UINT:
+    case DXGI_FORMAT_R8G8_UNORM:
+      return 16;
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_R8G8B8A8_SINT:
+    case DXGI_FORMAT_R8G8B8A8_UINT:
+    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+      return 32;
+
+    default:
+      throw runtime_error("Unsupported DDS format");
+    }
+  }
+
 }  // namespace
 
 template <>
@@ -1046,12 +1095,12 @@ Bsa::Bsa(const std::filesystem::path& archivePath, ArchiveType type, std::vector
       createArchiveTES3(fileList);
       break;
     case TES4: {
-      m_version        = headerVersions::TES4;
-      m_magic          = magic::BSA;
-      m_header         = HeaderTES4{};
-      auto& headerTES4 = get<HeaderTES4>(m_header);
-      headerTES4.flags = flags::archive::PATHNAMES | flags::archive::FILENAMES | flags::archive::EMBEDNAME |
-                         flags::archive::XMEM | flags::archive::UNKNOWN10;
+      m_version                = headerVersions::TES4;
+      m_magic                  = magic::BSA;
+      m_header                 = HeaderTES4{};
+      auto& headerTES4         = get<HeaderTES4>(m_header);
+      headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES | flags::archive::EMBEDNAME |
+                                 flags::archive::XMEM | flags::archive::UNKNOWN10;
       headerTES4.fileFlags     = 0;
       headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
       m_compressionType        = zlib;
@@ -1374,7 +1423,7 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
     file->dxgiFormat = narrow<uint8_t>(getDxgiFormat(data));
 
     // MipMap size detection
-    int bpp = bitsPerPixel(file->dxgiFormat);
+    uint8_t bpp = bitsPerPixel(file->dxgiFormat);
 
     uint32_t MipSize = file->width * file->height * bpp >> 3;
 
@@ -1425,50 +1474,6 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
     throw runtime_error(ex.what());
   } catch (const runtime_error&) {
     throw;
-  }
-}
-
-int Bsa::bitsPerPixel(uint8_t format) noexcept(false) {
-  switch (format) {
-  case DXGI_FORMAT_BC1_UNORM:
-  case DXGI_FORMAT_BC1_UNORM_SRGB:
-  case DXGI_FORMAT_BC4_UNORM:
-  case DXGI_FORMAT_BC4_SNORM:
-    return 4;
-  case DXGI_FORMAT_BC2_UNORM:
-  case DXGI_FORMAT_BC2_UNORM_SRGB:
-  case DXGI_FORMAT_BC3_UNORM:
-  case DXGI_FORMAT_BC3_UNORM_SRGB:
-  case DXGI_FORMAT_BC5_UNORM:
-  case DXGI_FORMAT_BC5_SNORM:
-  case DXGI_FORMAT_BC6H_SF16:
-  case DXGI_FORMAT_BC6H_UF16:
-  case DXGI_FORMAT_BC7_UNORM:
-  case DXGI_FORMAT_BC7_UNORM_SRGB:
-  case DXGI_FORMAT_A8_UNORM:
-  case DXGI_FORMAT_R8_SINT:
-  case DXGI_FORMAT_R8_SNORM:
-  case DXGI_FORMAT_R8_UINT:
-  case DXGI_FORMAT_R8_UNORM:
-    return 8;
-  case DXGI_FORMAT_B5G6R5_UNORM:
-  case DXGI_FORMAT_B5G5R5A1_UNORM:
-  case DXGI_FORMAT_R8G8_SINT:
-  case DXGI_FORMAT_R8G8_UINT:
-  case DXGI_FORMAT_R8G8_UNORM:
-    return 16;
-  case DXGI_FORMAT_B8G8R8A8_UNORM:
-  case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-  case DXGI_FORMAT_B8G8R8X8_UNORM:
-  case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:
-  case DXGI_FORMAT_R8G8B8A8_UNORM:
-  case DXGI_FORMAT_R8G8B8A8_SINT:
-  case DXGI_FORMAT_R8G8B8A8_UINT:
-  case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-    return 32;
-
-  default:
-    throw runtime_error("Unsupported DDS format");
   }
 }
 
@@ -2096,8 +2101,8 @@ Buffer Bsa::extractFileData(const FileRecord_t& fileRecord) noexcept(false) {
       //                 or DDSCAPS2_POSITIVEZ or DDSCAPS2_NEGATIVEZ;
       // This is the correct way
       ddsHeader->caps |= DDSCAPS_COMPLEX;
-      ddsHeader->caps2 = DDSCAPS2_CUBEMAP | DDSCAPS2_POSITIVEX | DDSCAPS2_NEGATIVEX | DDSCAPS2_POSITIVEY |
-                         DDSCAPS2_NEGATIVEY | DDSCAPS2_POSITIVEZ | DDSCAPS2_NEGATIVEZ;
+      ddsHeader->caps2         = DDSCAPS2_CUBEMAP | DDSCAPS2_POSITIVEX | DDSCAPS2_NEGATIVEX | DDSCAPS2_POSITIVEY |
+                                 DDSCAPS2_NEGATIVEY | DDSCAPS2_POSITIVEZ | DDSCAPS2_NEGATIVEZ;
       ddsHeaderDX10->miscFlags = DDS_RESOURCE_MISC_TEXTURECUBE;
     }
     ddsHeader->ddspf.size = sizeof(DDS_PIXELFORMAT);

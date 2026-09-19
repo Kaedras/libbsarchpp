@@ -16,7 +16,7 @@ struct MD5Context {
 };
 
 void md5Init(MD5Context* ctx);
-void md5Update(MD5Context* ctx, const uint8_t* input_buffer, size_t input_len);
+void md5Update(MD5Context* ctx, const uint8_t* inputBuffer, size_t inputLen);
 void md5Finalize(MD5Context* ctx);
 void md5Step(std::array<uint32_t, 4>& buffer, const std::array<uint32_t, 16>& input);
 

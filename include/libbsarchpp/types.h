@@ -10,7 +10,6 @@
 #include <string_view>  // for string_view
 #include <variant>      // for variant
 #include <vector>       // for vector
-#include <version>      // for nullptr_t
 
 namespace libbsarchpp {
 
