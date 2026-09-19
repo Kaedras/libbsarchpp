@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <cstdio>
 #include <string>
 
@@ -7,7 +8,7 @@ namespace libbsarchpp {
 /**
  * Per file compression options
  */
-enum class PackingCompression_t {
+enum class PackingCompression_t : uint8_t {
   global,      /**< use global compression setting */
   compressed,  /**< compressed */
   uncompressed /**< uncompressed */
@@ -16,13 +17,13 @@ enum class PackingCompression_t {
 /**
  * Compression types for BSA files
  */
-enum CompressionType {
+enum CompressionType : uint8_t {
   zlib,     /**< zlib */
   lz4Frame, /**< lz4 frame */
   lz4Block  /**< lz4 block */
 };
 
-enum ArchiveType {
+enum ArchiveType : uint8_t {
   none,   /**< None */
   TES3,   /**< Morrowind */
   TES4,   /**< Oblivion */
@@ -62,7 +63,7 @@ inline std::string ToString(ArchiveType type) {
 /**
  * Seek direction to use with @link Bsa::seek @endlink
  */
-enum SeekDirection {
+enum SeekDirection : uint8_t {
   SET = SEEK_SET, /**< Seek from beginning of file. */
   CUR = SEEK_CUR, /**< Seek from current position. */
   END = SEEK_END  /**< Seek from end of file. */
