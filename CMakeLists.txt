@@ -46,7 +46,6 @@ target_sources(libbsarchpp
         FILE_SET privateHeaders
         TYPE HEADERS
         FILES
-            src/pch.h
             src/md5.h
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/constants.h
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/hash.h
@@ -65,8 +64,6 @@ target_include_directories(libbsarchpp PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils
         ${CMAKE_CURRENT_SOURCE_DIR}/deps
 )
-
-target_precompile_headers(libbsarchpp PRIVATE src/pch.h)
 
 target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4)
 
