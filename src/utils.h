@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types.h"
+#include "libbsarchpp/types.h"
 #include <cstdint>
 #include <filesystem>
 #include <string>

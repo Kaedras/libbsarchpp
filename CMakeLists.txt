@@ -39,7 +39,7 @@ target_sources(libbsarchpp
         src/Bsa.cpp
         src/types.cpp
         src/hash.cpp
-        src/utils/utils.cpp
+        src/utils.cpp
         src/md5.cpp
 
     PRIVATE
@@ -47,9 +47,9 @@ target_sources(libbsarchpp
         TYPE HEADERS
         FILES
             src/md5.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/constants.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/hash.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/utils/utils.h
+            src/constants.h
+            src/hash.h
+            src/utils.h
 
     PUBLIC
         FILE_SET HEADERS

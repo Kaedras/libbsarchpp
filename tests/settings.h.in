@@ -3,22 +3,11 @@
 #include <filesystem>
 #include <unordered_map>
 
-#cmakedefine TESTS_TES3_ENABLE
-#cmakedefine TESTS_TES4_ENABLE
-#cmakedefine TESTS_TES5_ENABLE
-#cmakedefine TESTS_SSE_ENABLE
-#cmakedefine TESTS_SKYRIMVR_ENABLE
-#cmakedefine TESTS_FO3_ENABLE
-#cmakedefine TESTS_FONV_ENABLE
-#cmakedefine TESTS_FO4_ENABLE
-#cmakedefine TESTS_FO4VR_ENABLE
-#cmakedefine TESTS_SF_ENABLE
-
 #cmakedefine TESTS_TES3_DATADIR "@TESTS_TES3_DATADIR@"
 #cmakedefine TESTS_TES4_DATADIR "@TESTS_TES4_DATADIR@"
 #cmakedefine TESTS_TES5_DATADIR "@TESTS_TES5_DATADIR@"
 #cmakedefine TESTS_SSE_DATADIR "@TESTS_SSE_DATADIR@"
-#cmakedefine TESTS_SKYRIMVR_DATADIR "@TESTS_SKYRIMVR_DATADIR@"
+#cmakedefine TESTS_TES5VR_DATADIR "@TESTS_TES5VR_DATADIR@"
 #cmakedefine TESTS_FO3_DATADIR "@TESTS_FO3_DATADIR@"
 #cmakedefine TESTS_FONV_DATADIR "@TESTS_FONV_DATADIR@"
 #cmakedefine TESTS_FO4_DATADIR "@TESTS_FO4_DATADIR@"
@@ -43,8 +32,8 @@ static const std::filesystem::path DATADIR = "@TESTS_DATADIR@";
 #ifndef TESTS_SSE_DATADIR
     #define TESTS_SSE_DATADIR DATADIR / "sse"
 #endif
-#ifndef TESTS_SKYRIMVR_DATADIR
-    #define TESTS_SKYRIMVR_DATADIR DATADIR / "skyrimvr"
+#ifndef TESTS_TES5VR_DATADIR
+    #define TESTS_TES5VR_DATADIR DATADIR / "tes5vr"
 #endif
 #ifndef TESTS_FO3_DATADIR
     #define TESTS_FO3_DATADIR DATADIR / "fo3"
@@ -67,7 +56,7 @@ std::unordered_map<std::string, std::filesystem::path> dataDirs = {
     {"tes4", TESTS_TES4_DATADIR},
     {"tes5", TESTS_TES5_DATADIR},
     {"sse", TESTS_SSE_DATADIR},
-    {"skyrimvr", TESTS_SKYRIMVR_DATADIR},
+    {"tes5vr", TESTS_TES5VR_DATADIR},
     {"fo3", TESTS_FO3_DATADIR},
     {"fnv", TESTS_FONV_DATADIR},
     {"fo4", TESTS_FO4_DATADIR},
