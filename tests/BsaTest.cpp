@@ -66,8 +66,8 @@ std::string BsaTest::sha256(const std::filesystem::path& file) {
   return ss.str();
 }
 
-void BsaTest::pack(const std::string& game, const std::filesystem::path& fileName, ArchiveType type,
-                   bool compressed, bool shared) {
+void BsaTest::pack(const std::string& game, const std::filesystem::path& fileName, ArchiveType type, bool compressed,
+                   bool shared) {
   try {
     Bsa::create(WORKDIR / game / fileName, type, WORKDIR / game / fileName.stem(),
                 {.multithreaded = multithreadedPacking, .compressed = compressed, .shareData = shared});

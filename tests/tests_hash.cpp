@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-
 TEST(Hash, TES3) {
   EXPECT_EQ(libbsarchpp::CreateHashTES3("meshes/c/artifact_bloodring_01.nif"), 0x1C3C1149920D5F0C);
 }

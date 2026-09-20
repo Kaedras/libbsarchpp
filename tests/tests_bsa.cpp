@@ -28,4 +28,3 @@ TEST(CreateArchive, FilesListEmpty) {
   vector<fs::path> filesList;
   EXPECT_THROW(Bsa("test.bsa", libbsarchpp::TES4, filesList), std::runtime_error);
 }
-

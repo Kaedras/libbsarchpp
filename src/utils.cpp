@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace {
-inline constexpr unsigned char asciiDiff = 'a' - 'A';
+inline constexpr unsigned char asciiDiff    = 'a' - 'A';
 inline constexpr unsigned char extAsciiDiff = 0x20;
 
 constexpr char ToLowerWin1252(const char c) noexcept {
@@ -23,13 +23,13 @@ constexpr char ToLowerWin1252(const char c) noexcept {
   }
 
   switch (uc) {
-  case 0x8A:  // Š
+  case 0x8A:                         // Š
     return static_cast<char>(0x9A);  // š
-  case 0x8C:  // Œ
+  case 0x8C:                         // Œ
     return static_cast<char>(0x9C);  // œ
-  case 0x8E:  // Ž
+  case 0x8E:                         // Ž
     return static_cast<char>(0x9E);  // ž
-  case 0x9F:  // Ÿ
+  case 0x9F:                         // Ÿ
     return static_cast<char>(0xFF);  // ÿ
   default:
     return c;
@@ -109,7 +109,8 @@ bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rh
   const string rhsStr = rhs.generic_string();
 
   // approximate sorting order:
-  // '/' == '\' < ' '
+  // '/' == '\'
+  // < ' '
   // < '!'
   // < '#'
   // < '$'

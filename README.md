@@ -75,11 +75,11 @@ ctest --test-dir build -C RelWithDebInfo --output-on-failure
 # set to the appropriate path for VCPKG
 $env:VCPKG_ROOT = "C:\vcpkg"
 
-cmake --preset vs2022-windows -DCMAKE_INSTALL_PREFIX=install 
+cmake --preset vs2022-windows -DCMAKE_INSTALL_PREFIX=install
 
 # optionally configure tests here using ccmake or cmake-gui
 ccmake build
-    
+
 # build libbsarchpp
 cmake --build build --config RelWithDebInfo
 
