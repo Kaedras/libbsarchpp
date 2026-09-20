@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <gsl-lite/gsl-lite.hpp>
 #include <gtest/gtest.h>
-#include <src/utils.h>
 
 using namespace std;
 using namespace libbsarchpp;

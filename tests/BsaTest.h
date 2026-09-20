@@ -1,7 +1,6 @@
 #pragma once
 
 #include "enums.h"
-#include "libbsarchpp/Bsa.h"
 
 #include <filesystem>
 #include <gtest/gtest.h>
