@@ -23,6 +23,7 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 
 - lz4 (tested with 1.10)
 - zlib (tested with 1.3.1)
+- gsl-lite
 - C++23 compatible compiler (e.g. GCC 14, clang 18, Visual Studio 2022)
 - if building tests:
     - GTest (tested with 1.14.0 and 1.15.2)
@@ -186,7 +187,5 @@ used as a base.
 
 .clang-format is based
 on [this](https://github.com/ModOrganizer2/modorganizer/blob/2043d9931cb9baf1eef23240ea6061fc40fee67d/.clang-format).
-
-gsl-lite can be found [here](https://github.com/gsl-lite/gsl-lite).
 
 dxgiformat.h can be found [here](https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/dxgiformat.h).

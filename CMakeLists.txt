@@ -10,6 +10,8 @@ option(LIBBSARCHPP_TESTING "Build tests" OFF)
 
 add_library(libbsarchpp)
 
+find_package(gsl-lite REQUIRED)
+
 # zlib
 find_package(ZLIB REQUIRED)
 

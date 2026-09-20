@@ -1,7 +1,7 @@
 #include "Bsa.h"
-#include "gsl-lite/gsl-lite.hpp"
 
 #include <algorithm>
+#include <gsl-lite/gsl-lite.hpp>
 #include <gtest/gtest.h>
 #include <src/utils.h>
 

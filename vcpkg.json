@@ -4,6 +4,7 @@
       "name": "tbb",
       "platform": "linux | freebsd | openbsd"
     },
+    "gsl-lite",
     "lz4",
     "zlib"
   ],

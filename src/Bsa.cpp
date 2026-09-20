@@ -2,7 +2,6 @@
 #include "constants.h"            // for DX10, DDPF_FOURCC, DDSD_PITCH
 #include "directx/dxgiformat.h"   // for DXGI_FORMAT
 #include "enums.h"                // for ArchiveType, CompressionType
-#include "gsl-lite/gsl-lite.hpp"  // for narrow, narrowing_error
 #include "hash.h"                 // for CreateHashTES4, CreateHashFO4
 #include "md5.h"                  // for MD5Context, md5Finalize
 #include "types.h"                // for FileFO4, FolderTES4, FileTES3
@@ -12,6 +11,7 @@
 #include <exception>              // for exception
 #include <execution>              // for execution
 #include <format>                 // for format
+#include <gsl-lite/gsl-lite.hpp>  // for narrow, narrowing_error
 #include <lz4.h>                  // for LZ4_compressBound, LZ4_com...
 #include <lz4frame.h>             // for LZ4F_getErrorName, LZ4F_is...
 #include <ranges>                 // for pair, __find_fn, find

@@ -1,10 +1,10 @@
 #include "Bsa.h"
-#include "gsl-lite/gsl-lite.hpp"
 #include "include/libbsarchpp/types.h"
 #include "src/md5.h"
 
 #include <algorithm>
 #include <array>
+#include <gsl-lite/gsl-lite.hpp>
 #include <gtest/gtest.h>
 
 using namespace std;
