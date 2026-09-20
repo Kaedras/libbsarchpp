@@ -6,6 +6,37 @@
 
 using namespace std;
 
+namespace {
+inline constexpr unsigned char asciiDiff = 'a' - 'A';
+inline constexpr unsigned char extAsciiDiff = 0x20;
+
+constexpr char ToLowerWin1252(const char c) noexcept {
+  const auto uc = static_cast<unsigned char>(c);
+  // 'A' <= uc <= 'Z'
+  if (uc >= 65 && uc <= 90) {
+    return static_cast<char>(uc + asciiDiff);
+  }
+
+  // 'À' <= uc <= 'Ö' || 'Ù' <= uc <= 'Þ'
+  if ((uc >= 0xC0 && uc <= 0xD6) || (uc >= 0xD8 && uc <= 0xDE)) {
+    return static_cast<char>(uc + extAsciiDiff);
+  }
+
+  switch (uc) {
+  case 0x8A:  // Š
+    return static_cast<char>(0x9A);  // š
+  case 0x8C:  // Œ
+    return static_cast<char>(0x9C);  // œ
+  case 0x8E:  // Ž
+    return static_cast<char>(0x9E);  // ž
+  case 0x9F:  // Ÿ
+    return static_cast<char>(0xFF);  // ÿ
+  default:
+    return c;
+  }
+}
+}  // namespace
+
 namespace libbsarchpp {
 
 uint32_t MagicToInt(const Magic4 value) noexcept {
@@ -46,7 +77,7 @@ std::string MagicToString(const uint32_t& value) noexcept {
 }
 
 std::string ToLower(std::string str) noexcept {
-  ranges::transform(str, str.begin(), ::tolower);
+  ranges::transform(str, str.begin(), ToLowerWin1252);
   return str;
 }
 
@@ -55,14 +86,14 @@ std::string ToLower(const std::filesystem::path& str) noexcept {
 }
 
 void ToLowerInline(std::string& str) noexcept {
-  ranges::transform(str, str.begin(), ::tolower);
+  ranges::transform(str, str.begin(), ToLowerWin1252);
 }
 
 void normalizePath(std::string& str) noexcept {
   // replace '/' with '\\'
   ranges::replace(str, '/', '\\');
   // change string to lower characters
-  ranges::transform(str, str.begin(), ::tolower);
+  ranges::transform(str, str.begin(), ToLowerWin1252);
 }
 
 void changeSlashesToBackslashes(std::u16string& str) noexcept {
