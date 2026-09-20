@@ -2304,7 +2304,7 @@ void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& fileP
   }
 
   // uncompressed size in case the provided data gets compressed
-  const uint32_t uncompressedSize = narrow<uint32_t>(size);
+  const auto uncompressedSize = narrow<uint32_t>(size);
 
   Buffer compressedBuffer;
 

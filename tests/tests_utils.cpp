@@ -37,10 +37,10 @@ TEST(Utils, IntToMagic) {
   EXPECT_EQ(IntToMagic(0x04030201u), expectedBytes);
 
   // Round-trip tests
-  const uint32_t testVal = 0x12345678u;
+  constexpr uint32_t testVal = 0x12345678u;
   EXPECT_EQ(MagicToInt(IntToMagic(testVal)), testVal);
 
-  const Magic4 testMagic = {'T', 'E', 'S', '4'};
+  constexpr Magic4 testMagic = {'T', 'E', 'S', '4'};
   EXPECT_EQ(IntToMagic(MagicToInt(testMagic)), testMagic);
 }
 
@@ -64,13 +64,13 @@ TEST(Utils, StringToMagic) {
 }
 
 TEST(Utils, MagicToString) {
-  const Magic4 btdx = {'B', 'T', 'D', 'X'};
+  constexpr Magic4 btdx = {'B', 'T', 'D', 'X'};
   EXPECT_EQ(MagicToString(btdx), "BTDX");
 
-  const Magic4 bsa = {'B', 'S', 'A', '\0'};
+  constexpr Magic4 bsa = {'B', 'S', 'A', '\0'};
   EXPECT_EQ(MagicToString(bsa), string("BSA\0", 4));
 
-  const Magic4 zeros = {0, 0, 0, 0};
+  constexpr Magic4 zeros = {0, 0, 0, 0};
   EXPECT_EQ(MagicToString(zeros), string("\0\0\0\0", 4));
 
   // uint32_t overload
