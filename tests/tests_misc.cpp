@@ -14,24 +14,13 @@ namespace fs = std::filesystem;
 namespace {
 constexpr string_view testString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor "
                                    "incididunt ut labore et dolore magna aliqua.";
-constexpr std::array<uint8_t, 16> md5{0X81, 0X8C, 0X6E, 0X60, 0X1A, 0X24, 0XF7, 0X27,
-                                      0X50, 0XDA, 0X0F, 0X6C, 0X9B, 0X8E, 0XBE, 0X28};
+constexpr md5sum expectedResult{0X81, 0X8C, 0X6E, 0X60, 0X1A, 0X24, 0XF7, 0X27,
+                                0X50, 0XDA, 0X0F, 0X6C, 0X9B, 0X8E, 0XBE, 0X28};
 }  // namespace
 
-TEST(Misc, md5String) {
-  EXPECT_EQ(md5String(testString), md5);
-}
-
-TEST(Misc, md5File) {
-  // create file
-  const auto filePath = fs::temp_directory_path() / "libbsarchpp_tests_md5File";
-  filePtr file(fopen(filePath.c_str(), "w+"));
-  ASSERT_NE(file, nullptr) << "error opening file " << filePath << ": " << strerror(errno);
-  size_t result = fwrite(testString.data(), 1, testString.size(), file.get());
-  ASSERT_EQ(result, testString.size());
-
-  fseek(file.get(), 0, SEEK_SET);
-  EXPECT_EQ(md5File(file.get()), md5);
+TEST(Misc, md5) {
+  EXPECT_EQ(md5(testString), expectedResult);
+  EXPECT_EQ(md5(reinterpret_cast<const uint8_t*>(testString.data()), testString.size()), expectedResult);
 }
 
 TEST(Misc, GslThrowsexceptionOnNarrow) {

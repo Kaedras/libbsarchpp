@@ -1,6 +1,8 @@
 #pragma once
 
-#include "enums.h"      // for PackingCompression_t
+#include "enums.h"  // for PackingCompression_t
+#include "src/md5.h"
+
 #include <array>        // for array
 #include <cstdint>      // for uint32_t, uint16_t, int32_t, uint64_t, uint8_t
 #include <cstdio>       // for FILE, fclose
@@ -28,9 +30,8 @@ using FileRecord_t = std::variant<std::nullptr_t, FileTES3*, FileTES4*, FileFO4*
 using FilePtr_t    = std::variant<std::nullptr_t, FileTES3*, FileTES4*, FileFO4*>;
 using filePtr      = std::unique_ptr<FILE, fileDeleter>;
 
-using Magic4         = std::array<char, 4>;  // fourCC
-using Buffer         = std::vector<uint8_t>;
-using PackedDataHash = std::array<unsigned char, 16>;
+using Magic4 = std::array<char, 4>;  // fourCC
+using Buffer = std::vector<uint8_t>;
 
 namespace typeSizes {
   inline constexpr uint32_t DDS_PIXELFORMAT = 32;
@@ -203,7 +204,7 @@ struct FileFO4 {
 
 struct PackedDataInfo {
   uint32_t size = 0;
-  PackedDataHash hash{};
+  md5sum hash{};
   FileRecord_t fileRecord = nullptr;
 };
 

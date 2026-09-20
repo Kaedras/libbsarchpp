@@ -189,3 +189,5 @@ used as a base.
 on [this](https://github.com/ModOrganizer2/modorganizer/blob/2043d9931cb9baf1eef23240ea6061fc40fee67d/.clang-format).
 
 dxgiformat.h can be found [here](https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/dxgiformat.h).
+
+The MD5 implementation is based on [this](https://github.com/Zunawe/md5-c) code.

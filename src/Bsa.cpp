@@ -1269,20 +1269,11 @@ int Bsa::getDDSMipChunkCount(const DDSInfo& DDSInfo) const noexcept {
   return count;
 }
 
-PackedDataHash Bsa::calcDataHash(const uint8_t* data, const size_t length) noexcept {
-  // calculate md5
-  PackedDataHash result{};
-
-  MD5Context ctx;
-  md5Update(&ctx, data, length);
-  md5Finalize(&ctx);
-
-  ranges::copy(ctx.digest, result.begin());
-
-  return result;
+md5sum Bsa::calcDataHash(const uint8_t* data, const size_t length) noexcept {
+  return md5(data, length);
 }
 
-bool Bsa::findPackedData(const size_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept {
+bool Bsa::findPackedData(const size_t size, const md5sum& hash, const FileRecord_t& fileRecord) noexcept {
   if (!m_shareData) {
     return false;
   }
@@ -1456,7 +1447,7 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
         MipSize         = narrow<uint32_t>(data.size() - offset);
       }
 
-      PackedDataHash dataHash;
+      md5sum dataHash;
       if (m_shareData) {
         // only calculate hash when needed
         dataHash = calcDataHash(&data[offset], MipSize);
@@ -1481,14 +1472,14 @@ void Bsa::addFile(const std::filesystem::path& filePath, const Buffer& data) noe
   if (m_abort.load()) {
     return;
   }
-  PackedDataHash dataHash;
 
   if (m_existingArchive) {
     throw runtime_error("Archive is not in writing mode");
   }
 
   // dds mipmaps have their own partial hash calculation down below
-  if (m_shareData && m_type != FO4dds && m_type != SFdds) {
+  md5sum dataHash;
+  if (m_shareData && m_archiveFile.getType() != FO4dds && m_archiveFile.getType() != SFdds) {
     dataHash = calcDataHash(data.data(), data.size());
   }
 
@@ -1965,7 +1956,7 @@ void Bsa::save() noexcept(false) {
   }
 }
 
-void Bsa::addPackedData(const uint32_t size, const PackedDataHash& hash, const FileRecord_t& fileRecord) noexcept {
+void Bsa::addPackedData(const uint32_t size, const md5sum& hash, const FileRecord_t& fileRecord) noexcept {
   if (!m_shareData) {
     return;
   }
@@ -2305,7 +2296,7 @@ Buffer Bsa::extractFileData(const FileRecord_t& fileRecord) noexcept(false) {
   return retVal;
 }
 
-void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& filePath, const PackedDataHash& dataHash,
+void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& filePath, const md5sum& dataHash,
                    const uint8_t* data, size_t size, bool compress, const bool doCompress) noexcept(false) {
   // check if data already exists
   if (findPackedData(size, dataHash, fileRecord)) {
