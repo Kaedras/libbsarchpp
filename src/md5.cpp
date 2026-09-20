@@ -104,9 +104,9 @@ void md5Update(MD5Context* ctx, const uint8_t* inputBuffer, const size_t inputLe
         // Convert to little-endian
         // The local variable `input` our 512-bit chunk separated into 32-bit words
         // we can use in calculations
-        input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 |
-                   static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
-                   static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8 | static_cast<uint32_t>(ctx->input[(j * 4)]);
+        input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24u |
+                   static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16u |
+                   static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8u | static_cast<uint32_t>(ctx->input[(j * 4)]);
       }
       md5Step(ctx->buffer, input);
       offset = 0;
@@ -130,21 +130,21 @@ void md5Finalize(MD5Context* ctx) {
   // Do a final update (internal to this function)
   // Last two 32-bit words are the two halves of the size (converted from bytes to bits)
   for (unsigned int j = 0; j < 14; ++j) {
-    input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24 |
-               static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16 |
-               static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8 | static_cast<uint32_t>(ctx->input[(j * 4)]);
+    input[j] = static_cast<uint32_t>(ctx->input[(j * 4) + 3]) << 24u |
+               static_cast<uint32_t>(ctx->input[(j * 4) + 2]) << 16u |
+               static_cast<uint32_t>(ctx->input[(j * 4) + 1]) << 8u | static_cast<uint32_t>(ctx->input[(j * 4)]);
   }
   input[14] = static_cast<uint32_t>(ctx->size * 8);
-  input[15] = static_cast<uint32_t>((ctx->size * 8) >> 32);
+  input[15] = static_cast<uint32_t>((ctx->size * 8) >> 32u);
 
   md5Step(ctx->buffer, input);
 
   // Move the result into digest (convert from little-endian)
   for (unsigned int i = 0; i < 4; ++i) {
-    ctx->digest[(i * 4) + 0] = static_cast<uint8_t>((ctx->buffer[i] & 0x000000FF));
-    ctx->digest[(i * 4) + 1] = static_cast<uint8_t>((ctx->buffer[i] & 0x0000FF00) >> 8);
-    ctx->digest[(i * 4) + 2] = static_cast<uint8_t>((ctx->buffer[i] & 0x00FF0000) >> 16);
-    ctx->digest[(i * 4) + 3] = static_cast<uint8_t>((ctx->buffer[i] & 0xFF000000) >> 24);
+    ctx->digest[(i * 4) + 0] = static_cast<uint8_t>((ctx->buffer[i] & 0x000000FFu));
+    ctx->digest[(i * 4) + 1] = static_cast<uint8_t>((ctx->buffer[i] & 0x0000FF00u) >> 8u);
+    ctx->digest[(i * 4) + 2] = static_cast<uint8_t>((ctx->buffer[i] & 0x00FF0000u) >> 16u);
+    ctx->digest[(i * 4) + 3] = static_cast<uint8_t>((ctx->buffer[i] & 0xFF000000u) >> 24u);
   }
 }
 

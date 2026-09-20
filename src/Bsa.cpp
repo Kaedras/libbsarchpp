@@ -1425,12 +1425,12 @@ void Bsa::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false) {
     // MipMap size detection
     uint8_t bpp = bitsPerPixel(file->dxgiFormat);
 
-    uint32_t MipSize = file->width * file->height * bpp >> 3;
+    uint32_t MipSize = (static_cast<uint32_t>(file->width) * file->height * bpp) >> 3u;
 
     // cube maps detection
     file->cubeMaps = 0x800;
     if ((ddsHeader->caps2 & DDSCAPS2_CUBEMAP) != 0U) {
-      file->cubeMaps |= 1;
+      file->cubeMaps |= 1u;
     }
     DDSInfo ddsInfo;
 
@@ -1805,7 +1805,7 @@ void Bsa::save() noexcept(false) {
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
 
-      write(static_cast<uint32_t>(file.hash >> 32));
+      write(static_cast<uint32_t>(file.hash >> 32u));
       write(static_cast<uint32_t>(file.hash & UINT32_MAX));
     }
     break;

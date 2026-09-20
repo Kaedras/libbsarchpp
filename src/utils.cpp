@@ -34,20 +34,14 @@ Magic4 StringToMagic(const std::string& str) noexcept {
 }
 
 std::string MagicToString(const Magic4& magic) noexcept {
-  string str;
-  for (const char c : magic) {
-    str += c;
-  }
+  string str(4, 0);
+  memcpy(str.data(), magic.data(), 4);
   return str;
 }
 
 std::string MagicToString(const uint32_t& value) noexcept {
-  string str;
-  str += static_cast<char>(value & 0xFF);
-  str += static_cast<char>(value >> 8 & 0xFF);
-  str += static_cast<char>(value >> 16 & 0xFF);
-  str += static_cast<char>(value >> 24 & 0xFF);
-
+  string str(4, 0);
+  memcpy(str.data(), &value, 4);
   return str;
 }
 
