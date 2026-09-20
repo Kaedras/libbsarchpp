@@ -1016,7 +1016,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
   }
   try {
     // sort files alphabetically
-    sort(execution::par_unseq, fileList.begin(), fileList.end(), comparePaths);
+    sort(execution::par_unseq, fileList.begin(), fileList.end(), sortPaths);
 
     getHeaderFO4().fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
     m_files.reserve(fileList.size());

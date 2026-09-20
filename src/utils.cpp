@@ -104,7 +104,7 @@ void changeSlashesToBackslashes(std::u16string& str) noexcept {
   }
 }
 
-bool comparePaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept {
+bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept {
   const string lhsStr = lhs.generic_string();
   const string rhsStr = rhs.generic_string();
 

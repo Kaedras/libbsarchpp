@@ -198,7 +198,7 @@ TEST(Utils, changeSlashesToBackslashes) {
   EXPECT_EQ(str5, u"\\\\\\");
 }
 
-TEST(Utils, comparePaths) {
+TEST(Utils, sortPaths) {
   // unused paths: "Ħ", "犬", "ß", "ü", "Ü", "\"", "?", ":", "|", "<", ">", "*", "§", "®", "Ø", "\\", "/", "ä", "Ä",
   // "ö", "Ö", "A",
   vector<filesystem::path> paths = {
@@ -209,7 +209,7 @@ TEST(Utils, comparePaths) {
   static vector<filesystem::path> target = {" ", "!", "#", "$", "%", "&", "'", "(", ")", "+", ",", "-", ".", "0",
                                     ";", "=", "@", "a", "[", "]", "^", "_", "`", "{", "}", "~", "¥", "ふ"};
 
-  ranges::sort(paths, comparePaths);
+  ranges::sort(paths, sortPaths);
 
   ASSERT_EQ(paths.size(), target.size()) << "Paths and Target are of unequal length, " << paths.size() << ", "
                                          << target.size();

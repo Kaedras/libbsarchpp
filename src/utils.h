@@ -23,7 +23,7 @@ void normalizePath(std::string& str) noexcept;
 void changeSlashesToBackslashes(std::u16string& str) noexcept;
 
 /**
- * @brief This function is used to sort paths alphabetically.
+ * @brief This function for use with `std::sort` to sort paths alphabetically.
  */
-[[nodiscard]] bool comparePaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept;
+[[nodiscard]] bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept;
 }  // namespace libbsarchpp
