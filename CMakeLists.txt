@@ -43,6 +43,7 @@ target_sources(libbsarchpp
         src/hash.cpp
         src/utils.cpp
         src/md5.cpp
+        src/ArchiveIO.cpp
 
     PRIVATE
         FILE_SET privateHeaders
@@ -52,6 +53,7 @@ target_sources(libbsarchpp
             src/constants.h
             src/hash.h
             src/utils.h
+            src/ArchiveIO.h
 
     PUBLIC
         FILE_SET HEADERS

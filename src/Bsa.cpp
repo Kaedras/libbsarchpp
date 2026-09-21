@@ -25,17 +25,6 @@ using gsl_lite::narrow;
 
 namespace libbsarchpp {
 namespace {
-#ifdef __unix__
-  // On Windows long is only 32-bit, so we can't use ftell there. On POSIX systems it's 64-bit
-  long _ftelli64(FILE* stream) {
-    return ftell(stream);
-  }
-
-  // same with fseek
-  int _fseeki64(FILE* stream, long offset, int whence) {
-    return fseek(stream, offset, whence);
-  }
-#endif
 
   /**
    * @brief Returns the dxgi format of the given file.
@@ -158,219 +147,9 @@ namespace {
 
 }  // namespace
 
-template <>
-char Bsa::read() noexcept(false) {
-  int result = fgetc(m_file.get());
-  if (result == EOF) {
-    const int error = errno;
-    throw runtime_error("Read error: "s + strerror(error));
-  }
-  return static_cast<char>(result);
-}
-
-template <>
-char8_t Bsa::read() noexcept(false) {
-  int result = fgetc(m_file.get());
-  if (result == EOF) {
-    const int error = errno;
-    throw runtime_error("Read error: "s + strerror(error));
-  }
-  return static_cast<char8_t>(result);
-}
-
-template <>
-Magic4 Bsa::read() noexcept(false) {
-  Magic4 result{};
-  size_t itemsRead = fread(result.data(), 1, 4, m_file.get());
-  if (itemsRead != 4) {
-    const int error = errno;
-    throw runtime_error("Read error: "s + strerror(error));
-  }
-  return result;
-}
-
-template <>
-std::filesystem::path Bsa::read<>() noexcept(false) {
-  try {
-    u16string str;
-
-    char16_t c;
-    do {
-      c = read<uint8_t>();
-
-      // we use forward slashes internally, this is required for std::filesystem
-      if (c == '\\') {
-        c = '/';
-      }
-
-      str += c;
-    } while (c != '\0');
-
-    str.pop_back();
-
-    return {str};
-  } catch (...) {
-    throw;
-  }
-}
-
-std::u16string Bsa::readU16String(const uint32_t length) noexcept(false) {
-  try {
-    u16string str;
-
-    for (uint32_t i = 0; i < length; i++) {
-      char16_t c = read<uint8_t>();
-
-      // we use forward slashes internally, this is required for std::filesystem
-      if (c == '\\') {
-        c = '/';
-      }
-      str += c;
-    }
-
-    return str;
-  } catch (...) {
-    throw;
-  }
-}
-
-std::filesystem::path Bsa::readStringLen(const bool terminated) noexcept(false) {
-  try {
-    const auto length = read<uint8_t>();
-    auto str          = readU16String(length);
-    if (terminated) {
-      str.pop_back();
-    }
-    return {str};
-  } catch (...) {
-    throw;
-  }
-}
-
-std::filesystem::path Bsa::readStringLen16() noexcept(false) {
-  try {
-    const auto length = read<uint16_t>();
-    auto str          = readU16String(length);
-    return {str};
-  } catch (...) {
-    throw;
-  }
-}
-
-template <>
-void Bsa::write(const std::string& data) noexcept(false) {
-  try {
-    // only call this function once, the result won't change
-    static bool shouldUseBackslashes = useBackslashes();
-
-    for (char c : data) {
-      if (c == '/' && shouldUseBackslashes) {
-        c = '\\';
-      }
-      write(c);
-    }
-    if (fputc('\0', m_file.get()) == EOF) {
-      const int error = errno;
-      throw runtime_error("Write error: "s + strerror(error));
-    }
-  } catch (...) {
-    throw;
-  }
-}
-
-template <>
-void Bsa::write(const std::filesystem::path& data) noexcept(false) {
-  try {
-    // only call this function once, the result won't change
-    static bool shouldUseBackslashes = useBackslashes();
-
-    u16string str = data.generic_u16string();
-
-    // we use forward slashes internally, so we have to change them when writing
-    if (shouldUseBackslashes) {
-      changeSlashesToBackslashes(str);
-    }
-
-    for (const auto& c : str) {
-      if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF) {
-        const int error = errno;
-        throw runtime_error("Read error: "s + strerror(error));
-      }
-    }
-    if (fputc('\0', m_file.get()) == EOF) {
-      const int error = errno;
-      throw runtime_error("Read error: "s + strerror(error));
-    }
-  } catch (const gsl_lite::narrowing_error& ex) {
-    throw runtime_error(ex.what());
-  }
-}
-
-void Bsa::writeStringLen8(const std::filesystem::path& data, const bool terminated) noexcept(false) {
-  try {
-    // only call this function once, the result won't change
-    static bool shouldUseBackslashes = useBackslashes();
-
-    u16string str = data.generic_u16string();
-    auto length   = gsl_lite::narrow<uint8_t>(str.length());
-    if (terminated) {
-      length++;
-    }
-    write(length);
-
-    // we use forward slashes internally, so we have to change them when writing
-    if (shouldUseBackslashes) {
-      changeSlashesToBackslashes(str);
-    }
-
-    for (const auto& c : str) {
-      if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF) {
-        const int error = errno;
-        throw runtime_error("Error writing to file: "s + strerror(error));
-      }
-    }
-    if (terminated) {
-      if (fputc('\0', m_file.get()) == EOF) {
-        const int error = errno;
-        throw runtime_error("Error writing to file: "s + strerror(error));
-      }
-    }
-  } catch (const gsl_lite::narrowing_error& ex) {
-    throw runtime_error(ex.what());
-  } catch (...) {
-    throw;
-  }
-}
-
-void Bsa::writeStringLen16(const std::filesystem::path& data) noexcept(false) {
-  try {
-    // only call this function once, the result won't change
-    static bool shouldUseBackslashes = useBackslashes();
-
-    u16string str = data.generic_u16string();
-    write(gsl_lite::narrow<uint16_t>(str.length()));
-
-    // we use forward slashes internally, so we have to change them when writing
-    if (shouldUseBackslashes) {
-      changeSlashesToBackslashes(str);
-    }
-
-    for (const auto& c : str) {
-      if (fputc(gsl_lite::narrow<uint8_t>(c), m_file.get()) == EOF) {
-        const int error = errno;
-        throw runtime_error("Write error: "s + strerror(error));
-      }
-    }
-  } catch (const gsl_lite::narrowing_error& ex) {
-    throw runtime_error(ex.what());
-  } catch (...) {
-    throw;
-  }
-}
-
 uint32_t Bsa::getFileCount() const noexcept {
   try {
-    switch (m_type) {
+    switch (m_archiveFile.getType()) {
     case TES3:
       return get<HeaderTES3>(m_header).fileCount;
     case TES4:
@@ -394,7 +173,8 @@ uint32_t Bsa::getFileCount() const noexcept {
 
 void Bsa::setArchiveFlags(uint32_t flags) noexcept(false) {
   try {
-    if (m_type != TES4 && m_type != FO3 && m_type != SSE) {
+    const auto type = m_archiveFile.getType();
+    if (type != TES4 && type != FO3 && type != SSE) {
       throw runtime_error("Archive flags are not supported for this archive type");
     }
 
@@ -479,7 +259,7 @@ void Bsa::readFO4FileTable() noexcept(false) {
 
     for (auto& _file : m_files) {
       // the code below is required for case-sensitive file systems
-      fs::path filePath = readStringLen16();
+      fs::path filePath = m_archiveFile.readStringLen16();
       string parentPath = filePath.parent_path().string();
 
       size_t oldPos = 0;
@@ -545,10 +325,10 @@ void Bsa::readBa2DX10() noexcept(false) {
     throw runtime_error("Invalid/Unknown ba2 archive. Expected GNRL, got " + MagicToString(header.magic));
   }
 
-  if (m_type == FO4) {
-    m_type = FO4dds;
-  } else if (m_type == SF) {
-    m_type = SFdds;
+  if (m_archiveFile.getType() == FO4) {
+    m_archiveFile.setType(FO4dds);
+  } else if (m_archiveFile.getType() == SF) {
+    m_archiveFile.setType(SFdds);
   }
 
   m_files.reserve(header.fileCount);
@@ -610,11 +390,11 @@ void Bsa::readArchiveTes3() noexcept(false) {
     get<FileTES3>(file).hash = read<uint64_t>();
   }
   // remember binary data offset since stored files offsets are relative
-  m_dataOffset = _ftelli64(m_file.get());
+  m_dataOffset = m_archiveFile.tell();
 }
 
 void Bsa::readArchiveTes4() noexcept(false) {
-  if (m_type == SSE) {
+  if (m_archiveFile.getType() == SSE) {
     m_compressionType = lz4Frame;
   }
   // read header
@@ -630,7 +410,7 @@ void Bsa::readArchiveTes4() noexcept(false) {
 
     folder.hash      = read<uint64_t>();
     folder.fileCount = read<uint32_t>();
-    if (m_type == SSE) {
+    if (m_archiveFile.getType() == SSE) {
       folder.unk32  = read<uint32_t>();
       folder.offset = read<int64_t>();
     } else {
@@ -644,7 +424,7 @@ void Bsa::readArchiveTes4() noexcept(false) {
   for (auto& _folder : m_files) {
     auto& folder = get<FolderTES4>(_folder);
 
-    folder.name = readStringLen();
+    folder.name = m_archiveFile.readStringLen();
     folder.files.reserve(folder.fileCount);
     for (uint32_t j = 0; j < folder.fileCount; j++) {
       FileTES4 file;
@@ -664,20 +444,20 @@ void Bsa::readArchiveTes4() noexcept(false) {
 }
 
 void Bsa::determineArchiveVersion() noexcept(false) {
-  if (m_type == TES3) {
+  if (m_archiveFile.getType() == TES3) {
     return;
   }
 
   m_version = read<uint32_t>();
   switch (m_version) {
   case headerVersions::TES4:
-    m_type = TES4;
+    m_archiveFile.setType(TES4);
     break;
   case headerVersions::FO3:
-    m_type = FO3;
+    m_archiveFile.setType(FO3);
     break;
   case headerVersions::SSE:
-    m_type = SSE;
+    m_archiveFile.setType(SSE);
     break;
   case headerVersions::FO4v1:
   case headerVersions::FO4NGv7:
@@ -685,9 +465,9 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     // read ahead to get the subtype
     auto magic = read<uint32_t>();
     if (magic == magic::GNRL) {
-      m_type = FO4;
+      m_archiveFile.setType(FO4);
     } else if (magic == magic::DX10) {
-      m_type = FO4dds;
+      m_archiveFile.setType(FO4dds);
     } else {
       throw runtime_error("Unknown FO4 archive subtype " + MagicToString(magic));
     }
@@ -700,7 +480,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     // read ahead to get subtype, this is just to check for errors
     auto magic = read<uint32_t>();
     if (magic == magic::GNRL) {
-      m_type = SF;
+      m_archiveFile.setType(SF);
     } else {
       throw runtime_error("Unknown SF archive subtype " + MagicToString(magic));
     }
@@ -714,7 +494,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     // read ahead to get subtype, this is just to check for errors
     auto magic = read<uint32_t>();
     if (magic == magic::DX10) {
-      m_type = SFdds;
+      m_archiveFile.setType(SFdds);
     } else {
       throw runtime_error("Unknown SF archive subtype " + MagicToString(magic));
     }
@@ -729,25 +509,21 @@ void Bsa::determineArchiveVersion() noexcept(false) {
 }
 
 Bsa::Bsa(const std::filesystem::path& archivePath, bool multithreaded) noexcept(false)
-    : m_existingArchive(true), m_multithreaded(multithreaded) {
-  m_file.reset(fopen(archivePath.string().c_str(), "rb"));
+    : m_existingArchive(true), m_archiveFile(archivePath), m_multithreaded(multithreaded) {
 
-  if (m_file == nullptr) {
-    const int error = errno;
-    throw runtime_error(format("Could not open file \"{}\" for reading: {}", archivePath.string(), strerror(error)));
-  }
+  m_archiveFile.open(ArchiveIO::mode::read);
 
   m_magic = read<uint32_t>();
 
   switch (m_magic) {
   case magic::TES3:
-    m_type = TES3;
+    m_archiveFile.setType(TES3);
     break;
   case magic::BSA:
-    m_type = TES4;
+    m_archiveFile.setType(TES4);
     break;
   case magic::BTDX:
-    m_type = FO4;
+    m_archiveFile.setType(FO4);
     break;
   default:
     throw runtime_error("Unknown archive format, magic is "s + MagicToString(m_magic));
@@ -755,7 +531,7 @@ Bsa::Bsa(const std::filesystem::path& archivePath, bool multithreaded) noexcept(
 
   determineArchiveVersion();
 
-  switch (m_type) {
+  switch (m_archiveFile.getType()) {
   case TES3:
     readArchiveTes3();
     break;
@@ -966,7 +742,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
   // in other words, the start of files data
   m_dataOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4) + 16 * m_files.size();
   // SSE folder record is 8 bytes larger
-  if (m_type == SSE) {
+  if (m_archiveFile.getType() == SSE) {
     m_dataOffset += 8 * m_files.size();
   }
   // offsets are stored including this value
@@ -984,12 +760,12 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
   // final flags detection
 
   // misc file flag is not in Skyrim SE
-  if (m_type == SSE) {
+  if (m_archiveFile.getType() == SSE) {
     headerTES4.fileFlags &= ~flags::file::MISC;
   }
   // embedded names in texture-only archives
   // except Skyrim SE: crashing engine bug if texture is uncompressed and file name is embedded
-  if (headerTES4.fileFlags == flags::file::DDS && m_type != SSE) {
+  if (headerTES4.fileFlags == flags::file::DDS && m_archiveFile.getType() != SSE) {
     headerTES4.flags |= flags::archive::EMBEDNAME;
   }
   // startupstr flag in archives with meshes
@@ -1001,7 +777,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
     headerTES4.flags |= flags::archive::RETAINNAME;
   }
   // txt, xml and fnt file flags are exclusive for Oblivion
-  if (m_type != TES4) {
+  if (m_archiveFile.getType() != TES4) {
     headerTES4.fileFlags &= ~(flags::file::XML | flags::file::TXT | flags::file::FNT);
   }
   // set the compression flag if needed
@@ -1045,7 +821,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
 
     m_dataOffset = sizeof(Magic4) + sizeof(m_version);
 
-    switch (m_type) {
+    switch (m_archiveFile.getType()) {
     case FO4:
     case FO4dds:
       m_dataOffset += sizeof(HeaderFO4);
@@ -1057,16 +833,17 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
       m_dataOffset += sizeof(HeaderSFdds);
       break;
     default:
-      throw runtime_error(format("createArchiveFO4 was called with wrong archive type {}", static_cast<int>(m_type)));
+      throw runtime_error(
+          format("createArchiveFO4 was called with wrong archive type {}", static_cast<int>(m_archiveFile.getType())));
     }
 
     // file records have fixed length in a general archive
-    if (m_type == FO4 || m_type == SF) {
+    if (m_archiveFile.getType() == FO4 || m_archiveFile.getType() == SF) {
       m_dataOffset += sizes::fileRecordGNRL * m_files.size();
     }
 
     // variable file record length depending on DDS chunks number
-    else if (m_type == FO4dds || m_type == SFdds) {
+    else if (m_archiveFile.getType() == FO4dds || m_archiveFile.getType() == SFdds) {
       if (m_ddsBasePath.empty()) {
         throw runtime_error("DDS Archive requires setting a DDS Base Path");
       }
@@ -1084,7 +861,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
 Bsa::Bsa(const std::filesystem::path& archivePath, ArchiveType type, std::vector<std::filesystem::path>& fileList,
          const std::optional<std::filesystem::path>& ddsBasePath, bool compressed, bool shareData,
          bool multithreaded) noexcept(false)
-    : m_existingArchive(false), m_type(type), m_ddsBasePath(ddsBasePath.value_or(fs::path())), m_compressed(compressed),
+    : m_existingArchive(false), m_ddsBasePath(ddsBasePath.value_or(fs::path())), m_compressed(compressed),
       m_shareData(shareData), m_multithreaded(multithreaded) {
   try {
     switch (type) {
@@ -1183,17 +960,12 @@ Bsa::Bsa(const std::filesystem::path& archivePath, ArchiveType type, std::vector
     }
 
     create_directories(archivePath.parent_path());
-    m_file.reset(fopen(archivePath.string().c_str(), "wb"));
-    if (m_file == nullptr) {
-      const int error = errno;
-      throw runtime_error(format("Error opening file \"{}\" for writing: {}", archivePath.string(), strerror(error)));
-    }
-
+    m_archiveFile.open(archivePath, ArchiveIO::mode::write);
     m_fileName = archivePath;
 
     // reserve space for the header
     Buffer buffer(m_dataOffset, 0);
-    write(buffer);
+    m_archiveFile.write(buffer);
   } catch (...) {
     throw;
   }
@@ -1212,7 +984,7 @@ Bsa::Bsa(const filesystem::path& archivePath, ArchiveType type, std::vector<std:
 Bsa::~Bsa() = default;
 
 std::string Bsa::getArchiveFormatName() const noexcept {
-  return ToString(m_type);
+  return ToString(m_archiveFile.getType());
 }
 
 FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path& filePath) noexcept {
@@ -1286,8 +1058,8 @@ bool Bsa::findPackedData(const size_t size, const md5sum& hash, const FileRecord
 
   for (const auto& packedData : m_packedData) {
     // check if sizes and hashes are identical
-    if (size == packedData.size && memcmp(hash.data(), packedData.hash.data(), sizeof(PackedDataHash)) == 0) {
-      switch (m_type) {
+    if (size == packedData.size && memcmp(hash.data(), packedData.hash.data(), sizeof(md5sum)) == 0) {
+      switch (m_archiveFile.getType()) {
       case TES3: {
         auto* const a = get<FileTES3*>(fileRecord);
         const auto* b = get<FileTES3*>(packedData.fileRecord);
@@ -1340,8 +1112,8 @@ bool Bsa::findPackedData(const size_t size, const md5sum& hash, const FileRecord
 }
 
 int64_t Bsa::getCreatedArchiveSize() const noexcept {
-  if (!m_existingArchive && m_file != nullptr) {
-    return _ftelli64(m_file.get());
+  if (!m_existingArchive && m_archiveFile.isOpen()) {
+    return m_archiveFile.tell();
   }
   return 0;
 }
@@ -1489,7 +1261,7 @@ void Bsa::addFile(const std::filesystem::path& filePath, const Buffer& data) noe
   }
 
   try {
-    switch (m_type) {
+    switch (m_archiveFile.getType()) {
     case TES3: {
       auto file = findFileRecord(filePath);
       if (holds_alternative<nullptr_t>(file)) {
@@ -1517,7 +1289,7 @@ void Bsa::addFile(const std::filesystem::path& filePath, const Buffer& data) noe
 
       auto* fileFO4 = get<FileFO4*>(file);
 
-      fileFO4->offset = _ftelli64(m_file.get());
+      fileFO4->offset = m_archiveFile.tell();
       fileFO4->size   = narrow<uint32_t>(data.size());
 
       packData(fileFO4, fileFO4->name, dataHash, data.data(), data.size(), fileFO4->compress(this));
@@ -1550,7 +1322,7 @@ void Bsa::addFile(const std::filesystem::path& filePath, const Buffer& data) noe
 
 FileRecord_t Bsa::findFileRecord(const std::filesystem::path& fileName) noexcept {
   try {
-    switch (m_type) {
+    switch (m_archiveFile.getType()) {
     case TES3:
       return get<FileTES3*>(m_fileMap.at(fileName));
     case TES4:
@@ -1694,7 +1466,7 @@ void Bsa::iterateFiles(const FileIterationFunction& function, void* data) noexce
     return;
   }
 
-  switch (m_type) {
+  switch (m_archiveFile.getType()) {
   case TES3:
     for (auto& file : m_files) {
       if (function(get<FileTES3>(file).name, &get<FileTES3>(file), nullptr, data)) {
@@ -1735,7 +1507,7 @@ std::filesystem::path Bsa::getFileName() const noexcept {
 }
 
 ArchiveType Bsa::getArchiveType() const noexcept {
-  return m_type;
+  return m_archiveFile.getType();
 }
 
 uint32_t Bsa::getVersion() const noexcept {
@@ -1750,7 +1522,7 @@ void Bsa::save() noexcept(false) {
   if (m_existingArchive) {
     throw runtime_error("Archive is not in writing mode");
   }
-  if (m_file == nullptr) {
+  if (!m_archiveFile.isOpen()) {
     throw runtime_error("Archive file is not open");
   }
 
@@ -1760,7 +1532,7 @@ void Bsa::save() noexcept(false) {
     lock.lock();
   }
 
-  switch (m_type) {
+  switch (m_archiveFile.getType()) {
   case TES3: {
     // check that all files from the files table have saved data
     for (const auto& _file : m_files) {
@@ -1824,7 +1596,7 @@ void Bsa::save() noexcept(false) {
       const auto& folder = get<FolderTES4>(_folder);
       write(folder.hash);
       write(folder.fileCount);
-      if (m_type == SSE) {
+      if (m_archiveFile.getType() == SSE) {
         write(folder.unk32);
         write(folder.offset);
       } else {
@@ -1834,7 +1606,7 @@ void Bsa::save() noexcept(false) {
     // folder names and file records
     for (const auto& _folder : m_files) {
       const auto& folder = get<FolderTES4>(_folder);
-      writeStringLen8(folder.name);
+      m_archiveFile.writeStringLen8(folder.name);
       for (const auto& file : folder.files) {
         write(file.hash);
         write(file.size);
@@ -1861,9 +1633,9 @@ void Bsa::save() noexcept(false) {
       }
     }
     // file names table
-    getHeaderFO4().fileTableOffset = _ftelli64(m_file.get());
+    getHeaderFO4().fileTableOffset = m_archiveFile.tell();
     for (const auto& file : m_files) {
-      writeStringLen16(get<FileFO4>(file).name);
+      m_archiveFile.writeStringLen16(get<FileFO4>(file).name);
     }
     // write header
     seek(0);
@@ -1907,9 +1679,9 @@ void Bsa::save() noexcept(false) {
     }
 
     // file names table
-    getHeaderFO4().fileTableOffset = _ftelli64(m_file.get());
+    getHeaderFO4().fileTableOffset = m_archiveFile.tell();
     for (const auto& file : m_files) {
-      writeStringLen16(get<FileFO4>(file).name);
+      m_archiveFile.writeStringLen16(get<FileFO4>(file).name);
     }
     // write header
     seek(0);
@@ -1994,7 +1766,9 @@ Buffer Bsa::extractFileData(const FileRecord_t& fileRecord) noexcept(false) {
     lock.lock();
   }
 
-  switch (m_type) {
+  const ArchiveType type = m_archiveFile.getType();
+
+  switch (type) {
   case TES3: {
     const auto* fileTES3 = get<FileTES3*>(fileRecord);
     seek(gsl_lite::narrow<int64_t>(m_dataOffset + fileTES3->offset));
@@ -2017,8 +1791,8 @@ Buffer Bsa::extractFileData(const FileRecord_t& fileRecord) noexcept(false) {
     }
 
     // skip embedded file name + length prefix
-    if ((m_type == FO3 || m_type == SSE) && ((header.flags & flags::archive::EMBEDNAME) != 0U)) {
-      const auto length = gsl_lite::narrow<uint32_t>(readStringLen(false).u16string().length());
+    if ((type == FO3 || type == SSE) && ((header.flags & flags::archive::EMBEDNAME) != 0U)) {
+      const auto length = gsl_lite::narrow<uint32_t>(m_archiveFile.readStringLen(false).u16string().length());
       size -= length + 1;
     }
 
@@ -2332,22 +2106,24 @@ void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& fileP
       }
     }
 
-    const int64_t position = _ftelli64(m_file.get());
+    const int64_t position = m_archiveFile.tell();
+
+    const auto type = m_archiveFile.getType();
 
     // embedded name for Fallout 3/NV/Skyrim/Skyrim SE
-    if ((m_type == FO3 || m_type == SSE) && (get<HeaderTES4>(m_header).flags & flags::archive::EMBEDNAME) != 0) {
-      writeStringLen8(filePath, false);
+    if ((type == FO3 || type == SSE) && (get<HeaderTES4>(m_header).flags & flags::archive::EMBEDNAME) != 0) {
+      m_archiveFile.writeStringLen8(filePath, false);
     }
 
     // if compressed, then write uncompressed size first for Oblivion/Fallout 3/NV/Skyrim/Skyrim SE
-    if ((m_type == TES4 || m_type == FO3 || m_type == SSE) && compress) {
+    if ((type == TES4 || type == FO3 || type == SSE) && compress) {
       write(uncompressedSize);
     }
 
     write(data, size);
 
     // updating file record
-    switch (m_type) {
+    switch (type) {
     case TES3: {
       auto* const file = get<FileTES3*>(fileRecord);
 
@@ -2368,7 +2144,7 @@ void Bsa::packData(const FileRecord_t& fileRecord, const filesystem::path& fileP
 
       try {
         file->offset = gsl_lite::narrow<uint32_t>(position);
-        file->size   = gsl_lite::narrow<uint32_t>(_ftelli64(m_file.get()) - position);
+        file->size   = gsl_lite::narrow<uint32_t>(m_archiveFile.tell() - position);
       } catch (const gsl_lite::narrowing_error&) {
         // xEdit allows creating archives > 4GiB which I assume is an error
         throw runtime_error("Error packing data: Archive exceeds 4GiB");
@@ -2514,7 +2290,7 @@ Bsa::getFileList(const std::optional<std::filesystem::path>& directoryName) cons
 
   const string folderLower = ToLower(directory.string());
 
-  switch (m_type) {
+  switch (m_archiveFile.getType()) {
   case TES3:
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
@@ -2592,13 +2368,6 @@ void Bsa::lock() noexcept {
 void Bsa::unlock() noexcept {
   if (m_multithreaded) {
     m_writeMtx.unlock();
-  }
-}
-
-void Bsa::seek(int64_t pos, SeekDirection whence) const noexcept(false) {
-  if (_fseeki64(m_file.get(), pos, whence) != 0) {
-    const int error = errno;
-    throw runtime_error("Seek error: "s + strerror(error));
   }
 }
 
