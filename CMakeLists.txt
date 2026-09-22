@@ -44,6 +44,7 @@ target_sources(libbsarchpp
         src/utils.cpp
         src/md5.cpp
         src/ArchiveIO.cpp
+        src/win1252.cpp
 
     PRIVATE
         FILE_SET privateHeaders
@@ -54,6 +55,7 @@ target_sources(libbsarchpp
             src/hash.h
             src/utils.h
             src/ArchiveIO.h
+            src/win1252.h
 
     PUBLIC
         FILE_SET HEADERS

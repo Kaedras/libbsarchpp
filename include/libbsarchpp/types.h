@@ -2,6 +2,7 @@
 
 #include "enums.h"  // for PackingCompression_t
 #include "src/md5.h"
+#include "src/win1252.h"
 
 #include <array>        // for array
 #include <cstdint>      // for uint32_t, uint16_t, int32_t, uint64_t, uint8_t
@@ -52,7 +53,30 @@ namespace typeSizes {
 #define PACKED(structure) __pragma(pack(push, 1)) structure __pragma(pack(pop))
 #endif
 
-// NOTE: string types use Windows-1252 encoding.
+// A string prefixed with a byte length. NOT null terminated.
+struct bString {
+  bString();
+  bString(uint8_t length, const std::vector<uint8_t>& data);
+  uint8_t length;
+  win1252string data;
+};
+
+// A string prefixed with a byte length and null terminated
+struct bzString {
+  bzString();
+  bzString(uint8_t length, const std::vector<uint8_t>& data);
+  bzString& operator=(std::string_view str);
+  uint8_t length;
+  win1252string data;
+};
+
+// A string prefixed with a uint16 length. NOT null terminated.
+struct wString {
+  wString();
+  wString(uint16_t length, const std::vector<uint8_t>& data);
+  uint16_t length;
+  win1252string data;
+};
 
 PACKED(struct DDS_PIXELFORMAT {
   uint32_t size        = 0;
@@ -113,7 +137,7 @@ struct FileTES3 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  std::filesystem::path name;  // Windows-1252 string
+  win1252string name;
 };
 
 PACKED(struct HeaderTES4 {
@@ -131,7 +155,7 @@ struct FileTES4 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  std::filesystem::path name;  // Windows-1252 string
+  bzString name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
   [[nodiscard]] bool compress(const Bsa* bsa) const noexcept;  // compress when packing into a new archive
 };
@@ -141,7 +165,7 @@ struct FolderTES4 {
   uint32_t fileCount = 0;
   uint32_t unk32     = 0;
   uint64_t offset    = 0;
-  std::filesystem::path name;  // Windows-1252 string
+  bzString name;
   std::vector<FileTES4> files;
 };
 
@@ -195,7 +219,7 @@ struct FileFO4 {
   uint16_t cubeMaps  = 0;
   std::vector<TexChunkRec> texChunks;
 
-  std::filesystem::path name;  // Windows-1252 string
+  win1252string name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
 
   [[nodiscard]] std::string_view dxgiFormatName() const noexcept;

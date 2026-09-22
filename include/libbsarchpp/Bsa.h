@@ -37,7 +37,6 @@ static_assert(std::endian::native == std::endian::little);
 
 namespace libbsarchpp {
 
-using std::string_literals::operator""s;
 using FileIterationFunction = std::function<bool(const std::filesystem::path&, FilePtr_t, FolderTES4*,
                                                  void*)>;  // filename, file, folder, optional data
 

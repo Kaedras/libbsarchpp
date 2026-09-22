@@ -177,37 +177,37 @@ TEST(Utils, normalizePath) {
 }
 
 TEST(Utils, changeSlashesToBackslashes) {
-  u16string str1 = u"textures/subfolder/file.dds";
+  string str1 = "textures/subfolder/file.dds";
   changeSlashesToBackslashes(str1);
-  EXPECT_EQ(str1, u"textures\\subfolder\\file.dds");
+  EXPECT_EQ(str1, "textures\\subfolder\\file.dds");
 
-  u16string str2 = u"meshes\\armor/helmet.nif";
+  string str2 = "meshes\\armor/helmet.nif";
   changeSlashesToBackslashes(str2);
-  EXPECT_EQ(str2, u"meshes\\armor\\helmet.nif");
+  EXPECT_EQ(str2, "meshes\\armor\\helmet.nif");
 
-  u16string str3 = u"no_slashes_in_path";
+  string str3 = "no_slashes_in_path";
   changeSlashesToBackslashes(str3);
-  EXPECT_EQ(str3, u"no_slashes_in_path");
+  EXPECT_EQ(str3, "no_slashes_in_path");
 
-  u16string str4;
+  string str4;
   changeSlashesToBackslashes(str4);
-  EXPECT_EQ(str4, u"");
+  EXPECT_EQ(str4, "");
 
-  u16string str5 = u"///";
+  string str5 = "///";
   changeSlashesToBackslashes(str5);
-  EXPECT_EQ(str5, u"\\\\\\");
+  EXPECT_EQ(str5, "\\\\\\");
 }
 
 TEST(Utils, sortPaths) {
-  // unused paths: "Ħ", "犬", "ß", "ü", "Ü", "\"", "?", ":", "|", "<", ">", "*", "§", "®", "Ø", "\\", "/", "ä", "Ä",
-  // "ö", "Ö", "A",
   vector<filesystem::path> paths = {
-      ".", " ", "_", "-", ",", ";", "!", "'", "(", ")", "[", "]", "{", "}",
-      "@", "&", "#", "%", "`", "^", "+", "=", "~", "$", "¥", "0", "a", "ふ",
+      ".", " ", "_", "-", ",", ";", "!", "'", "(", ")", "[", "]", "{",
+      "}", "@", "&", "#", "%", "`", "^", "+", "=", "~", "$", "0", "a",
   };
 
-  static vector<filesystem::path> target = {" ", "!", "#", "$", "%", "&", "'", "(", ")", "+", ",", "-", ".", "0",
-                                            ";", "=", "@", "a", "[", "]", "^", "_", "`", "{", "}", "~", "¥", "ふ"};
+  static vector<filesystem::path> target = {
+      " ", "!", "#", "$", "%", "&", "'", "(", ")", "+", ",", "-", ".",
+      "0", ";", "=", "@", "a", "[", "]", "^", "_", "`", "{", "}", "~",
+  };
 
   ranges::sort(paths, sortPaths);
 

@@ -1,5 +1,7 @@
 #include "types.h"
 
+#include <utility>
+
 #include "Bsa.h"
 #include "directx/dxgiformat.h"
 
@@ -146,6 +148,23 @@ bool FileFO4::compress(const Bsa* bsa) const noexcept {
   }
   return bsa->getCompressed();
 }
+
+bString::bString() : length(0) {}
+bString::bString(uint8_t length, const std::vector<uint8_t>& data) : length(length), data({(data)}) {}
+
+bzString::bzString() : length(0) {}
+
+bzString::bzString(uint8_t length, const std::vector<uint8_t>& data) : length(length), data({data}) {}
+
+bzString& bzString::operator=(std::string_view str) {
+  length = str.size();
+  data   = win1252string{str};
+  return *this;
+}
+
+wString::wString() : length(0) {}
+
+wString::wString(uint16_t length, const std::vector<uint8_t>& data) : length(length), data({data}) {}
 
 bool FileTES4::compress(const Bsa* bsa) const noexcept {
   if (packingCompression == PackingCompression_t::compressed) {

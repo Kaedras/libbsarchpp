@@ -20,7 +20,10 @@ void ToLowerInline(std::string& str) noexcept;
  * @brief Replaces slashes with backslashes and changes string to lower case
  */
 void normalizePath(std::string& str) noexcept;
-void changeSlashesToBackslashes(std::u16string& str) noexcept;
+void changeSlashesToBackslashes(std::string& str) noexcept;
+
+std::string_view getFileName(std::string_view str);
+std::string_view getParentPath(std::string_view str);
 
 /**
  * @brief This function for use with `std::sort` to sort paths alphabetically.

@@ -96,12 +96,24 @@ void normalizePath(std::string& str) noexcept {
   ranges::transform(str, str.begin(), ToLowerWin1252);
 }
 
-void changeSlashesToBackslashes(std::u16string& str) noexcept {
+void changeSlashesToBackslashes(std::string& str) noexcept {
   for (auto& c : str) {
     if (c == '/') {
       c = '\\';
     }
   }
+}
+
+std::string_view getFileName(std::string_view str) {
+  const size_t lastSlash = str.find_last_of('/');
+  return {str.data() + lastSlash, str.length() - lastSlash};
+}
+
+std::string_view getParentPath(std::string_view str) {
+  const size_t parentPathEnd   = str.find_last_of('/');
+  const size_t parentPathStart = str.find_last_of('/', parentPathEnd + 1);
+
+  return {str.data() + parentPathStart, parentPathEnd - parentPathStart};
 }
 
 bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept {
