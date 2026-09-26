@@ -35,7 +35,7 @@ enum ArchiveType : uint8_t {
   SFdds   /**< Starfield DDS */
 };
 
-inline std::string ToString(ArchiveType type) {
+inline std::string toString(ArchiveType type) {
   using std::string_literals::operator""s;
   switch (type) {
   case TES3:

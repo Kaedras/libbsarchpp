@@ -2,7 +2,7 @@
 
 #include "enums.h"  // for PackingCompression_t
 #include "src/md5.h"
-#include "src/win1252.h"
+#include "src/win1252string.h"
 
 #include <array>        // for array
 #include <cstdint>      // for uint32_t, uint16_t, int32_t, uint64_t, uint8_t

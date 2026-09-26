@@ -1,6 +1,6 @@
 #include "types.h"
 
-#include "Bsa.h"
+#include "bsa.h"
 #include "directx/dxgiformat.h"
 
 namespace libbsarchpp {

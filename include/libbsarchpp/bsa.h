@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enums.h"  // for ArchiveType, CompressionType, SeekDirection
-#include "src/ArchiveIO.h"
+#include "src/archiveio.h"
 #include "types.h"  // for FileFO4, FolderTES4, FileTES3, fileDeleter
 
 #include <atomic>         // for atomic

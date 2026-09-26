@@ -1,4 +1,4 @@
-#include "src/win1252.h"
+#include "src/win1252string.h"
 
 #include <gtest/gtest.h>
 

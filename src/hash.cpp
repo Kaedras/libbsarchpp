@@ -12,7 +12,7 @@ using namespace std;
 
 namespace libbsarchpp {
 
-uint64_t CreateHashTES3(const std::filesystem::path& fileName) noexcept {
+uint64_t createHashTES3(const std::filesystem::path& fileName) noexcept {
   Win1252string str{fileName};
   str.normalizePath();
 
@@ -42,7 +42,7 @@ uint64_t CreateHashTES3(const std::filesystem::path& fileName) noexcept {
   return result | sum;
 }
 
-uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDirectory) noexcept {
+uint64_t createHashTES4(const std::filesystem::path& fileName, const bool isDirectory) noexcept {
   try {
     uint32_t hash = 0;
 
@@ -101,7 +101,7 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
   }
 }
 
-uint32_t CreateHashFO4(const std::filesystem::path& fileName) noexcept {
+uint32_t createHashFO4(const std::filesystem::path& fileName) noexcept {
   uint32_t result = 0;
 
   Win1252string str{fileName};

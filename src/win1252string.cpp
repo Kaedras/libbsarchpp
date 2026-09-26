@@ -1,4 +1,4 @@
-#include "win1252.h"
+#include "win1252string.h"
 
 #include "utils.h"
 

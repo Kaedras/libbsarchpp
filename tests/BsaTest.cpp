@@ -1,4 +1,4 @@
-#include "Bsa.h"
+#include "bsa.h"
 #include "BsaTest.h"
 #include "checksums/sha256sums.h"
 #include "settings.h"

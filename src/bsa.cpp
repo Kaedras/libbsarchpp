@@ -1,4 +1,4 @@
-#include "Bsa.h"
+#include "bsa.h"
 #include "constants.h"            // for DX10, DDPF_FOURCC, DDSD_PITCH
 #include "directx/dxgiformat.h"   // for DXGI_FORMAT
 #include "enums.h"                // for ArchiveType, CompressionType
@@ -587,7 +587,7 @@ void Bsa::createArchiveTES3(std::vector<std::filesystem::path>& fileList) noexce
 
   unordered_map<fs::path, uint64_t> hashMap;
   for (const auto& file : fileList) {
-    hashMap.try_emplace(file, CreateHashTES3(file));
+    hashMap.try_emplace(file, createHashTES3(file));
   }
 
   // sort by hash
@@ -650,7 +650,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
     fs::path filePath = file.filename();
 
     bool inserted =
-        hashMap.try_emplace(file, make_pair(CreateHashTES4(dirPath, true), CreateHashTES4(filePath, false))).second;
+        hashMap.try_emplace(file, make_pair(createHashTES4(dirPath, true), createHashTES4(filePath, false))).second;
 
     if (!inserted) {
       throw runtime_error(format("Could not insert HashPair for file \"{}\" into hash map", file.string()));
@@ -809,8 +809,8 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
 
       FileFO4 fileFO4;
       fileFO4.name     = file.string();
-      fileFO4.dirHash  = CreateHashFO4(file.parent_path());
-      fileFO4.nameHash = CreateHashFO4(name);
+      fileFO4.dirHash  = createHashFO4(file.parent_path());
+      fileFO4.nameHash = createHashFO4(name);
       fileFO4.ext      = stringToMagic(toLower(ext));
       fileFO4.unknown  = iFileFO4Unknown;
       m_files.emplace_back(fileFO4);
@@ -983,7 +983,7 @@ Bsa::Bsa(const filesystem::path& archivePath, ArchiveType type, std::vector<std:
 Bsa::~Bsa() = default;
 
 std::string Bsa::getArchiveFormatName() const noexcept {
-  return ToString(m_archiveFile.getType());
+  return toString(m_archiveFile.getType());
 }
 
 FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path& filePath) noexcept {
@@ -995,7 +995,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path& filePath) noex
     dir = filePath.has_parent_path() ? filePath.parent_path() : "";
   }
 
-  const uint64_t dirHash = CreateHashTES4(dir, true);
+  const uint64_t dirHash = createHashTES4(dir, true);
   for (auto& _folder : m_files) {
     auto& folder = get<FolderTES4>(_folder);
     // since the table is sorted by hash, we can abort when our hash is lesser
@@ -1004,7 +1004,7 @@ FileRecord_t Bsa::findFileRecordTES4(const std::filesystem::path& filePath) noex
     }
 
     if (dirHash == folder.hash) {
-      const uint64_t fileHash = CreateHashTES4(filePath.filename(), false);
+      const uint64_t fileHash = createHashTES4(filePath.filename(), false);
       for (uint32_t j = 0; j < folder.fileCount; j++) {
         // since the table is sorted by hash, we can abort when our hash is lesser
         if (fileHash < folder.files[j].hash) {

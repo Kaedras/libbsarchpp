@@ -38,13 +38,13 @@ endif()
 
 target_sources(libbsarchpp
     PRIVATE
-        src/Bsa.cpp
+        src/bsa.cpp
         src/types.cpp
         src/hash.cpp
         src/utils.cpp
         src/md5.cpp
-        src/ArchiveIO.cpp
-        src/win1252.cpp
+        src/archiveio.cpp
+        src/win1252string.cpp
 
     PRIVATE
         FILE_SET privateHeaders
@@ -54,14 +54,14 @@ target_sources(libbsarchpp
             src/constants.h
             src/hash.h
             src/utils.h
-            src/ArchiveIO.h
-            src/win1252.h
+            src/archiveio.h
+            src/win1252string.h
 
     PUBLIC
         FILE_SET HEADERS
         BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
         FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/Bsa.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/bsa.h
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/enums.h
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libbsarchpp/types.h
 )

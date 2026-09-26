@@ -1,4 +1,4 @@
-#include "Bsa.h"
+#include "bsa.h"
 #include "src/md5.h"
 
 #include <algorithm>

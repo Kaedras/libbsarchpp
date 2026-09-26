@@ -1,4 +1,4 @@
-#include "Bsa.h"
+#include "bsa.h"
 
 #include <algorithm>
 #include <gsl-lite/gsl-lite.hpp>
