@@ -465,21 +465,29 @@ std::string fromUtf8(const std::u8string_view str) {
   return out;
 }
 
+void normalizeSeparators(string& str) noexcept {
+  for (char& c : str) {
+    if (c == '\\') {
+      c = '/';
+    }
+  }
+}
+
 }  // namespace
 
 Win1252string::Win1252string(std::string rawData) : m_data(std::move(rawData)) {
-  normalizeSeparators();
+  normalizeSeparators(m_data);
 }
 Win1252string::Win1252string(const std::vector<uint8_t>& rawData)
     : m_data(reinterpret_cast<const char*>(rawData.data()), rawData.size()) {
-  normalizeSeparators();
+  normalizeSeparators(m_data);
 }
 Win1252string::Win1252string(std::u8string_view u8Str) : m_data(fromUtf8(u8Str)) {
-  normalizeSeparators();
+  normalizeSeparators(m_data);
 }
 
 Win1252string::Win1252string(const std::filesystem::path& path) : m_data(fromUtf8(path.generic_u8string())) {
-  normalizeSeparators();
+  normalizeSeparators(m_data);
 }
 
 Win1252string& Win1252string::operator=(std::string str) {

@@ -39,12 +39,4 @@ public:
 
 private:
   std::string m_data;
-
-  void normalizeSeparators() noexcept {
-    for (char& c : m_data) {
-      if (c == '\\') {
-        c = '/';
-      }
-    }
-  }
 };
