@@ -8,10 +8,10 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 
 ## Limitations / differences compared to xEdit
 
-- When extracting an archive, the path casing can be different compared to using xEdit multithreaded extraction, if the
+- When extracting an archive, the path casing can be different compared to using xEdit multithreaded extraction if the
   paths inside the archive are inconsistent.
-    - FO4 VR: extracting "Fallout4 - Misc - Debug.ba2" will create "scripts/Hardcore" directory, using xEdit may
-      create "scripts/hardcore" instead.
+    - FO4 VR: extracting "Fallout4 - Misc - Debug.ba2" will create the `scripts/Hardcore` directory, using xEdit may
+      create `scripts/hardcore` instead.
 - Multithreaded packing produces indeterministic results, as the file order in the data section may change, which causes
   the unit tests to fail but improves performance. xEdit also exhibits this behaviour.
 - LZ4 compressed archives (SSE, SkyrimVR, SFdds) differ from ones created with xEdit (it apparently uses lz4 r127,
@@ -21,17 +21,19 @@ For the most part, I just copied the Delphi code, converted it to C++, and then 
 
 ## Dependencies
 
-- lz4 (tested with 1.10)
-- zlib (tested with 1.3.1)
-- gsl-lite
 - C++23 compatible compiler (e.g. GCC 14, clang 18, Visual Studio 2022)
+- cmake
+- gsl-lite
+- lz4
+- tbb (linux only)
+- zlib
 - if building tests:
-    - GTest (tested with 1.14.0 and 1.15.2)
-    - OpenSSL 3 (tested with 3.3.2)
+    - GTest
+    - OpenSSL 3
 
 ## Building
 
-This library can be built as either shared or static library by setting `BUILD_SHARED_LIBS` to either `ON` or `OFF`
+This library can be built as either a shared or static library by setting `BUILD_SHARED_LIBS` to either `ON` or `OFF`
 [vcpkg](https://github.com/microsoft/vcpkg) can be used for automatic dependency configuration.
 
 See examples below.
@@ -109,6 +111,7 @@ include(FetchContent)
 FetchContent_Declare(
         libbsarchpp
         GIT_REPOSITORY https://github.com/Kaedras/libbsarchpp.git
+        GIT_TAG <some tag or commit>
 )
 FetchContent_MakeAvailable(libbsarchpp)
 target_link_libraries(<target> PRIVATE libbsarchpp)
@@ -122,7 +125,7 @@ TODO: add this section
 
 ### Examples
 
-For simple extraction or creation of archive files you can use the static functions below after including
+For simple extraction or creation of archive files, you can use the static functions below after including
 ``libbsarchpp/Bsa.h``.
 
 ```c++
@@ -170,12 +173,11 @@ The scripts used can be found in tests/utils.
 
 - The tests will fail if using multithreaded packing because of a limitation mentioned above.
 - Linux specific:
-    - Building as a shared library will lead to undefined references when linking
-    - You may get ENOSPC (No space left on device) if you leave the work directory at the default value and your distro
-      uses tmpfs for temporary files.
+    - You may get ENOSPC (`No space left on device`) if you leave the work directory at the default value and your
+      distro uses tmpfs for temporary files.
     - To improve performance, you should consider setting the work directory to tmpfs for improved performance (10GiB
       recommended if running tests for Skyrim and later titles, 20GiB for Starfield) by running
-      ``sudo mount -t tmpfs -o size=20g tmpfs <path>``. There does not seem to be a tmpfs equivalent for Windows.
+      `sudo mount -t tmpfs -o size=20g tmpfs <path>`.
 
 ## Credits
 
