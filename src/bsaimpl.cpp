@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #include <execution>
+#include <format>
 #include <gsl-lite/gsl-lite.hpp>
 #include <lz4.h>
 #include <lz4frame.h>

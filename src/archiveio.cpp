@@ -2,6 +2,7 @@
 
 #include "utils.h"
 
+#include <format>
 #include <gsl-lite/gsl-lite.hpp>
 
 using namespace std;
