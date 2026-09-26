@@ -32,8 +32,10 @@ public:
    * @brief Replaces slashes with backslashes and changes string to lower case
    */
   void normalizePath();
-  [[nodiscard]] std::string extension() const;
-  [[nodiscard]] std::string stem() const;
+
+  [[nodiscard]] std::string_view filename() const;
+  [[nodiscard]] std::string_view extension() const;
+  [[nodiscard]] std::string_view stem() const;
 
 private:
   std::string m_data;

@@ -4,8 +4,17 @@
 
 using namespace std;
 
-TEST(Win1252, TES3) {
-  const win1252string str{"/test/abc"s};
+TEST(Win1252, filename) {
+  const win1252string str{"/test/abc.xyz.wasd"s};
+  EXPECT_EQ(str.filename(), "abc.xyz.wasd");
+}
 
-  EXPECT_EQ(str.parentPath(), "/test");
+TEST(Win1252, extension) {
+  const win1252string str{"/test/abc.xyz.wasd"s};
+  EXPECT_EQ(str.extension(), ".wasd");
+}
+
+TEST(Win1252, stem) {
+  const win1252string str{"/test/abc.xyz.wasd"s};
+  EXPECT_EQ(str.stem(), "abc.xyz");
 }

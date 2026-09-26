@@ -510,7 +510,15 @@ void win1252string::normalizePath() {
   libbsarchpp::normalizePath(m_data);
 }
 
-std::string win1252string::extension() const {
+std::string_view win1252string::filename() const {
+  const size_t lastSlash = m_data.find_last_of('/');
+  if (lastSlash == string_view::npos) {
+    return m_data;
+  }
+  return {m_data.data() + lastSlash + 1};
+}
+
+std::string_view win1252string::extension() const {
   const size_t lastDot = m_data.find_last_of('.');
   if (lastDot == string::npos) {
     return m_data;
@@ -519,11 +527,12 @@ std::string win1252string::extension() const {
   return {m_data.data() + lastDot};
 }
 
-std::string win1252string::stem() const {
-  const size_t lastDot = m_data.find_last_of('.');
+std::string_view win1252string::stem() const {
+  const auto fileName  = filename();
+  const size_t lastDot = fileName.find_last_of('.');
   if (lastDot == string::npos) {
-    return m_data;
+    return fileName;
   }
 
-  return {m_data.data(), lastDot};
+  return {fileName.data(), lastDot};
 }
