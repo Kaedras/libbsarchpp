@@ -1148,7 +1148,7 @@ void Bsa::addFile(const filesystem::path& rootDirectory, const filesystem::path&
 
   if (inputFile.get() == nullptr) {
     const int error = errno;
-    throw runtime_error(format("Could not open  \"{}\" for reading: {}", filePath.generic_string(), strerror(error)));
+    throw runtime_error(format("Could not open \"{}\" for reading: {}", filePath.generic_string(), strerror(error)));
   }
 
   // get file size
