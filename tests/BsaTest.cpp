@@ -11,11 +11,12 @@
 using namespace std;
 using namespace libbsarchpp;
 
-void BsaTest::clean(const std::string& game) {
+namespace {
+void clean(const std::string& game) {
   std::filesystem::remove_all(WORKDIR / game);
 }
 
-std::string BsaTest::sha256(const std::filesystem::path& file) {
+std::string sha256(const std::filesystem::path& file) {
   // check if file exists
   if (!exists(file)) {
     throw runtime_error(format("[{}] file {} does not exist", __FUNCTION__, file.string()));
@@ -54,6 +55,7 @@ std::string BsaTest::sha256(const std::filesystem::path& file) {
 
   // finalize data
   if (1 != EVP_DigestFinal_ex(mdCtx, digest, &digestLength)) {
+    OPENSSL_free(digest);
     throw runtime_error("EVP_DigestFinal_ex error");
   }
   EVP_MD_CTX_free(mdCtx);
@@ -66,25 +68,21 @@ std::string BsaTest::sha256(const std::filesystem::path& file) {
   return ss.str();
 }
 
-void BsaTest::pack(const std::string& game, const std::filesystem::path& fileName, ArchiveType type, bool compressed,
-                   bool shared) {
-  try {
-    Bsa::create(WORKDIR / game / fileName, type, WORKDIR / game / fileName.stem(),
-                {.multithreaded = multithreadedPacking, .compressed = compressed, .shareData = shared});
-  } catch (...) {
-    throw;
-  }
+void pack(const std::string& game, const std::filesystem::path& fileName, ArchiveType type, bool compressed,
+          bool shared) {
+  Bsa::create(WORKDIR / game / fileName, type, WORKDIR / game / fileName.stem(),
+              {.multithreaded = multithreadedPacking, .compressed = compressed, .shareData = shared});
 }
 
-void BsaTest::extract(const std::string& game, const std::filesystem::path& fileName) {
+void extract(const std::string& game, const std::filesystem::path& fileName) {
   Bsa::extract(dataDirs[game] / fileName, WORKDIR / game / fileName.stem(), multithreadedExtracting);
 }
 
-ArchiveType BsaTest::getType(const std::string& game, const std::string& name) {
+ArchiveType getType(const std::string& game, const std::string& name) {
   return Bsa::getArchiveType(dataDirs[game] / name);
 }
 
-testing::AssertionResult BsaTest::ChecksumMatches(const std::filesystem::path& file, const std::string& checksum) {
+testing::AssertionResult ChecksumMatches(const std::filesystem::path& file, const std::string& checksum) {
   string fileChecksum = sha256(file);
   if (fileChecksum == checksum) {
     return testing::AssertionSuccess();
@@ -93,7 +91,7 @@ testing::AssertionResult BsaTest::ChecksumMatches(const std::filesystem::path& f
                                      << ") has incorrect checksum: " + fileChecksum;
 }
 
-void BsaTest::recreateArchive(const std::string& game, const std::string& archive, bool compressed, bool shared) {
+void recreateArchive(const std::string& game, const std::string& archive, bool compressed, bool shared) {
   // this directory is deleted after running the test, so we require it to be empty to prevent deletion of unrelated
   // files
   if (exists(WORKDIR / game)) {
@@ -123,6 +121,7 @@ void BsaTest::recreateArchive(const std::string& game, const std::string& archiv
   // clean up
   clean(game);
 }
+}  // namespace
 
 // prevent reporting an error when no game-specific tests are enabled
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(BsaTest);
