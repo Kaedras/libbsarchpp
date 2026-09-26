@@ -27,7 +27,7 @@ endif()
 # tbb, required for parallel loops
 if (UNIX)
     find_package(TBB CONFIG REQUIRED)
-    target_link_libraries(libbsarchpp PRIVATE TBB::tbb)
+    target_link_libraries(libbsarchpp PUBLIC TBB::tbb)
 endif()
 
 if (BUILD_SHARED_LIBS)
@@ -71,7 +71,7 @@ target_include_directories(libbsarchpp PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/deps
 )
 
-target_link_libraries(libbsarchpp PRIVATE ZLIB::ZLIB lz4::lz4)
+target_link_libraries(libbsarchpp PUBLIC ZLIB::ZLIB lz4::lz4)
 
 set_target_properties(libbsarchpp PROPERTIES
         DEBUG_POSTFIX "d"
