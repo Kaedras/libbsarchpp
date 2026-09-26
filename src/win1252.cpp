@@ -503,14 +503,7 @@ std::string win1252string::toUtf8() const {
 }
 
 std::string_view win1252string::parentPath() const {
-  const size_t parentPathEnd = m_data.find_last_of('/');
-  if (parentPathEnd == string::npos) {
-    return m_data;
-  }
-  const size_t parentPathStart = m_data.find_last_of('/', parentPathEnd - 1);
-  const size_t length          = parentPathEnd - parentPathStart;
-
-  return {m_data.data() + parentPathStart, length};
+  return libbsarchpp::getParentPath(m_data);
 }
 
 void win1252string::normalizePath() {

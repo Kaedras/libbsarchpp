@@ -117,10 +117,9 @@ std::string_view getParentPath(std::string_view str) {
     return str;
   }
 
-  const size_t parentPathEnd   = str.find_last_of('/');
-  const size_t parentPathStart = str.find_last_of('/', parentPathEnd - 1);
+  const size_t parentPathEnd = str.find_last_of('/');
 
-  return {str.data() + parentPathStart, parentPathEnd - parentPathStart};
+  return {str.data(), parentPathEnd};
 }
 
 bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept {

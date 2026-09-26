@@ -193,6 +193,7 @@ TEST(Utils, changeSlashesToBackslashes) {
 
 TEST(Utils, getParentPath) {
   EXPECT_EQ(getParentPath("/abc/def"), "/abc");
+  EXPECT_EQ(getParentPath("/abc/def/ghi"), "/abc/def");
   EXPECT_EQ(getParentPath("/"), "/");
   EXPECT_EQ(getParentPath(""), "");
 }
