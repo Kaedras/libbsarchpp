@@ -1,7 +1,5 @@
 #include "types.h"
 
-#include <utility>
-
 #include "Bsa.h"
 #include "directx/dxgiformat.h"
 
