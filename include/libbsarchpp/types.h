@@ -34,18 +34,6 @@ using filePtr      = std::unique_ptr<FILE, fileDeleter>;
 using Magic4 = std::array<char, 4>;  // fourCC
 using Buffer = std::vector<uint8_t>;
 
-namespace typeSizes {
-  inline constexpr uint32_t DDS_PIXELFORMAT = 32;
-  inline constexpr uint32_t DDSHeader       = 128;
-  inline constexpr uint32_t DDSHeaderDX10   = 20;
-  inline constexpr uint32_t HeaderTES3      = 8;
-  inline constexpr uint32_t HeaderTES4      = 28;
-  inline constexpr uint32_t HeaderFO4       = 16;
-  inline constexpr uint32_t HeaderSF        = 8;
-  inline constexpr uint32_t HeaderSFdds     = 12;
-  inline constexpr uint32_t TexChunkRec     = 20;
-}  // namespace typeSizes
-
 // we want to be able to directly read and write structs, so we have to disable padding
 #ifdef __GNUC__
 #define PACKED(structure) structure __attribute__((__packed__))
@@ -88,7 +76,7 @@ PACKED(struct DDS_PIXELFORMAT {
   uint32_t BBitMask    = 0;
   uint32_t ABitMask    = 0;
 });
-static_assert(sizeof(DDS_PIXELFORMAT) == typeSizes::DDS_PIXELFORMAT);
+static_assert(sizeof(DDS_PIXELFORMAT) == 32);
 
 #define RESERVED1_ARRAY std::array<uint32_t, 11>  // required to use multiple template arguments inside macro
 PACKED(struct DDSHeader {
@@ -109,7 +97,7 @@ PACKED(struct DDSHeader {
   uint32_t caps4     = 0;
   uint32_t reserved2 = 0;
 });
-static_assert(sizeof(DDSHeader) == typeSizes::DDSHeader);
+static_assert(sizeof(DDSHeader) == 128);
 #undef RESERVED1_ARRAY
 
 PACKED(struct DDSHeaderDX10 {
@@ -119,7 +107,7 @@ PACKED(struct DDSHeaderDX10 {
   uint32_t arraySize         = 0;
   uint32_t miscFlags2        = 0;
 });
-static_assert(sizeof(DDSHeaderDX10) == typeSizes::DDSHeaderDX10);
+static_assert(sizeof(DDSHeaderDX10) == 20);
 
 struct DDSInfo {
   int32_t width   = 0;
@@ -131,7 +119,7 @@ PACKED(struct HeaderTES3 {
   uint32_t hashOffset = 0;
   uint32_t fileCount  = 0;
 });
-static_assert(sizeof(HeaderTES3) == typeSizes::HeaderTES3);
+static_assert(sizeof(HeaderTES3) == 8);
 
 struct FileTES3 {
   uint64_t hash   = 0;
@@ -149,7 +137,7 @@ PACKED(struct HeaderTES4 {
   uint32_t fileNamesLength   = 0;
   uint32_t fileFlags         = 0;
 });
-static_assert(sizeof(HeaderTES4) == typeSizes::HeaderTES4);
+static_assert(sizeof(HeaderTES4) == 28);
 
 struct FileTES4 {
   uint64_t hash   = 0;
@@ -174,14 +162,14 @@ PACKED(struct HeaderFO4 {
   uint32_t fileCount      = 0;
   int64_t fileTableOffset = 0;
 });
-static_assert(sizeof(HeaderFO4) == typeSizes::HeaderFO4);
+static_assert(sizeof(HeaderFO4) == 16);
 
 PACKED(struct HeaderSF {
   HeaderFO4 fo4Header = {};
   uint32_t unknown1   = 0;
   uint32_t unknown2   = 0;
 });
-static_assert(sizeof(HeaderSF) == typeSizes::HeaderFO4 + typeSizes::HeaderSF);
+static_assert(sizeof(HeaderSF) == sizeof(HeaderFO4) + 8);
 
 PACKED(struct HeaderSFdds {
   HeaderFO4 fo4Header        = {};
@@ -189,7 +177,7 @@ PACKED(struct HeaderSFdds {
   uint32_t unknown2          = 0;
   uint32_t compressionMethod = 0;
 });
-static_assert(sizeof(HeaderSFdds) == typeSizes::HeaderFO4 + typeSizes::HeaderSFdds);
+static_assert(sizeof(HeaderSFdds) == sizeof(HeaderFO4) + 12);
 
 PACKED(struct TexChunkRec {
   int64_t offset      = 0;
@@ -198,7 +186,7 @@ PACKED(struct TexChunkRec {
   uint16_t startMip   = 0;
   uint16_t endMip     = 0;
 });
-static_assert(sizeof(TexChunkRec) == typeSizes::TexChunkRec);
+static_assert(sizeof(TexChunkRec) == 20);
 
 struct FileFO4 {
   uint32_t nameHash = 0;
