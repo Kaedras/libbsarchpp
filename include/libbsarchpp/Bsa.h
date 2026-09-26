@@ -411,9 +411,7 @@ private:
    */
   void unlock() noexcept;
 
-  int64_t seek(int64_t pos, SeekDirection whence = SET) const noexcept(false) {
-    return m_archiveFile.seek(pos, whence);
-  }
+  void seek(int64_t pos, SeekDirection whence = SET) const noexcept(false) { m_archiveFile.seek(pos, whence); }
 
   /**
    * @brief Returns HeaderFO4 structure from @link m_header @endlink.

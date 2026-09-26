@@ -38,7 +38,7 @@ public:
    * @param whence Seek direction
    * @throw std::runtime_error
    */
-  int64_t seek(int64_t pos, SeekDirection whence = SET) const noexcept(false);
+  void seek(int64_t pos, SeekDirection whence = SET) const noexcept(false);
 
   /**
    * @brief Reads data.

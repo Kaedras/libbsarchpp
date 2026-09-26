@@ -29,14 +29,12 @@ int64_t ArchiveIO::tell() const {
   return _ftelli64(m_file.get());
 }
 
-int64_t ArchiveIO::seek(int64_t pos, SeekDirection whence) const noexcept(false) {
+void ArchiveIO::seek(int64_t pos, SeekDirection whence) const noexcept(false) {
   int64_t result = _fseeki64(m_file.get(), pos, whence);
   if (result != 0) {
     const int error = errno;
     throw runtime_error("Seek error: "s + strerror(error));
   }
-
-  return result;
 }
 
 ArchiveIO::ArchiveIO(std::filesystem::path file) : m_fileName(std::move(file)) {}
