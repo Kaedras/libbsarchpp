@@ -6,15 +6,15 @@
 #include <string>
 
 namespace libbsarchpp {
-[[nodiscard]] uint32_t MagicToInt(Magic4 value) noexcept;
-[[nodiscard]] Magic4 IntToMagic(uint32_t value) noexcept;
-[[nodiscard]] Magic4 StringToMagic(const std::string& str) noexcept;
-[[nodiscard]] std::string MagicToString(const Magic4& magic) noexcept;
-[[nodiscard]] std::string MagicToString(const uint32_t& value) noexcept;
+[[nodiscard]] uint32_t magicToInt(Magic4 value) noexcept;
+[[nodiscard]] Magic4 intToMagic(uint32_t value) noexcept;
+[[nodiscard]] Magic4 stringToMagic(const std::string& str) noexcept;
+[[nodiscard]] std::string magicToString(const Magic4& magic) noexcept;
+[[nodiscard]] std::string magicToString(const uint32_t& value) noexcept;
 
-[[nodiscard]] std::string ToLower(std::string str) noexcept;
-[[nodiscard]] std::string ToLower(const std::filesystem::path& str) noexcept;
-void ToLowerInline(std::string& str) noexcept;
+[[nodiscard]] std::string toLower(std::string str) noexcept;
+[[nodiscard]] std::string toLower(const std::filesystem::path& str) noexcept;
+void toLowerInline(std::string& str) noexcept;
 
 /**
  * @brief Replaces slashes with backslashes and changes string to lower case

@@ -5,98 +5,98 @@
 using namespace std;
 using namespace libbsarchpp;
 
-TEST(Utils, MagicToInt) {
+TEST(Utils, magicToInt) {
   constexpr Magic4 btdx = {'B', 'T', 'D', 'X'};
-  EXPECT_EQ(MagicToInt(btdx), 0x58445442u);
+  EXPECT_EQ(magicToInt(btdx), 0x58445442u);
 
   constexpr Magic4 bsa = {'B', 'S', 'A', '\0'};
-  EXPECT_EQ(MagicToInt(bsa), 0x00415342u);
+  EXPECT_EQ(magicToInt(bsa), 0x00415342u);
 
   constexpr Magic4 zero = {0, 0, 0, 0};
-  EXPECT_EQ(MagicToInt(zero), 0u);
+  EXPECT_EQ(magicToInt(zero), 0u);
 
   constexpr Magic4 bytes = {0x01, 0x02, 0x03, 0x04};
-  EXPECT_EQ(MagicToInt(bytes), 0x04030201u);
+  EXPECT_EQ(magicToInt(bytes), 0x04030201u);
 
   constexpr Magic4 allOnes = {static_cast<char>(0xFF), static_cast<char>(0xFF), static_cast<char>(0xFF),
                               static_cast<char>(0xFF)};
-  EXPECT_EQ(MagicToInt(allOnes), 0xFFFFFFFFu);
+  EXPECT_EQ(magicToInt(allOnes), 0xFFFFFFFFu);
 }
 
-TEST(Utils, IntToMagic) {
+TEST(Utils, intToMagic) {
   constexpr Magic4 expectedBtdx = {'B', 'T', 'D', 'X'};
-  EXPECT_EQ(IntToMagic(0x58445442u), expectedBtdx);
+  EXPECT_EQ(intToMagic(0x58445442u), expectedBtdx);
 
   constexpr Magic4 expectedBsa = {'B', 'S', 'A', '\0'};
-  EXPECT_EQ(IntToMagic(0x00415342u), expectedBsa);
+  EXPECT_EQ(intToMagic(0x00415342u), expectedBsa);
 
   constexpr Magic4 expectedZero = {0, 0, 0, 0};
-  EXPECT_EQ(IntToMagic(0u), expectedZero);
+  EXPECT_EQ(intToMagic(0u), expectedZero);
 
   constexpr Magic4 expectedBytes = {0x01, 0x02, 0x03, 0x04};
-  EXPECT_EQ(IntToMagic(0x04030201u), expectedBytes);
+  EXPECT_EQ(intToMagic(0x04030201u), expectedBytes);
 
   // Round-trip tests
   constexpr uint32_t testVal = 0x12345678u;
-  EXPECT_EQ(MagicToInt(IntToMagic(testVal)), testVal);
+  EXPECT_EQ(magicToInt(intToMagic(testVal)), testVal);
 
   constexpr Magic4 testMagic = {'T', 'E', 'S', '4'};
-  EXPECT_EQ(IntToMagic(MagicToInt(testMagic)), testMagic);
+  EXPECT_EQ(intToMagic(magicToInt(testMagic)), testMagic);
 }
 
-TEST(Utils, StringToMagic) {
+TEST(Utils, stringToMagic) {
   constexpr Magic4 expectedBtdx = {'B', 'T', 'D', 'X'};
-  EXPECT_EQ(StringToMagic("BTDX"), expectedBtdx);
+  EXPECT_EQ(stringToMagic("BTDX"), expectedBtdx);
 
   constexpr Magic4 expectedBsa = {'B', 'S', 'A', 0};
-  EXPECT_EQ(StringToMagic("BSA"), expectedBsa);
+  EXPECT_EQ(stringToMagic("BSA"), expectedBsa);
 
   constexpr Magic4 expectedSingle = {'X', 0, 0, 0};
-  EXPECT_EQ(StringToMagic("X"), expectedSingle);
+  EXPECT_EQ(stringToMagic("X"), expectedSingle);
 
   constexpr Magic4 expectedEmpty = {0, 0, 0, 0};
-  EXPECT_EQ(StringToMagic(""), expectedEmpty);
+  EXPECT_EQ(stringToMagic(""), expectedEmpty);
 
   // Strings longer than 4 characters should be truncated
-  EXPECT_EQ(StringToMagic("BTDX_EXTRA"), expectedBtdx);
+  EXPECT_EQ(stringToMagic("BTDX_EXTRA"), expectedBtdx);
   constexpr Magic4 expectedDigits = {'1', '2', '3', '4'};
-  EXPECT_EQ(StringToMagic("123456789"), expectedDigits);
+  EXPECT_EQ(stringToMagic("123456789"), expectedDigits);
 }
 
-TEST(Utils, MagicToString) {
+TEST(Utils, magicToString) {
   constexpr Magic4 btdx = {'B', 'T', 'D', 'X'};
-  EXPECT_EQ(MagicToString(btdx), "BTDX");
+  EXPECT_EQ(magicToString(btdx), "BTDX");
 
   constexpr Magic4 bsa = {'B', 'S', 'A', '\0'};
-  EXPECT_EQ(MagicToString(bsa), string("BSA\0", 4));
+  EXPECT_EQ(magicToString(bsa), string("BSA\0", 4));
 
   constexpr Magic4 zeros = {0, 0, 0, 0};
-  EXPECT_EQ(MagicToString(zeros), string("\0\0\0\0", 4));
+  EXPECT_EQ(magicToString(zeros), string("\0\0\0\0", 4));
 
   // uint32_t overload
-  EXPECT_EQ(MagicToString(0x58445442u), "BTDX");
-  EXPECT_EQ(MagicToString(0x00415342u), string("BSA\0", 4));
-  EXPECT_EQ(MagicToString(0u), string("\0\0\0\0", 4));
+  EXPECT_EQ(magicToString(0x58445442u), "BTDX");
+  EXPECT_EQ(magicToString(0x00415342u), string("BSA\0", 4));
+  EXPECT_EQ(magicToString(0u), string("\0\0\0\0", 4));
 
   // Verify resulting string length is always 4
-  EXPECT_EQ(MagicToString(btdx).length(), 4u);
-  EXPECT_EQ(MagicToString(0x58445442u).length(), 4u);
+  EXPECT_EQ(magicToString(btdx).length(), 4u);
+  EXPECT_EQ(magicToString(0x58445442u).length(), 4u);
 }
 
-TEST(Utils, ToLower) {
-  EXPECT_EQ(ToLower(string("UPPER CASE")), "upper case");
-  EXPECT_EQ(ToLower(string("MixEd_CaSe-123!#")), "mixed_case-123!#");
-  EXPECT_EQ(ToLower(string("lower CASE 123")), "lower case 123");
-  EXPECT_EQ(ToLower(string("")), "");
+TEST(Utils, toLower) {
+  EXPECT_EQ(toLower(string("UPPER CASE")), "upper case");
+  EXPECT_EQ(toLower(string("MixEd_CaSe-123!#")), "mixed_case-123!#");
+  EXPECT_EQ(toLower(string("lower CASE 123")), "lower case 123");
+  EXPECT_EQ(toLower(string("")), "");
 
-  EXPECT_EQ(ToLower(filesystem::path("Meshes/Armor/HELMET.NIF")), "meshes/armor/helmet.nif");
-  EXPECT_EQ(ToLower(filesystem::path("TEXTURES\\HELMET.DDS")), "textures\\helmet.dds");
-  EXPECT_EQ(ToLower(filesystem::path("")), "");
+  EXPECT_EQ(toLower(filesystem::path("Meshes/Armor/HELMET.NIF")), "meshes/armor/helmet.nif");
+  EXPECT_EQ(toLower(filesystem::path("TEXTURES\\HELMET.DDS")), "textures\\helmet.dds");
+  EXPECT_EQ(toLower(filesystem::path("")), "");
 
   // Windows-1252 characters
-  EXPECT_EQ(ToLower(filesystem::path("Meshes/\xCB/\xC9\xC9\x65.NIF")), "meshes/\xEB/\xE9\xE9\x65.nif");
+  EXPECT_EQ(toLower(filesystem::path("Meshes/\xCB/\xC9\xC9\x65.NIF")), "meshes/\xEB/\xE9\xE9\x65.nif");
 
-  EXPECT_EQ(ToLower(string("\xDC\xC4/\xDC\xDF")), "\xFC\xE4/\xFC\xDF");
+  EXPECT_EQ(toLower(string("\xDC\xC4/\xDC\xDF")), "\xFC\xE4/\xFC\xDF");
 
   // latin-1 uppercase letters:
   const string win1252Latin1Upper =
@@ -105,39 +105,39 @@ TEST(Utils, ToLower) {
   const string win1252Latin1Lower =
       "\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF8\xF9\xFA\xFB"
       "\xFC\xFD\xFE";
-  EXPECT_EQ(ToLower(win1252Latin1Upper), win1252Latin1Lower);
+  EXPECT_EQ(toLower(win1252Latin1Upper), win1252Latin1Lower);
 
-  EXPECT_EQ(ToLower(string("\x8A\x8C\x8E\x9F")), "\x9A\x9C\x9E\xFF");
+  EXPECT_EQ(toLower(string("\x8A\x8C\x8E\x9F")), "\x9A\x9C\x9E\xFF");
 
   // non-cased symbols
   const string symbols = "\xD7 \xF7 \x80 \xA9 \xAE \xA7 123 !@#";
-  EXPECT_EQ(ToLower(symbols), symbols);
+  EXPECT_EQ(toLower(symbols), symbols);
 }
 
-TEST(Utils, ToLowerInline) {
+TEST(Utils, toLowerInline) {
   string str1 = "UPPER CASE";
-  ToLowerInline(str1);
+  toLowerInline(str1);
   EXPECT_EQ(str1, "upper case");
 
   string str2 = "MixEd_CaSe 123!@#";
-  ToLowerInline(str2);
+  toLowerInline(str2);
   EXPECT_EQ(str2, "mixed_case 123!@#");
 
   string str3 = "lower case";
-  ToLowerInline(str3);
+  toLowerInline(str3);
   EXPECT_EQ(str3, "lower case");
 
   string str4;
-  ToLowerInline(str4);
+  toLowerInline(str4);
   EXPECT_EQ(str4, "");
 
   // Windows-1252
   string strWin1252 = "\xD6 \x8A\x8C\x8E\x9F \xC9\xC9\x45";
-  ToLowerInline(strWin1252);
+  toLowerInline(strWin1252);
   EXPECT_EQ(strWin1252, "\xF6 \x9A\x9C\x9E\xFF \xE9\xE9\x65");
 
   string strWin1252AlreadyLower = "already lower \xE4\xF6\xFC\xDF \x9A\x9C\x9E\xFF";
-  ToLowerInline(strWin1252AlreadyLower);
+  toLowerInline(strWin1252AlreadyLower);
   EXPECT_EQ(strWin1252AlreadyLower, "already lower \xE4\xF6\xFC\xDF \x9A\x9C\x9E\xFF");
 }
 

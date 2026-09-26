@@ -273,7 +273,7 @@ void Bsa::readFO4FileTable() noexcept(false) {
 
         string subStr = parentPath.substr(0, pos);
 
-        const auto [iterator, wasInserted] = pathMap.try_emplace(ToLower(subStr), subStr);
+        const auto [iterator, wasInserted] = pathMap.try_emplace(toLower(subStr), subStr);
         if (!wasInserted) {
           // directory already exists in the map
           size_t charsToReplace = pos - oldPos;
@@ -295,7 +295,7 @@ void Bsa::readBa2GNRL() noexcept(false) {
   const HeaderFO4& header = getHeaderFO4();
 
   if (header.magic != magic::GNRL) {
-    throw runtime_error("Invalid/Unknown ba2 archive. Expected GNRL, got " + MagicToString(header.magic));
+    throw runtime_error("Invalid/Unknown ba2 archive. Expected GNRL, got " + magicToString(header.magic));
   }
 
   m_files.reserve(header.fileCount);
@@ -322,7 +322,7 @@ void Bsa::readBa2GNRL() noexcept(false) {
 void Bsa::readBa2DX10() noexcept(false) {
   const HeaderFO4& header = getHeaderFO4();
   if (header.magic != magic::DX10) {
-    throw runtime_error("Invalid/Unknown ba2 archive. Expected GNRL, got " + MagicToString(header.magic));
+    throw runtime_error("Invalid/Unknown ba2 archive. Expected GNRL, got " + magicToString(header.magic));
   }
 
   if (m_archiveFile.getType() == FO4) {
@@ -469,7 +469,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     } else if (magic == magic::DX10) {
       m_archiveFile.setType(FO4dds);
     } else {
-      throw runtime_error("Unknown FO4 archive subtype " + MagicToString(magic));
+      throw runtime_error("Unknown FO4 archive subtype " + magicToString(magic));
     }
     // seek to previous location
     seek(-4, CUR);
@@ -482,7 +482,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     if (magic == magic::GNRL) {
       m_archiveFile.setType(SF);
     } else {
-      throw runtime_error("Unknown SF archive subtype " + MagicToString(magic));
+      throw runtime_error("Unknown SF archive subtype " + magicToString(magic));
     }
     // seek to previous location
     seek(-4, CUR);
@@ -496,7 +496,7 @@ void Bsa::determineArchiveVersion() noexcept(false) {
     if (magic == magic::DX10) {
       m_archiveFile.setType(SFdds);
     } else {
-      throw runtime_error("Unknown SF archive subtype " + MagicToString(magic));
+      throw runtime_error("Unknown SF archive subtype " + magicToString(magic));
     }
     // seek to previous location
     seek(-4, CUR);
@@ -526,7 +526,7 @@ Bsa::Bsa(const std::filesystem::path& archivePath, bool multithreaded) noexcept(
     m_archiveFile.setType(FO4);
     break;
   default:
-    throw runtime_error("Unknown archive format, magic is "s + MagicToString(m_magic));
+    throw runtime_error("Unknown archive format, magic is "s + magicToString(m_magic));
   }
 
   determineArchiveVersion();
@@ -600,7 +600,7 @@ void Bsa::createArchiveTES3(std::vector<std::filesystem::path>& fileList) noexce
   for (const auto& file : fileList) {
     FileTES3 fileTES3;
     fileTES3.hash = hashMap.at(file);
-    fileTES3.name = ToLower(file.string());
+    fileTES3.name = toLower(file.string());
     len += fileTES3.name.length() + 1;
     m_files.emplace_back(fileTES3);
 
@@ -655,8 +655,8 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
       throw runtime_error(format("Could not insert HashPair for file \"{}\" into hash map", file.string()));
     }
 
-    string ext = ToLower(file.extension().string());
-    string dir = ToLower(dirPath.generic_string());
+    string ext = toLower(file.extension().string());
+    string dir = toLower(dirPath.generic_string());
 
     // determine file flags
     if (dir.starts_with("textures/") || ext == ".dds") {
@@ -713,7 +713,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
 
       FolderTES4 folderTES4;
       folderTES4.hash = dirHash;
-      folderTES4.name = ToLower(file.parent_path());
+      folderTES4.name = toLower(file.parent_path());
 
       m_files.emplace_back(folderTES4);
 
@@ -723,7 +723,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
     }
     FileTES4 fileTES4;
     fileTES4.hash = fileHash;
-    fileTES4.name = ToLower(file.filename());
+    fileTES4.name = toLower(file.filename());
 
     auto& last = get<FolderTES4>(m_files.back());
     last.files.emplace_back(fileTES4);
@@ -810,7 +810,7 @@ void Bsa::createArchiveFO4(std::vector<std::filesystem::path>& fileList) noexcep
       fileFO4.name     = file.string();
       fileFO4.dirHash  = CreateHashFO4(file.parent_path());
       fileFO4.nameHash = CreateHashFO4(name);
-      fileFO4.ext      = StringToMagic(ToLower(ext));
+      fileFO4.ext      = stringToMagic(toLower(ext));
       fileFO4.unknown  = iFileFO4Unknown;
       m_files.emplace_back(fileFO4);
 
@@ -2287,14 +2287,14 @@ Bsa::getFileList(const std::optional<std::filesystem::path>& directoryName) cons
     directory = canonical(directoryName.value());
   }
 
-  const string folderLower = ToLower(directory.string());
+  const string folderLower = toLower(directory.string());
 
   switch (m_archiveFile.getType()) {
   case TES3:
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
-      if (directory.empty() || ToLower(file.name.string()).starts_with(folderLower)) {
+      if (directory.empty() || toLower(file.name.string()).starts_with(folderLower)) {
         result.emplace_back(file.name.toUtf8());
       }
     }
@@ -2305,7 +2305,7 @@ Bsa::getFileList(const std::optional<std::filesystem::path>& directoryName) cons
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
       const auto& folder = get<FolderTES4>(_file);
-      if (directory.empty() || ToLower(folder.name.data.string()).starts_with(folderLower)) {
+      if (directory.empty() || toLower(folder.name.data.string()).starts_with(folderLower)) {
         for (const auto& fileTES4 : folder.files) {
           result.emplace_back(folder.name.data.toUtf8() + "/" + fileTES4.name.data.toUtf8());
         }
@@ -2320,7 +2320,7 @@ Bsa::getFileList(const std::optional<std::filesystem::path>& directoryName) cons
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
       const auto& file = get<FileFO4>(_file);
-      if (directory.empty() || ToLower(file.name.string()).starts_with(folderLower)) {
+      if (directory.empty() || toLower(file.name.string()).starts_with(folderLower)) {
         result.emplace_back(file.name.toUtf8());
       }
     }
@@ -2422,7 +2422,7 @@ void Bsa::create(const std::filesystem::path& archivePath, ArchiveType type,
   for (const auto& entry : fs::recursive_directory_iterator(inputDirectory)) {
     if (entry.is_regular_file()) {
       string ext = entry.path().extension().string();
-      ToLowerInline(ext);
+      toLowerInline(ext);
 
       // only pack dds files for dds archives
       if ((type == FO4dds || type == SFdds) && ext != ".dds") {

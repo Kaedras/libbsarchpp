@@ -10,7 +10,7 @@ namespace {
 inline constexpr unsigned char asciiDiff    = 'a' - 'A';
 inline constexpr unsigned char extAsciiDiff = 0x20;
 
-constexpr char ToLowerWin1252(const char c) noexcept {
+constexpr char toLowerWin1252(const char c) noexcept {
   const auto uc = static_cast<unsigned char>(c);
   // 'A' <= uc <= 'Z'
   if (uc >= 65 && uc <= 90) {
@@ -39,19 +39,19 @@ constexpr char ToLowerWin1252(const char c) noexcept {
 
 namespace libbsarchpp {
 
-uint32_t MagicToInt(const Magic4 value) noexcept {
+uint32_t magicToInt(const Magic4 value) noexcept {
   uint32_t result;
   memcpy(&result, value.data(), 4);
   return result;
 }
 
-Magic4 IntToMagic(const uint32_t value) noexcept {
+Magic4 intToMagic(const uint32_t value) noexcept {
   Magic4 result;
   memcpy(result.data(), &value, 4);
   return result;
 }
 
-Magic4 StringToMagic(const std::string& str) noexcept {
+Magic4 stringToMagic(const std::string& str) noexcept {
   Magic4 result = {0, 0, 0, 0};
 
   for (size_t i = 0; i < 4; i++) {
@@ -64,36 +64,36 @@ Magic4 StringToMagic(const std::string& str) noexcept {
   return result;
 }
 
-std::string MagicToString(const Magic4& magic) noexcept {
+std::string magicToString(const Magic4& magic) noexcept {
   string str(4, 0);
   memcpy(str.data(), magic.data(), 4);
   return str;
 }
 
-std::string MagicToString(const uint32_t& value) noexcept {
+std::string magicToString(const uint32_t& value) noexcept {
   string str(4, 0);
   memcpy(str.data(), &value, 4);
   return str;
 }
 
-std::string ToLower(std::string str) noexcept {
-  ranges::transform(str, str.begin(), ToLowerWin1252);
+std::string toLower(std::string str) noexcept {
+  ranges::transform(str, str.begin(), toLowerWin1252);
   return str;
 }
 
-std::string ToLower(const std::filesystem::path& str) noexcept {
-  return ToLower(str.string());
+std::string toLower(const std::filesystem::path& str) noexcept {
+  return toLower(str.string());
 }
 
-void ToLowerInline(std::string& str) noexcept {
-  ranges::transform(str, str.begin(), ToLowerWin1252);
+void toLowerInline(std::string& str) noexcept {
+  ranges::transform(str, str.begin(), toLowerWin1252);
 }
 
 void normalizePath(std::string& str) noexcept {
   // replace '/' with '\\'
   ranges::replace(str, '/', '\\');
   // change string to lower characters
-  ranges::transform(str, str.begin(), ToLowerWin1252);
+  ranges::transform(str, str.begin(), toLowerWin1252);
 }
 
 void changeSlashesToBackslashes(std::string& str) noexcept {
