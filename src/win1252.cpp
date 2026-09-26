@@ -467,27 +467,27 @@ std::string fromUtf8(const std::u8string_view str) {
 
 }  // namespace
 
-win1252string::win1252string(std::string rawData) : m_data(std::move(rawData)) {
+Win1252string::Win1252string(std::string rawData) : m_data(std::move(rawData)) {
   normalizeSeparators();
 }
-win1252string::win1252string(const std::vector<uint8_t>& rawData)
+Win1252string::Win1252string(const std::vector<uint8_t>& rawData)
     : m_data(reinterpret_cast<const char*>(rawData.data()), rawData.size()) {
   normalizeSeparators();
 }
-win1252string::win1252string(std::u8string_view u8Str) : m_data(fromUtf8(u8Str)) {
+Win1252string::Win1252string(std::u8string_view u8Str) : m_data(fromUtf8(u8Str)) {
   normalizeSeparators();
 }
 
-win1252string::win1252string(const std::filesystem::path& path) : m_data(fromUtf8(path.generic_u8string())) {
+Win1252string::Win1252string(const std::filesystem::path& path) : m_data(fromUtf8(path.generic_u8string())) {
   normalizeSeparators();
 }
 
-win1252string& win1252string::operator=(std::string str) {
+Win1252string& Win1252string::operator=(std::string str) {
   m_data = std::move(str);
   return *this;
 }
 
-std::u8string win1252string::toU8String() const {
+std::u8string Win1252string::toU8String() const {
   u8string utf8;
   utf8.reserve(m_data.size() * 2);
   for (const uint8_t c : m_data) {
@@ -497,20 +497,20 @@ std::u8string win1252string::toU8String() const {
   return utf8;
 }
 
-std::string win1252string::toUtf8() const {
+std::string Win1252string::toUtf8() const {
   const u8string str = toU8String();
   return {reinterpret_cast<const char*>(str.data()), str.size()};
 }
 
-std::string_view win1252string::parentPath() const {
+std::string_view Win1252string::parentPath() const {
   return libbsarchpp::getParentPath(m_data);
 }
 
-void win1252string::normalizePath() {
+void Win1252string::normalizePath() {
   libbsarchpp::normalizePath(m_data);
 }
 
-std::string_view win1252string::filename() const {
+std::string_view Win1252string::filename() const {
   const size_t lastSlash = m_data.find_last_of('/');
   if (lastSlash == string_view::npos) {
     return m_data;
@@ -518,7 +518,7 @@ std::string_view win1252string::filename() const {
   return {m_data.data() + lastSlash + 1};
 }
 
-std::string_view win1252string::extension() const {
+std::string_view Win1252string::extension() const {
   const size_t lastDot = m_data.find_last_of('.');
   if (lastDot == string::npos) {
     return m_data;
@@ -527,7 +527,7 @@ std::string_view win1252string::extension() const {
   return {m_data.data() + lastDot};
 }
 
-std::string_view win1252string::stem() const {
+std::string_view Win1252string::stem() const {
   const auto fileName  = filename();
   const size_t lastDot = fileName.find_last_of('.');
   if (lastDot == string::npos) {

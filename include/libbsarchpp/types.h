@@ -58,7 +58,7 @@ struct bString {
   bString();
   bString(uint8_t length, const std::vector<uint8_t>& data);
   uint8_t length;
-  win1252string data;
+  Win1252string data;
 };
 
 // A string prefixed with a byte length and null terminated
@@ -67,7 +67,7 @@ struct bzString {
   bzString(uint8_t length, const std::vector<uint8_t>& data);
   bzString& operator=(std::string_view str);
   uint8_t length;
-  win1252string data;
+  Win1252string data;
 };
 
 // A string prefixed with a uint16 length. NOT null terminated.
@@ -75,7 +75,7 @@ struct wString {
   wString();
   wString(uint16_t length, const std::vector<uint8_t>& data);
   uint16_t length;
-  win1252string data;
+  Win1252string data;
 };
 
 PACKED(struct DDS_PIXELFORMAT {
@@ -137,7 +137,7 @@ struct FileTES3 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  win1252string name;
+  Win1252string name;
 };
 
 PACKED(struct HeaderTES4 {
@@ -219,7 +219,7 @@ struct FileFO4 {
   uint16_t cubeMaps  = 0;
   std::vector<TexChunkRec> texChunks;
 
-  win1252string name;
+  Win1252string name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
 
   [[nodiscard]] std::string_view dxgiFormatName() const noexcept;

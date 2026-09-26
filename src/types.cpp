@@ -156,7 +156,7 @@ bzString::bzString(uint8_t length, const std::vector<uint8_t>& data) : length(le
 
 bzString& bzString::operator=(std::string_view str) {
   length = str.size();
-  data   = win1252string{str};
+  data   = Win1252string{str};
   return *this;
 }
 

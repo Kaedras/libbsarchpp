@@ -9,16 +9,16 @@
 /**
  * @brief A Windows-1252 encoded file path
  */
-class win1252string {
+class Win1252string {
 public:
-  win1252string() = default;
+  Win1252string() = default;
 
-  explicit win1252string(std::string rawData);
-  explicit win1252string(const std::vector<uint8_t>& rawData);
-  explicit win1252string(std::u8string_view u8Str);
-  explicit win1252string(const std::filesystem::path& path);
+  explicit Win1252string(std::string rawData);
+  explicit Win1252string(const std::vector<uint8_t>& rawData);
+  explicit Win1252string(std::u8string_view u8Str);
+  explicit Win1252string(const std::filesystem::path& path);
 
-  win1252string& operator=(std::string str);
+  Win1252string& operator=(std::string str);
 
   [[nodiscard]] std::u8string toU8String() const;
   [[nodiscard]] std::string toUtf8() const;

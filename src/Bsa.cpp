@@ -383,7 +383,7 @@ void Bsa::readArchiveTes3() noexcept(false) {
   // read names
   for (auto& _file : m_files) {
     auto& file = get<FileTES3>(_file);
-    file.name  = read<win1252string>();
+    file.name  = read<Win1252string>();
     addToFileMap(file.name.toUtf8(), &file);
   }
   // read hashes

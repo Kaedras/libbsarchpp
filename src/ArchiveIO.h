@@ -189,7 +189,7 @@ inline void ArchiveIO::write(const std::string& data) noexcept(false) {
 }
 
 template <>
-inline void ArchiveIO::write(const win1252string& data) noexcept(false) {
+inline void ArchiveIO::write(const Win1252string& data) noexcept(false) {
   for (const auto& c : data.string()) {
     if (m_useBackslashes && c == '/') {
       write('\\');

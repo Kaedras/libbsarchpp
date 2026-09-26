@@ -13,7 +13,7 @@ using namespace std;
 namespace libbsarchpp {
 
 uint64_t CreateHashTES3(const std::filesystem::path& fileName) noexcept {
-  win1252string str{fileName};
+  Win1252string str{fileName};
   str.normalizePath();
 
   const string& s = str.string();
@@ -46,7 +46,7 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
   try {
     uint32_t hash = 0;
 
-    win1252string str{fileName};
+    Win1252string str{fileName};
     str.normalizePath();
 
     string name;
@@ -104,7 +104,7 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
 uint32_t CreateHashFO4(const std::filesystem::path& fileName) noexcept {
   uint32_t result = 0;
 
-  win1252string str{fileName};
+  Win1252string str{fileName};
   str.normalizePath();
 
   for (const unsigned char c : str.string()) {
