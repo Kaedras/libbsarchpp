@@ -22,8 +22,6 @@ public:
 
   [[nodiscard]] std::u8string toU8String() const;
   [[nodiscard]] std::string toUtf8() const;
-  [[nodiscard]] std::string_view parentPath() const;
-
   [[nodiscard]] const std::string& string() const noexcept { return m_data; }
   [[nodiscard]] const char* data() const noexcept { return m_data.data(); }
   [[nodiscard]] size_t length() const { return m_data.size(); }
@@ -33,6 +31,7 @@ public:
    */
   void normalizePath();
 
+  [[nodiscard]] std::string_view parentPath() const;
   [[nodiscard]] std::string_view filename() const;
   [[nodiscard]] std::string_view extension() const;
   [[nodiscard]] std::string_view stem() const;
