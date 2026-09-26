@@ -6,11 +6,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-2022, ubuntu-24.04 ]
+        os: [ windows-2022, ubuntu-26.04 ]
         include:
           - os: windows-2022
             preset: vs2022-windows
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             preset: linux
 
     runs-on: ${{ matrix.os }}
@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Configure libbsarchpp build
         run: |
