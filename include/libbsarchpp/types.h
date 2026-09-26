@@ -157,7 +157,7 @@ struct FileTES4 {
   uint32_t offset = 0;
   bzString name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
-  [[nodiscard]] bool compress(const Bsa* bsa) const noexcept;  // compress when packing into a new archive
+  [[nodiscard]] bool compress(bool globalCompress) const noexcept;  // compress when packing into a new archive
 };
 
 struct FolderTES4 {
@@ -223,7 +223,7 @@ struct FileFO4 {
   PackingCompression_t packingCompression = PackingCompression_t::global;
 
   [[nodiscard]] std::string_view dxgiFormatName() const noexcept;
-  [[nodiscard]] bool compress(const Bsa* bsa) const noexcept;  // compress when packing into a new archive
+  [[nodiscard]] bool compress(bool globalCompress) const noexcept;  // compress when packing into a new archive
 };
 
 struct PackedDataInfo {

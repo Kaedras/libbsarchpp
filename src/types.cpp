@@ -137,14 +137,14 @@ std::string_view FileFO4::dxgiFormatName() const noexcept {
   }
 }
 
-bool FileFO4::compress(const Bsa* bsa) const noexcept {
+bool FileFO4::compress(bool globalCompress) const noexcept {
   if (packingCompression == PackingCompression_t::compressed) {
     return true;
   }
   if (packingCompression == PackingCompression_t::uncompressed) {
     return false;
   }
-  return bsa->getCompressed();
+  return globalCompress;
 }
 
 bString::bString() : length(0) {}
@@ -164,14 +164,14 @@ wString::wString() : length(0) {}
 
 wString::wString(uint16_t length, const std::vector<uint8_t>& data) : length(length), data({data}) {}
 
-bool FileTES4::compress(const Bsa* bsa) const noexcept {
+bool FileTES4::compress(bool globalCompress) const noexcept {
   if (packingCompression == PackingCompression_t::compressed) {
     return true;
   }
   if (packingCompression == PackingCompression_t::uncompressed) {
     return false;
   }
-  return bsa->getCompressed();
+  return globalCompress;
 }
 
 }  // namespace libbsarchpp

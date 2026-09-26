@@ -39,6 +39,7 @@ endif()
 target_sources(libbsarchpp
     PRIVATE
         src/bsa.cpp
+        src/bsaimpl.cpp
         src/types.cpp
         src/hash.cpp
         src/utils.cpp
@@ -50,6 +51,7 @@ target_sources(libbsarchpp
         FILE_SET privateHeaders
         TYPE HEADERS
         FILES
+            src/bsaimpl.h
             src/md5.h
             src/constants.h
             src/hash.h
