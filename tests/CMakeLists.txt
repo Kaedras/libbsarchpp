@@ -103,6 +103,12 @@ configure_file(settings.h.in settings.h @ONLY)
 target_include_directories(libbsarchpp_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 set_target_properties(libbsarchpp_tests PROPERTIES CXX_STANDARD 23)
+if (MSVC)
+    target_compile_options(libbsarchpp_tests PRIVATE /W4)
+else()
+    target_compile_options(libbsarchpp_tests PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 target_link_libraries(
         libbsarchpp_tests
         PRIVATE
