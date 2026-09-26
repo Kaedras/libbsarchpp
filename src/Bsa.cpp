@@ -258,8 +258,9 @@ void Bsa::readFO4FileTable() noexcept(false) {
     unordered_map<string, string> pathMap;
 
     for (auto& _file : m_files) {
+      auto filePath = read<wString>();
+
       // the code below is required for case-sensitive file systems
-      auto filePath     = read<wString>();
       string parentPath = string(filePath.data.parentPath());
 
       size_t oldPos = 0;
@@ -713,7 +714,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
 
       FolderTES4 folderTES4;
       folderTES4.hash = dirHash;
-      folderTES4.name = toLower(file.parent_path());
+      folderTES4.name = toLower(file.parent_path().string());
 
       m_files.emplace_back(folderTES4);
 
@@ -723,7 +724,7 @@ void Bsa::createArchiveTES4(std::vector<std::filesystem::path>& fileList) noexce
     }
     FileTES4 fileTES4;
     fileTES4.hash = fileHash;
-    fileTES4.name = toLower(file.filename());
+    fileTES4.name = toLower(file.filename().string());
 
     auto& last = get<FolderTES4>(m_files.back());
     last.files.emplace_back(fileTES4);

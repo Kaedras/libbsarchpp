@@ -3,6 +3,7 @@
 #include <algorithm>  // for __transform_fn, transform, __replace_fn, replace
 #include <cctype>     // for tolower, isalpha, isdigit, isascii
 #include <cstring>    // for memcpy, size_t
+#include <ranges>
 
 using namespace std;
 
@@ -76,13 +77,8 @@ std::string magicToString(const uint32_t& value) noexcept {
   return str;
 }
 
-std::string toLower(std::string str) noexcept {
-  ranges::transform(str, str.begin(), toLowerWin1252);
-  return str;
-}
-
-std::string toLower(const std::filesystem::path& str) noexcept {
-  return toLower(str.string());
+std::string toLower(const std::string_view str) noexcept {
+  return str | std::views::transform(toLowerWin1252) | std::ranges::to<std::string>();
 }
 
 void toLowerInline(std::string& str) noexcept {
@@ -105,13 +101,24 @@ void changeSlashesToBackslashes(std::string& str) noexcept {
 }
 
 std::string_view getFileName(std::string_view str) {
+  if (str == "/" || str.empty()) {
+    return str;
+  }
+
   const size_t lastSlash = str.find_last_of('/');
-  return {str.data() + lastSlash, str.length() - lastSlash};
+  if (lastSlash == string_view::npos) {
+    return str;
+  }
+  return {str.data() + lastSlash + 1, str.length() - lastSlash - 1};
 }
 
 std::string_view getParentPath(std::string_view str) {
+  if (str == "/" || str.empty()) {
+    return str;
+  }
+
   const size_t parentPathEnd   = str.find_last_of('/');
-  const size_t parentPathStart = str.find_last_of('/', parentPathEnd + 1);
+  const size_t parentPathStart = str.find_last_of('/', parentPathEnd - 1);
 
   return {str.data() + parentPathStart, parentPathEnd - parentPathStart};
 }

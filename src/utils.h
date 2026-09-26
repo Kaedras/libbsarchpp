@@ -12,8 +12,7 @@ namespace libbsarchpp {
 [[nodiscard]] std::string magicToString(const Magic4& magic) noexcept;
 [[nodiscard]] std::string magicToString(const uint32_t& value) noexcept;
 
-[[nodiscard]] std::string toLower(std::string str) noexcept;
-[[nodiscard]] std::string toLower(const std::filesystem::path& str) noexcept;
+[[nodiscard]] std::string toLower(std::string_view str) noexcept;
 void toLowerInline(std::string& str) noexcept;
 
 /**

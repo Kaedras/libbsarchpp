@@ -6,12 +6,14 @@
 #include <cstring>
 #include <utility>
 
+using namespace std;
+
 namespace {
 
 constexpr char fallbackChar = '?';
 
-inline constexpr std::array<std::u8string_view, 256> win1252ToUtf8 = {
-    std::u8string_view(u8"\x00", 1),
+inline constexpr array<u8string_view, 256> win1252ToUtf8 = {
+    u8string_view(u8"\x00", 1),
     u8"\x01",
     u8"\x02",
     u8"\x03",
@@ -274,7 +276,7 @@ struct Utf8ToWin1252Entry {
   uint8_t length;
   char win1252Char;
 };
-inline constexpr std::array<Utf8ToWin1252Entry, 128> utf8ToWin1252Table = {{
+inline constexpr array<Utf8ToWin1252Entry, 128> utf8ToWin1252Table = {{
     // 2-byte sequences (0xC2 prefix: U+00A0 - U+00BF)
     {0xA0C2, 2, static_cast<char>(0xA0)},
     {0xA1C2, 2, static_cast<char>(0xA1)},
@@ -408,7 +410,7 @@ inline constexpr std::array<Utf8ToWin1252Entry, 128> utf8ToWin1252Table = {{
 }};
 
 std::string fromUtf8(const std::u8string_view str) {
-  std::string out;
+  string out;
   out.reserve(str.size());
 
   size_t i         = 0;
@@ -472,7 +474,7 @@ win1252string::win1252string(const std::vector<uint8_t>& rawData)
     : m_data(reinterpret_cast<const char*>(rawData.data()), rawData.size()) {
   normalizeSeparators();
 }
-win1252string::win1252string(std::u8string_view utf8Str) : m_data(fromUtf8(utf8Str)) {
+win1252string::win1252string(std::u8string_view u8Str) : m_data(fromUtf8(u8Str)) {
   normalizeSeparators();
 }
 
@@ -486,7 +488,7 @@ win1252string& win1252string::operator=(std::string str) {
 }
 
 std::u8string win1252string::toU8String() const {
-  std::u8string utf8;
+  u8string utf8;
   utf8.reserve(m_data.size() * 2);
   for (const uint8_t c : m_data) {
     utf8.append(win1252ToUtf8[c]);
@@ -496,13 +498,39 @@ std::u8string win1252string::toU8String() const {
 }
 
 std::string win1252string::toUtf8() const {
-  std::u8string str = toU8String();
+  const u8string str = toU8String();
   return {reinterpret_cast<const char*>(str.data()), str.size()};
 }
 
 std::string_view win1252string::parentPath() const {
-  const size_t parentPathEnd   = m_data.find_last_of('/');
-  const size_t parentPathStart = m_data.find_last_of('/', parentPathEnd + 1);
+  const size_t parentPathEnd = m_data.find_last_of('/');
+  if (parentPathEnd == string::npos) {
+    return m_data;
+  }
+  const size_t parentPathStart = m_data.find_last_of('/', parentPathEnd - 1);
+  const size_t length          = parentPathEnd - parentPathStart;
 
-  return {m_data.data() + parentPathStart, parentPathEnd - parentPathStart};
+  return {m_data.data() + parentPathStart, length};
+}
+
+void win1252string::normalizePath() {
+  libbsarchpp::normalizePath(m_data);
+}
+
+std::string win1252string::extension() const {
+  const size_t lastDot = m_data.find_last_of('.');
+  if (lastDot == string::npos) {
+    return m_data;
+  }
+
+  return {m_data.data() + lastDot};
+}
+
+std::string win1252string::stem() const {
+  const size_t lastDot = m_data.find_last_of('.');
+  if (lastDot == string::npos) {
+    return m_data;
+  }
+
+  return {m_data.data(), lastDot};
 }

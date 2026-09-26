@@ -13,8 +13,10 @@ using namespace std;
 namespace libbsarchpp {
 
 uint64_t CreateHashTES3(const std::filesystem::path& fileName) noexcept {
-  string s = fileName.string();
-  normalizePath(s);
+  win1252string str{fileName};
+  str.normalizePath();
+
+  const string& s = str.string();
 
   uint32_t sum    = 0;
   uint32_t offset = 0;
@@ -44,25 +46,20 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
   try {
     uint32_t hash = 0;
 
-    u16string name;
+    win1252string str{fileName};
+    str.normalizePath();
+
+    string name;
     string ext;
 
     if (fileName.has_extension() && !isDirectory) {
-      name = fileName.stem().u16string();
-      ext  = fileName.extension().string();
+      name = str.stem();
+      ext  = str.extension();
     } else {
-      name = fileName.u16string();
+      name = str.string();
     }
 
     const auto length = gsl_lite::narrow<uint32_t>(name.length());
-
-    for (uint32_t i = 0; i < length; i++) {
-      if (name[i] == '/') {
-        name[i] = '\\';
-      } else if (name[i] >= 'A' && name[i] <= 'Z') {
-        name[i] = name[i] + ('a' - 'A');
-      }
-    }
 
     if (length == 0) {
       return 0;
@@ -70,10 +67,10 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
 
     uint64_t result = static_cast<uint8_t>(name[length - 1]);
     if (length > 2) {
-      result |= static_cast<uint32_t>(name[length - 2] << 8u);
+      result |= static_cast<uint32_t>(static_cast<uint8_t>(name[length - 2]) << 8u);
     }
     result |= length << 16u;
-    result |= static_cast<uint32_t>(name[0] << 24u);
+    result |= static_cast<uint32_t>(static_cast<uint8_t>(name[0]) << 24u);
 
     if (ext == ".kf") {
       result |= 0x80u;
@@ -106,11 +103,11 @@ uint64_t CreateHashTES4(const std::filesystem::path& fileName, const bool isDire
 
 uint32_t CreateHashFO4(const std::filesystem::path& fileName) noexcept {
   uint32_t result = 0;
-  auto str        = fileName.string();
 
-  normalizePath(str);
+  win1252string str{fileName};
+  str.normalizePath();
 
-  for (const unsigned char c : str) {
+  for (const unsigned char c : str.string()) {
     if (c <= CHAR_MAX) {
       result = (result >> 8u) ^ crc32table.at((result ^ c) & UCHAR_MAX);
     }

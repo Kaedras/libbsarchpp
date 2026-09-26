@@ -84,19 +84,12 @@ TEST(Utils, magicToString) {
 }
 
 TEST(Utils, toLower) {
-  EXPECT_EQ(toLower(string("UPPER CASE")), "upper case");
-  EXPECT_EQ(toLower(string("MixEd_CaSe-123!#")), "mixed_case-123!#");
-  EXPECT_EQ(toLower(string("lower CASE 123")), "lower case 123");
-  EXPECT_EQ(toLower(string("")), "");
-
-  EXPECT_EQ(toLower(filesystem::path("Meshes/Armor/HELMET.NIF")), "meshes/armor/helmet.nif");
-  EXPECT_EQ(toLower(filesystem::path("TEXTURES\\HELMET.DDS")), "textures\\helmet.dds");
-  EXPECT_EQ(toLower(filesystem::path("")), "");
-
+  EXPECT_EQ(toLower("UPPER CASE"), "upper case");
+  EXPECT_EQ(toLower("MixEd_CaSe-123!#"), "mixed_case-123!#");
+  EXPECT_EQ(toLower("lower CASE 123"), "lower case 123");
+  EXPECT_EQ(toLower(""), "");
   // Windows-1252 characters
-  EXPECT_EQ(toLower(filesystem::path("Meshes/\xCB/\xC9\xC9\x65.NIF")), "meshes/\xEB/\xE9\xE9\x65.nif");
-
-  EXPECT_EQ(toLower(string("\xDC\xC4/\xDC\xDF")), "\xFC\xE4/\xFC\xDF");
+  EXPECT_EQ(toLower("\xDC\xC4/\xDC\xDF"), "\xFC\xE4/\xFC\xDF");
 
   // latin-1 uppercase letters:
   const string win1252Latin1Upper =
@@ -107,7 +100,7 @@ TEST(Utils, toLower) {
       "\xFC\xFD\xFE";
   EXPECT_EQ(toLower(win1252Latin1Upper), win1252Latin1Lower);
 
-  EXPECT_EQ(toLower(string("\x8A\x8C\x8E\x9F")), "\x9A\x9C\x9E\xFF");
+  EXPECT_EQ(toLower("\x8A\x8C\x8E\x9F"), "\x9A\x9C\x9E\xFF");
 
   // non-cased symbols
   const string symbols = "\xD7 \xF7 \x80 \xA9 \xAE \xA7 123 !@#";
@@ -196,6 +189,18 @@ TEST(Utils, changeSlashesToBackslashes) {
   string str5 = "///";
   changeSlashesToBackslashes(str5);
   EXPECT_EQ(str5, "\\\\\\");
+}
+
+TEST(Utils, getParentPath) {
+  EXPECT_EQ(getParentPath("/abc/def"), "/abc");
+  EXPECT_EQ(getParentPath("/"), "/");
+  EXPECT_EQ(getParentPath(""), "");
+}
+
+TEST(Utils, getFileName) {
+  EXPECT_EQ(getFileName("/abc/def"), "def");
+  EXPECT_EQ(getFileName("/"), "/");
+  EXPECT_EQ(getFileName(""), "");
 }
 
 TEST(Utils, sortPaths) {
