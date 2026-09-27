@@ -235,11 +235,19 @@ void Bsa::BsaImpl::setCompressionLevel(int value) noexcept {
 }
 
 ArchiveType Bsa::BsaImpl::getArchiveType(const std::filesystem::path& archivePath) noexcept(false) {
-  try {
-    Bsa bsa(archivePath);
-    return bsa.getArchiveType();
-  } catch (...) {
-    throw;
+  ArchiveIO file(archivePath);
+  file.open(ArchiveIO::mode::read);
+
+  auto magic = file.read<uint32_t>();
+  switch (magic) {
+  case magic::TES3:
+    return TES3;
+  case magic::BSA:
+    return TES4;
+  case magic::BTDX:
+    return FO4;
+  default:
+    throw runtime_error("invalid file");
   }
 }
 
