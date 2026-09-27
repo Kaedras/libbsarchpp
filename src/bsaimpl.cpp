@@ -963,6 +963,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
 
     create_directories(archivePath.parent_path());
     m_archiveFile.open(archivePath, ArchiveIO::mode::write);
+    m_archiveFile.setType(type);
     m_fileName = archivePath;
 
     // reserve space for the header
