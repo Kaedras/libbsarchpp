@@ -1,7 +1,9 @@
 #include "archiveio.h"
 
+#include "stringencoding.h"
 #include "utils.h"
 
+#include <algorithm>
 #include <format>
 #include <gsl-lite/gsl-lite.hpp>
 
@@ -36,6 +38,12 @@ void ArchiveIO::seek(int64_t pos, SeekDirection whence) const noexcept(false) {
     const int error = errno;
     throw runtime_error("Seek error: "s + strerror(error));
   }
+}
+
+std::filesystem::path ArchiveIO::readPath(size_t length) {
+  vector<uint8_t> data = read<uint8_t>(length);
+  ranges::replace(data, '\\', '/');
+  return win1252ToPath(data);
 }
 
 ArchiveIO::ArchiveIO(std::filesystem::path file) : m_fileName(std::move(file)) {}

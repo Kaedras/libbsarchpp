@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stringencoding.h"
 #include "types.h"
 
 #include <cstring>
@@ -48,7 +49,7 @@ public:
    */
   template <typename T>
   T read() noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     T retVal;
 
@@ -71,7 +72,7 @@ public:
    */
   template <typename T>
   std::vector<T> read(uint32_t length) noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     std::vector<T> retVal(length);
 
@@ -94,7 +95,7 @@ public:
    */
   template <typename T>
   void read(T* data, uint32_t length) noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     size_t result = fread(data, sizeof(T), length, m_file.get());
     if (result != length) {
@@ -112,7 +113,7 @@ public:
    */
   template <typename T>
   void write(const T& data) noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     if (fwrite(&data, sizeof(T), 1, m_file.get()) != 1) {
       throw std::runtime_error("Write error: "s + strerror(errno));
@@ -125,7 +126,7 @@ public:
    */
   template <typename T>
   void write(const T* data, size_t length) noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     if (fwrite(data, sizeof(T), length, m_file.get()) != length) {
       throw std::runtime_error("Write error: "s + strerror(errno));
@@ -138,7 +139,7 @@ public:
    */
   template <typename T>
   void write(const std::vector<T>& data) noexcept(false) {
-    static_assert(is_none_of<T, bString, bzString, wString>);
+    static_assert(is_none_of<T, bString, bzString, wString, std::string, std::filesystem::path>);
 
     if (fwrite(data.data(), sizeof(T), data.size(), m_file.get()) != data.size()) {
       throw std::runtime_error("Write error: "s + strerror(errno));
@@ -150,52 +151,50 @@ private:
   std::filesystem::path m_fileName;
   ArchiveType m_type    = none;
   bool m_useBackslashes = false;
+
+  std::filesystem::path readPath(size_t length);
 };
 
 template <>
 inline bString ArchiveIO::read() noexcept(false) {
   auto length = read<uint8_t>();
-  return {length, read<uint8_t>(length)};
+  return {length, readPath(length)};
 }
 
 template <>
 inline bzString ArchiveIO::read() noexcept(false) {
   auto length = read<uint8_t>();
-  return {length, read<uint8_t>(length)};
+  return {length, readPath(length)};
 }
 
 template <>
 inline wString ArchiveIO::read() noexcept(false) {
   auto length = read<uint16_t>();
-  return {length, read<uint8_t>(length)};
+  return {length, readPath(length)};
 }
 
 template <>
-inline void ArchiveIO::write(const std::string& data) noexcept(false) {
-  try {
-    for (char c : data) {
-      if (c == '/' && m_useBackslashes) {
-        c = '\\';
-      }
-      write(c);
+inline zString ArchiveIO::read() noexcept(false) {
+  zString str;
+  char c = 1;
+  while (c != 0) {
+    c = read<char>();
+    if (!isascii(c)) {
+      throw std::runtime_error(std::to_string(c) + " is not an ASCII character");
     }
-    if (fputc('\0', m_file.get()) == EOF) {
-      const int error = errno;
-      throw std::runtime_error("Write error: "s + strerror(error));
-    }
-  } catch (...) {
-    throw;
+    str += c;
   }
+  return str;
 }
 
 template <>
-inline void ArchiveIO::write(const Win1252string& data) noexcept(false) {
-  for (const auto& c : data.string()) {
-    if (m_useBackslashes && c == '/') {
-      write('\\');
-    } else {
-      write(c);
+inline void ArchiveIO::write(const std::filesystem::path& data) noexcept(false) {
+  auto str = pathToWin1252(data);
+  for (uint8_t c : str) {
+    if (c == '/' && m_useBackslashes) {
+      c = '\\';
     }
+    write(c);
   }
 }
 
@@ -207,14 +206,26 @@ inline void ArchiveIO::write(const bString& data) noexcept(false) {
 
 template <>
 inline void ArchiveIO::write(const bzString& data) noexcept(false) {
-  write(data.length);
+  write(data.length + 1);
   write(data.data);
+  write('\0');
 }
 
 template <>
 inline void ArchiveIO::write(const wString& data) noexcept(false) {
   write(data.length);
   write(data.data);
+}
+
+template <>
+inline void ArchiveIO::write(const zString& data) noexcept(false) {
+  for (char c : data) {
+    if (c == '/' && m_useBackslashes) {
+      c = '\\';
+    }
+    write(c);
+  }
+  write('\0');
 }
 
 }  // namespace libbsarchpp

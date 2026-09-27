@@ -45,7 +45,7 @@ target_sources(libbsarchpp
         src/utils.cpp
         src/md5.cpp
         src/archiveio.cpp
-        src/win1252string.cpp
+        src/stringencoding.cpp
 
     PRIVATE
         FILE_SET privateHeaders
@@ -57,7 +57,7 @@ target_sources(libbsarchpp
             src/hash.h
             src/utils.h
             src/archiveio.h
-            src/win1252string.h
+            src/stringencoding.h
 
     PUBLIC
         FILE_SET HEADERS

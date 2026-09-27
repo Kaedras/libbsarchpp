@@ -23,6 +23,8 @@ void changeSlashesToBackslashes(std::string& str) noexcept;
 
 std::string_view getFileName(std::string_view str);
 std::string_view getParentPath(std::string_view str);
+std::string_view getFileExtension(std::string_view str);
+std::string_view getFileStem(std::string_view str);
 
 /**
  * @brief This function for use with `std::sort` to sort paths alphabetically.

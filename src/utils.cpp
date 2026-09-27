@@ -11,27 +11,26 @@ namespace {
 inline constexpr unsigned char asciiDiff    = 'a' - 'A';
 inline constexpr unsigned char extAsciiDiff = 0x20;
 
-constexpr char toLowerWin1252(const char c) noexcept {
-  const auto uc = static_cast<unsigned char>(c);
+constexpr uint8_t toLowerWin1252(const uint8_t c) noexcept {
   // 'A' <= uc <= 'Z'
-  if (uc >= 65 && uc <= 90) {
-    return static_cast<char>(uc + asciiDiff);
+  if (c >= 65 && c <= 90) {
+    return c + asciiDiff;
   }
 
-  // 'À' <= uc <= 'Ö' || 'Ù' <= uc <= 'Þ'
-  if ((uc >= 0xC0 && uc <= 0xD6) || (uc >= 0xD8 && uc <= 0xDE)) {
-    return static_cast<char>(uc + extAsciiDiff);
+  // 'À' <= c <= 'Ö' || 'Ù' <= c <= 'Þ'
+  if ((c >= 0xC0 && c <= 0xD6) || (c >= 0xD8 && c <= 0xDE)) {
+    return c + extAsciiDiff;
   }
 
-  switch (uc) {
-  case 0x8A:                         // Š
-    return static_cast<char>(0x9A);  // š
-  case 0x8C:                         // Œ
-    return static_cast<char>(0x9C);  // œ
-  case 0x8E:                         // Ž
-    return static_cast<char>(0x9E);  // ž
-  case 0x9F:                         // Ÿ
-    return static_cast<char>(0xFF);  // ÿ
+  switch (c) {
+  case 0x8A:      // Š
+    return 0x9A;  // š
+  case 0x8C:      // Œ
+    return 0x9C;  // œ
+  case 0x8E:      // Ž
+    return 0x9E;  // ž
+  case 0x9F:      // Ÿ
+    return 0xFF;  // ÿ
   default:
     return c;
   }
@@ -78,7 +77,7 @@ std::string magicToString(const uint32_t& value) noexcept {
 }
 
 std::string toLower(const std::string_view str) noexcept {
-  return str | std::views::transform(toLowerWin1252) | std::ranges::to<std::string>();
+  return str | views::transform(toLowerWin1252) | ranges::to<string>();
 }
 
 void toLowerInline(std::string& str) noexcept {
@@ -119,7 +118,26 @@ std::string_view getParentPath(std::string_view str) {
 
   const size_t parentPathEnd = str.find_last_of('/');
 
-  return {str.data(), parentPathEnd};
+  return str.substr(0, parentPathEnd);
+}
+
+std::string_view getFileExtension(std::string_view str) {
+  const size_t lastDot = str.find_last_of('.');
+  if (lastDot == string::npos) {
+    return str;
+  }
+
+  return str.substr(lastDot);
+}
+
+std::string_view getFileStem(std::string_view str) {
+  const string_view fileName = getFileName(str);
+  const size_t lastDot       = fileName.find_last_of('.');
+  if (lastDot == string::npos) {
+    return fileName;
+  }
+
+  return fileName.substr(0, lastDot);
 }
 
 bool sortPaths(const std::filesystem::path& lhs, const std::filesystem::path& rhs) noexcept {

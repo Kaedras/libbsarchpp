@@ -1,16 +1,11 @@
-#include "win1252string.h"
+#include "stringencoding.h"
 
-#include "utils.h"
-
-#include <array>
+#include <algorithm>
 #include <cstring>
-#include <utility>
 
 using namespace std;
 
 namespace {
-
-constexpr char fallbackChar = '?';
 
 inline constexpr array<u8string_view, 256> win1252ToUtf8 = {
     u8string_view(u8"\x00", 1),
@@ -409,8 +404,23 @@ inline constexpr array<Utf8ToWin1252Entry, 128> utf8ToWin1252Table = {{
     {0xA2E084E2, 3, static_cast<char>(0x99)}   // ™ (U+2122)
 }};
 
-std::string fromUtf8(const std::u8string_view str) {
+}  // namespace
+
+std::filesystem::path libbsarchpp::win1252ToPath(std::span<const uint8_t> data) {
+  u8string str;
+  str.reserve(data.size() * 2);
+  for (uint8_t c : data) {
+    if (c == '\\') {
+      c = '/';
+    }
+    str.append(win1252ToUtf8[c]);
+  }
+  return str;
+}
+
+std::string libbsarchpp::pathToWin1252(const std::filesystem::path& path) {
   string out;
+  u8string str = path.u8string();
   out.reserve(str.size());
 
   size_t i         = 0;
@@ -449,98 +459,22 @@ std::string fromUtf8(const std::u8string_view str) {
     }
 
     if (!matched) {
-      out.push_back(fallbackChar);
-      // Skip the current multi-byte sequence
-      if ((b0 & 0xE0u) == 0xC0) {
-        i += 2;
-      } else if ((b0 & 0xF0u) == 0xE0) {
-        i += 3;
-      } else if ((b0 & 0xF8u) == 0xF0) {
-        i += 4;
-      } else {
-        ++i;
-      }
+      throw runtime_error("invalid character");
     }
   }
   return out;
 }
 
-void normalizeSeparators(string& str) noexcept {
-  for (char& c : str) {
-    if (c == '\\') {
-      c = '/';
-    }
-  }
-}
-
-}  // namespace
-
-Win1252string::Win1252string(std::string rawData) : m_data(std::move(rawData)) {
-  normalizeSeparators(m_data);
-}
-Win1252string::Win1252string(const std::vector<uint8_t>& rawData)
-    : m_data(reinterpret_cast<const char*>(rawData.data()), rawData.size()) {
-  normalizeSeparators(m_data);
-}
-Win1252string::Win1252string(std::u8string_view u8Str) : m_data(fromUtf8(u8Str)) {
-  normalizeSeparators(m_data);
-}
-
-Win1252string::Win1252string(const std::filesystem::path& path) : m_data(fromUtf8(path.generic_u8string())) {
-  normalizeSeparators(m_data);
-}
-
-Win1252string& Win1252string::operator=(std::string str) {
-  m_data = std::move(str);
-  return *this;
-}
-
-std::u8string Win1252string::toU8String() const {
-  u8string utf8;
-  utf8.reserve(m_data.size() * 2);
-  for (const uint8_t c : m_data) {
-    utf8.append(win1252ToUtf8[c]);
-  }
-
-  return utf8;
-}
-
-std::string Win1252string::toUtf8() const {
-  const u8string str = toU8String();
-  return {reinterpret_cast<const char*>(str.data()), str.size()};
-}
-
-std::string_view Win1252string::parentPath() const {
-  return libbsarchpp::getParentPath(m_data);
-}
-
-void Win1252string::normalizePath() {
-  libbsarchpp::normalizePath(m_data);
-}
-
-std::string_view Win1252string::filename() const {
-  const size_t lastSlash = m_data.find_last_of('/');
-  if (lastSlash == string_view::npos) {
-    return m_data;
-  }
-  return {m_data.data() + lastSlash + 1};
-}
-
-std::string_view Win1252string::extension() const {
-  const size_t lastDot = m_data.find_last_of('.');
-  if (lastDot == string::npos) {
-    return m_data;
-  }
-
-  return {m_data.data() + lastDot};
-}
-
-std::string_view Win1252string::stem() const {
-  const auto fileName  = filename();
-  const size_t lastDot = fileName.find_last_of('.');
-  if (lastDot == string::npos) {
-    return fileName;
-  }
-
-  return {fileName.data(), lastDot};
+size_t libbsarchpp::getWin1252Length(const std::filesystem::path& path) {
+#ifdef __unix__
+  const auto& str = path.native();
+  return std::ranges::count_if(str, [](unsigned char c) {
+    return (c & 0xC0u) != 0x80;
+  });
+#else
+  const auto& wstr = path.native();
+  return std::ranges::count_if(wstr, [](wchar_t c) {
+    return c < 0xDC00 || c > 0xDFFF;
+  });
+#endif
 }

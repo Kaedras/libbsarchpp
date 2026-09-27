@@ -200,8 +200,19 @@ TEST(Utils, getParentPath) {
 
 TEST(Utils, getFileName) {
   EXPECT_EQ(getFileName("/abc/def"), "def");
+  EXPECT_EQ(getFileName("/abc/def.test"), "def.test");
   EXPECT_EQ(getFileName("/"), "/");
   EXPECT_EQ(getFileName(""), "");
+}
+
+TEST(Utils, getFileExtension) {
+  EXPECT_EQ(getFileExtension("/abc/test.txt"), ".txt");
+  EXPECT_EQ(getFileExtension("/abc/test.tar.bz2"), ".bz2");
+}
+
+TEST(Utils, getFileStem) {
+  EXPECT_EQ(getFileStem("/abc/test.txt"), "test");
+  EXPECT_EQ(getFileStem("/abc/test.tar.xz"), "test.tar");
 }
 
 TEST(Utils, sortPaths) {

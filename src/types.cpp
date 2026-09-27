@@ -2,6 +2,7 @@
 
 #include "bsa.h"
 #include "directx/dxgiformat.h"
+#include "stringencoding.h"
 
 namespace libbsarchpp {
 inline constexpr std::array dxgiFormatNames = {"UNKNOWN",
@@ -147,22 +148,12 @@ bool FileFO4::compress(bool globalCompress) const noexcept {
   return globalCompress;
 }
 
-bString::bString() : length(0) {}
-bString::bString(uint8_t length, const std::vector<uint8_t>& data) : length(length), data({(data)}) {}
+bzString& bzString::operator=(const std::filesystem::path& path) {
+  data   = path;
+  length = getWin1252Length(path);
 
-bzString::bzString() : length(0) {}
-
-bzString::bzString(uint8_t length, const std::vector<uint8_t>& data) : length(length), data({data}) {}
-
-bzString& bzString::operator=(std::string_view str) {
-  length = str.size();
-  data   = Win1252string{std::string(str)};
   return *this;
 }
-
-wString::wString() : length(0) {}
-
-wString::wString(uint16_t length, const std::vector<uint8_t>& data) : length(length), data({data}) {}
 
 bool FileTES4::compress(bool globalCompress) const noexcept {
   if (packingCompression == PackingCompression_t::compressed) {

@@ -2,7 +2,6 @@
 
 #include "enums.h"  // for PackingCompression_t
 #include "src/md5.h"
-#include "src/win1252string.h"
 
 #include <array>        // for array
 #include <cstdint>      // for uint32_t, uint16_t, int32_t, uint64_t, uint8_t
@@ -43,28 +42,25 @@ using Buffer = std::vector<uint8_t>;
 
 // A string prefixed with a byte length. NOT null terminated.
 struct bString {
-  bString();
-  bString(uint8_t length, const std::vector<uint8_t>& data);
-  uint8_t length;
-  Win1252string data;
+  uint8_t length = 0;
+  std::filesystem::path data;
 };
 
 // A string prefixed with a byte length and null terminated
 struct bzString {
-  bzString();
-  bzString(uint8_t length, const std::vector<uint8_t>& data);
-  bzString& operator=(std::string_view str);
-  uint8_t length;
-  Win1252string data;
+  bzString& operator=(const std::filesystem::path& path);
+  uint8_t length = 0;
+  std::filesystem::path data;
 };
 
 // A string prefixed with a uint16 length. NOT null terminated.
 struct wString {
-  wString();
-  wString(uint16_t length, const std::vector<uint8_t>& data);
-  uint16_t length;
-  Win1252string data;
+  uint16_t length = 0;
+  std::filesystem::path data;
 };
+
+// Null-terminated ASCII string
+using zString = std::string;
 
 PACKED(struct DDS_PIXELFORMAT {
   uint32_t size        = 0;
@@ -125,7 +121,7 @@ struct FileTES3 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  Win1252string name;
+  zString name;
 };
 
 PACKED(struct HeaderTES4 {
@@ -207,7 +203,7 @@ struct FileFO4 {
   uint16_t cubeMaps  = 0;
   std::vector<TexChunkRec> texChunks;
 
-  Win1252string name;
+  std::filesystem::path name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
 
   [[nodiscard]] std::string_view dxgiFormatName() const noexcept;

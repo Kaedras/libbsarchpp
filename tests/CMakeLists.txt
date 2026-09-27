@@ -52,7 +52,7 @@ find_package(OpenSSL REQUIRED)
 
 add_executable(libbsarchpp_tests)
 
-set(SOURCES BsaTest.cpp tests_bsa.cpp tests_hash.cpp tests_utils.cpp tests_misc.cpp tests_win1252string.cpp $<TARGET_OBJECTS:libbsarchpp>)
+set(SOURCES BsaTest.cpp tests_bsa.cpp tests_hash.cpp tests_utils.cpp tests_misc.cpp tests_stringencoding.cpp $<TARGET_OBJECTS:libbsarchpp>)
 set(HEADERS BsaTest.h)
 
 if(TESTS_TES3_ENABLE)

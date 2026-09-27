@@ -1,6 +1,7 @@
 #include "hash.h"
 
-#include "constants.h"            // for crc32table
+#include "constants.h"  // for crc32table
+#include "stringencoding.h"
 #include "utils.h"                // for normalizePath
 #include <array>                  // for array
 #include <climits>                // for CHAR_MAX, UCHAR_MAX
@@ -13,17 +14,15 @@ using namespace std;
 namespace libbsarchpp {
 
 uint64_t createHashTES3(const std::filesystem::path& fileName) noexcept {
-  Win1252string str{fileName};
-  str.normalizePath();
-
-  const string& s = str.string();
+  string str = pathToWin1252(fileName);
+  normalizePath(str);
 
   uint32_t sum    = 0;
   uint32_t offset = 0;
-  const size_t l  = s.length() >> 1u;
+  const size_t l  = str.length() >> 1u;
 
   for (size_t i = 0; i < l; i++) {
-    const uint32_t tmp = static_cast<unsigned char>(s[i]) << (offset & 0x1Fu);
+    const uint32_t tmp = static_cast<unsigned char>(str[i]) << (offset & 0x1Fu);
     sum ^= tmp;
     offset += 8;
   }
@@ -31,8 +30,8 @@ uint64_t createHashTES3(const std::filesystem::path& fileName) noexcept {
 
   sum    = 0;
   offset = 0;
-  for (size_t i = l; i < s.length(); i++) {
-    const uint32_t tmp = static_cast<unsigned char>(s[i]) << (offset & 0x1Fu);
+  for (size_t i = l; i < str.length(); i++) {
+    const uint32_t tmp = static_cast<unsigned char>(str[i]) << (offset & 0x1Fu);
     sum ^= tmp;
     const uint32_t n = tmp & 0x1Fu;
     sum              = (sum >> n) | (sum << (32 - n));
@@ -44,19 +43,17 @@ uint64_t createHashTES3(const std::filesystem::path& fileName) noexcept {
 
 uint64_t createHashTES4(const std::filesystem::path& fileName, const bool isDirectory) noexcept {
   try {
-    uint32_t hash = 0;
+    string str = pathToWin1252(fileName);
+    normalizePath(str);
 
-    Win1252string str{fileName};
-    str.normalizePath();
-
-    string name;
-    string ext;
+    string_view name;
+    string_view ext;
 
     if (fileName.has_extension() && !isDirectory) {
-      name = str.stem();
-      ext  = str.extension();
+      name = getFileStem(str);
+      ext  = getFileExtension(str);
     } else {
-      name = str.string();
+      name = str;
     }
 
     const auto length = gsl_lite::narrow<uint32_t>(name.length());
@@ -81,6 +78,8 @@ uint64_t createHashTES4(const std::filesystem::path& fileName, const bool isDire
     } else if (ext == ".wav") {
       result |= 0x80000000u;
     }
+
+    uint32_t hash = 0;
     if (length > 1) {
       for (uint32_t i = 1; i < length - 2; i++) {
         hash = name[i] + (hash << 6u) + (hash << 16u) - hash;
@@ -104,10 +103,10 @@ uint64_t createHashTES4(const std::filesystem::path& fileName, const bool isDire
 uint32_t createHashFO4(const std::filesystem::path& fileName) noexcept {
   uint32_t result = 0;
 
-  Win1252string str{fileName};
-  str.normalizePath();
+  string str = pathToWin1252(fileName);
+  normalizePath(str);
 
-  for (const unsigned char c : str.string()) {
+  for (const unsigned char c : str) {
     if (c <= CHAR_MAX) {
       result = (result >> 8u) ^ crc32table.at((result ^ c) & UCHAR_MAX);
     }

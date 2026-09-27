@@ -256,7 +256,7 @@ void Bsa::BsaImpl::readFO4FileTable() noexcept(false) {
       auto filePath = read<wString>();
 
       // the code below is required for case-sensitive file systems
-      string parentPath = string(filePath.data.parentPath());
+      string parentPath = filePath.data.parent_path().generic_string();
 
       size_t oldPos = 0;
       size_t pos    = 0;
@@ -278,9 +278,9 @@ void Bsa::BsaImpl::readFO4FileTable() noexcept(false) {
       }
 
       auto& file = get<FileFO4>(_file);
-      file.name  = parentPath + "/" + string(libbsarchpp::getFileName(filePath.data.toUtf8()));
+      file.name  = fs::path(parentPath) / filePath.data.filename();
 
-      addToFileMap(file.name.toUtf8(), &file);
+      addToFileMap(file.name, &file);
     }
   } catch (...) {
     throw;
@@ -378,8 +378,8 @@ void Bsa::BsaImpl::readArchiveTes3() noexcept(false) {
   // read names
   for (auto& _file : m_files) {
     auto& file = get<FileTES3>(_file);
-    file.name  = read<Win1252string>();
-    addToFileMap(file.name.toUtf8(), &file);
+    file.name  = read<zString>();
+    addToFileMap(file.name, &file);
   }
   // read hashes
   for (auto& file : m_files) {
@@ -582,6 +582,14 @@ void Bsa::BsaImpl::createArchiveTES3(std::vector<std::filesystem::path>& fileLis
 
   unordered_map<fs::path, uint64_t> hashMap;
   for (const auto& file : fileList) {
+    // check for non-ascii characters
+    auto fileString = file.string();
+    for (const auto& c : fileString) {
+      if (!isascii(c)) {
+        throw runtime_error(format("Filename '{}' contains non-ascii characters", fileString));
+      }
+    }
+
     hashMap.try_emplace(file, createHashTES3(file));
   }
 
@@ -597,7 +605,7 @@ void Bsa::BsaImpl::createArchiveTES3(std::vector<std::filesystem::path>& fileLis
     FileTES3 fileTES3;
     fileTES3.hash = hashMap.at(file);
     fileTES3.name = toLower(file.string());
-    len += fileTES3.name.length() + 1;
+    len += fileTES3.name.size() + 1;
     m_files.emplace_back(fileTES3);
 
     addToFileMap(file, &get<FileTES3>(m_files.back()));
@@ -709,7 +717,7 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
 
       FolderTES4 folderTES4;
       folderTES4.hash = dirHash;
-      folderTES4.name = toLower(file.parent_path().string());
+      folderTES4.name = file.parent_path();
 
       m_files.emplace_back(folderTES4);
 
@@ -1222,8 +1230,8 @@ void Bsa::BsaImpl::addFileDDS(FileFO4* file, const Buffer& data) noexcept(false)
       file->texChunks.emplace_back(texChunk);
 
       // force compression
-      packData(&file->texChunks[x], file->name.toUtf8(), dataHash, &data[offset], MipSize,
-               file->compress(getCompressed()), file->compress(getCompressed()));
+      packData(&file->texChunks[x], file->name, dataHash, &data[offset], MipSize, file->compress(getCompressed()),
+               file->compress(getCompressed()));
       offset += MipSize;
       MipSize /= 4;
     }
@@ -1286,7 +1294,7 @@ void Bsa::BsaImpl::addFile(const std::filesystem::path& filePath, const Buffer& 
       fileFO4->offset = m_archiveFile.tell();
       fileFO4->size   = narrow<uint32_t>(data.size());
 
-      packData(fileFO4, fileFO4->name.toUtf8(), dataHash, data.data(), data.size(), fileFO4->compress(getCompressed()));
+      packData(fileFO4, fileFO4->name, dataHash, data.data(), data.size(), fileFO4->compress(getCompressed()));
       break;
     }
 
@@ -1464,7 +1472,7 @@ void Bsa::BsaImpl::iterateFiles(const FileIterationFunction& function, void* dat
   switch (m_archiveFile.getType()) {
   case TES3:
     for (auto& file : m_files) {
-      if (function(get<FileTES3>(file).name.toUtf8(), &get<FileTES3>(file), nullptr, data)) {
+      if (function(get<FileTES3>(file).name, &get<FileTES3>(file), nullptr, data)) {
         break;
       }
     }
@@ -1475,7 +1483,7 @@ void Bsa::BsaImpl::iterateFiles(const FileIterationFunction& function, void* dat
     for (auto& _folder : m_files) {
       auto& folder = get<FolderTES4>(_folder);
       for (auto& file : folder.files) {
-        if (function(folder.name.data.toUtf8() + "/" + file.name.data.toUtf8(), &file, &folder, data)) {
+        if (function(folder.name.data / file.name.data, &file, &folder, data)) {
           break;
         }
       }
@@ -1487,7 +1495,7 @@ void Bsa::BsaImpl::iterateFiles(const FileIterationFunction& function, void* dat
   case SF:
   case SFdds:
     for (auto& file : m_files) {
-      if (function(get<FileFO4>(file).name.toUtf8(), &get<FileFO4>(file), nullptr, data)) {
+      if (function(get<FileFO4>(file).name, &get<FileFO4>(file), nullptr, data)) {
         break;
       }
     }
@@ -1533,7 +1541,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
       if (file.offset == 0) {
-        throw runtime_error("Archived file has no data: "s + file.name.toUtf8());
+        throw runtime_error("Archived file has no data: "s + file.name);
       }
     }
 
@@ -1552,7 +1560,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
     uint32_t j = 0;
     for (const auto& file : m_files) {
       write(j);
-      j += gsl_lite::narrow<uint32_t>(get<FileTES3>(file).name.toUtf8().length()) + 1;
+      j += gsl_lite::narrow<uint32_t>(getWin1252Length(get<FileTES3>(file).name) + 1);
       // including terminator
     }
     // Filename records
@@ -1576,8 +1584,8 @@ void Bsa::BsaImpl::save() noexcept(false) {
       const auto& folder = get<FolderTES4>(_folder);
       for (const auto& file : folder.files) {
         if (file.offset == 0) {
-          throw runtime_error("Archived file has no data: "s + folder.name.data.toUtf8() + "/"s +
-                              file.name.data.toUtf8());
+          throw runtime_error("Archived file has no data: "s + folder.name.data.string() + "/"s +
+                              file.name.data.string());
         }
       }
     }
@@ -1625,7 +1633,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
       const auto& file = get<FileFO4>(_file);
 
       if (file.offset == 0) {
-        throw runtime_error("Archived file has no data: "s + file.name.toUtf8());
+        throw runtime_error("Archived file has no data: "s + file.name.string());
       }
     }
     // file names table
@@ -1670,7 +1678,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
     for (const auto& _file : m_files) {
       const auto& file = get<FileFO4>(_file);
       if (file.texChunks.empty()) {
-        throw runtime_error("Archived file has no data: "s + file.name.toUtf8());
+        throw runtime_error("Archived file has no data: "s + file.name.string());
       }
     }
 
@@ -2292,8 +2300,8 @@ Bsa::BsaImpl::getFileList(const std::filesystem::path& directoryName) const noex
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
-      if (directory.empty() || toLower(file.name.string()).starts_with(folderLower)) {
-        result.emplace_back(file.name.toUtf8());
+      if (directory.empty() || toLower(file.name).starts_with(folderLower)) {
+        result.emplace_back(file.name);
       }
     }
     break;
@@ -2305,7 +2313,7 @@ Bsa::BsaImpl::getFileList(const std::filesystem::path& directoryName) const noex
       const auto& folder = get<FolderTES4>(_file);
       if (directory.empty() || toLower(folder.name.data.string()).starts_with(folderLower)) {
         for (const auto& fileTES4 : folder.files) {
-          result.emplace_back(folder.name.data.toUtf8() + "/" + fileTES4.name.data.toUtf8());
+          result.emplace_back(folder.name.data / fileTES4.name.data);
         }
       }
     }
@@ -2319,7 +2327,7 @@ Bsa::BsaImpl::getFileList(const std::filesystem::path& directoryName) const noex
     for (const auto& _file : m_files) {
       const auto& file = get<FileFO4>(_file);
       if (directory.empty() || toLower(file.name.string()).starts_with(folderLower)) {
-        result.emplace_back(file.name.toUtf8());
+        result.emplace_back(file.name);
       }
     }
     break;
