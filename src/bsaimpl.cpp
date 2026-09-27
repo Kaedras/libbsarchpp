@@ -984,13 +984,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
 
 Bsa::BsaImpl::BsaImpl(const filesystem::path& archivePath, ArchiveType type,
                       std::vector<std::filesystem::path>& fileList, std::filesystem::path ddsBasePath) noexcept(false)
-    : m_existingArchive(false) {
-  try {
-    Bsa(archivePath, type, fileList, std::move(ddsBasePath), false, false, false);
-  } catch (...) {
-    throw;
-  }
-}
+    : BsaImpl(archivePath, type, fileList, std::move(ddsBasePath), false, false, false) {}
 
 Bsa::BsaImpl::~BsaImpl() = default;
 
