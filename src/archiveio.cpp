@@ -46,7 +46,7 @@ std::filesystem::path ArchiveIO::readPath(size_t length) {
   return win1252ToPath(data);
 }
 
-ArchiveIO::ArchiveIO(std::filesystem::path file) : m_fileName(std::move(file)) {}
+ArchiveIO::ArchiveIO(std::filesystem::path file) noexcept : m_fileName(std::move(file)) {}
 
 void ArchiveIO::open(std::filesystem::path file, mode m) {
   m_fileName = std::move(file);
@@ -69,7 +69,7 @@ void ArchiveIO::open(mode m) {
   }
 }
 
-bool ArchiveIO::isOpen() const {
+bool ArchiveIO::isOpen() const noexcept {
   return m_file != nullptr;
 }
 

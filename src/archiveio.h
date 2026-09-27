@@ -17,12 +17,12 @@ public:
   enum class mode : uint8_t { read, write };
 
   ArchiveIO() = default;
-  explicit ArchiveIO(std::filesystem::path file);
+  explicit ArchiveIO(std::filesystem::path file) noexcept;
 
   void open(std::filesystem::path file, mode m);
   void open(mode m);
 
-  [[nodiscard]] bool isOpen() const;
+  [[nodiscard]] bool isOpen() const noexcept;
 
   void setType(ArchiveType t) noexcept {
     m_type           = t;
