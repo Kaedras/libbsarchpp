@@ -1,13 +1,11 @@
 #pragma once
 
-#include "enums.h"  // for ArchiveType, CompressionType, SeekDirection
-#include "types.h"  // for FileFO4, FolderTES4, FileTES3, fileDeleter
+#include "types.h"  // for FileFO4, FolderTES4, FileTES3
 
-#include <bit>         // for endian
 #include <cstdint>     // for uint32_t, uint8_t, int32_t, int64_t, uint64_t
 #include <filesystem>  // for path, hash
 #include <functional>  // for function
-#include <string>      // for operator+, operator""s, string, u16string
+#include <string>      // for operator+, operator""s, string
 #include <variant>     // for variant
 #include <vector>      // for vector
 
@@ -26,8 +24,6 @@
 #else
 #define DLLEXPORT IMPORT
 #endif
-
-static_assert(std::endian::native == std::endian::little);
 
 namespace libbsarchpp {
 
@@ -193,9 +189,9 @@ public:
   [[nodiscard]] ArchiveType getArchiveType() const noexcept;
 
   /**
-   * @brief Returns the header version. Values can be found in namespace headerVersions inside constants.h.
+   * @brief Returns the header version. See HeaderVersion in enums.h
    */
-  [[nodiscard]] uint32_t getVersion() const noexcept;
+  [[nodiscard]] HeaderVersion getVersion() const noexcept;
 
   /**
    * @brief Returns a string describing the archive format.
@@ -213,7 +209,7 @@ public:
   [[nodiscard]] int64_t getCreatedArchiveSize() const noexcept;
 
   /**
-   * @brief Returns archive flags. A list of flags can be found in namespace flags::archive inside constants.h.
+   * @brief Returns archive flags. See ArchiveFlag in enums.h
    */
   [[nodiscard]] uint32_t getArchiveFlags() const noexcept;
 

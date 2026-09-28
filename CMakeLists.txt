@@ -58,6 +58,8 @@ target_sources(libbsarchpp
             src/utils.h
             src/archiveio.h
             src/stringencoding.h
+            src/enums.h
+            src/types.h
 
     PUBLIC
         FILE_SET HEADERS

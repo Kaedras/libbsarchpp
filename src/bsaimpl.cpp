@@ -175,7 +175,7 @@ void Bsa::BsaImpl::setArchiveFlags(uint32_t flags) noexcept(false) {
 
     // force compression flag if needed
     if (m_compressed) {
-      flags |= flags::archive::COMPRESS;
+      flags |= ArchiveFlag::compress;
     }
 
     get<HeaderTES4>(m_header).flags = flags;
@@ -244,17 +244,17 @@ ArchiveType Bsa::BsaImpl::getArchiveType(const std::filesystem::path& archivePat
   }
 
   // version
-  switch (file.read<uint32_t>()) {
-  case headerVersions::TES4:
+  switch (static_cast<HeaderVersion>(file.read<uint32_t>())) {
+  case HeaderVersion::TES4:
     return TES4;
-  case headerVersions::FO3:
+  case HeaderVersion::FO3:
     return FO3;
-  case headerVersions::SSE:
+  case HeaderVersion::SSE:
     return SSE;
 
-  case headerVersions::FO4v1:
-  case headerVersions::FO4NGv7:
-  case headerVersions::FO4NGv8:
+  case HeaderVersion::FO4v1:
+  case HeaderVersion::FO4NGv7:
+  case HeaderVersion::FO4NGv8:
     switch (const auto magic = file.read<uint32_t>()) {
     case magic::GNRL:
       return FO4;
@@ -264,7 +264,7 @@ ArchiveType Bsa::BsaImpl::getArchiveType(const std::filesystem::path& archivePat
       throw runtime_error("Unknown or invalid FO4 archive subtype " + magicToString(magic));
     }
 
-  case headerVersions::SF:
+  case HeaderVersion::SF:
     if (const auto magic = file.read<uint32_t>(); magic == magic::GNRL) {
       return SF;
     } else {
@@ -276,46 +276,42 @@ ArchiveType Bsa::BsaImpl::getArchiveType(const std::filesystem::path& archivePat
 }
 
 void Bsa::BsaImpl::readFO4FileTable() noexcept(false) {
-  try {
-    const HeaderFO4& headerFO4 = getHeaderFO4();
-    // read file names
-    seek(headerFO4.fileTableOffset);
+  const HeaderFO4& headerFO4 = getHeaderFO4();
+  // read file names
+  seek(headerFO4.fileTableOffset);
 
-    // this map stores all directories, the key is lowercase
-    unordered_map<string, string> pathMap;
+  // this map stores all directories, the key is lowercase
+  unordered_map<string, string> pathMap;
 
-    for (auto& _file : m_files) {
-      auto filePath = read<wString>();
+  for (auto& _file : m_files) {
+    auto filePath = read<wString>();
 
-      // the code below is required for case-sensitive file systems
-      string parentPath = filePath.data.parent_path().generic_string();
+    // the code below is required for case-sensitive file systems
+    string parentPath = filePath.data.parent_path().generic_string();
 
-      size_t oldPos = 0;
-      size_t pos    = 0;
+    size_t oldPos = 0;
+    size_t pos    = 0;
 
-      // iterate over all subfolders starting at the root directory
-      // if a folder already exists in pathMap replace the path with the one stored there
-      while (pos != string::npos) {
-        oldPos = pos;
-        pos    = parentPath.find('/', oldPos + 1);
+    // iterate over all subfolders starting at the root directory
+    // if a folder already exists in pathMap replace the path with the one stored there
+    while (pos != string::npos) {
+      oldPos = pos;
+      pos    = parentPath.find('/', oldPos + 1);
 
-        string subStr = parentPath.substr(0, pos);
+      string subStr = parentPath.substr(0, pos);
 
-        const auto [iterator, wasInserted] = pathMap.try_emplace(toLower(subStr), subStr);
-        if (!wasInserted) {
-          // directory already exists in the map
-          size_t charsToReplace = pos - oldPos;
-          parentPath.replace(oldPos, charsToReplace, iterator->second, oldPos, charsToReplace);
-        }
+      const auto [iterator, wasInserted] = pathMap.try_emplace(toLower(subStr), subStr);
+      if (!wasInserted) {
+        // directory already exists in the map
+        size_t charsToReplace = pos - oldPos;
+        parentPath.replace(oldPos, charsToReplace, iterator->second, oldPos, charsToReplace);
       }
-
-      auto& file = get<FileFO4>(_file);
-      file.name  = fs::path(parentPath) / filePath.data.filename();
-
-      addToFileMap(file.name, &file);
     }
-  } catch (...) {
-    throw;
+
+    auto& file = get<FileFO4>(_file);
+    file.name  = fs::path(parentPath) / filePath.data.filename();
+
+    addToFileMap(file.name, &file);
   }
 }
 
@@ -477,19 +473,19 @@ void Bsa::BsaImpl::determineArchiveVersion() noexcept(false) {
   }
 
   m_version = read<uint32_t>();
-  switch (m_version) {
-  case headerVersions::TES4:
+  switch (static_cast<HeaderVersion>(m_version)) {
+  case HeaderVersion::TES4:
     m_archiveFile.setType(TES4);
     break;
-  case headerVersions::FO3:
+  case HeaderVersion::FO3:
     m_archiveFile.setType(FO3);
     break;
-  case headerVersions::SSE:
+  case HeaderVersion::SSE:
     m_archiveFile.setType(SSE);
     break;
-  case headerVersions::FO4v1:
-  case headerVersions::FO4NGv7:
-  case headerVersions::FO4NGv8: {
+  case HeaderVersion::FO4v1:
+  case HeaderVersion::FO4NGv7:
+  case HeaderVersion::FO4NGv8: {
     // read ahead to get the subtype
     auto magic = read<uint32_t>();
     if (magic == magic::GNRL) {
@@ -504,7 +500,7 @@ void Bsa::BsaImpl::determineArchiveVersion() noexcept(false) {
 
     break;
   }
-  case headerVersions::SF: {
+  case HeaderVersion::SF: {
     // read ahead to get subtype, this is just to check for errors
     auto magic = read<uint32_t>();
     if (magic == magic::GNRL) {
@@ -518,7 +514,7 @@ void Bsa::BsaImpl::determineArchiveVersion() noexcept(false) {
     break;
   }
 
-  case headerVersions::SFdds: {
+  case HeaderVersion::SFdds: {
     // read ahead to get subtype, this is just to check for errors
     auto magic = read<uint32_t>();
     if (magic == magic::DX10) {
@@ -696,26 +692,26 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
 
     // determine file flags
     if (dir.starts_with("textures/") || ext == ".dds") {
-      headerTES4.fileFlags |= flags::file::DDS;
+      headerTES4.fileFlags |= FileFlag::dds;
     } else if (dir.starts_with("meshes/") || ext == ".nif" || ext == ".lod" || ext == ".bto" || ext == ".btr" ||
                ext == ".btt" || ext == ".dtl" || ext == ".kf" || ext == ".kfm" || ext == ".hkx") {
-      headerTES4.fileFlags |= flags::file::NIF;
+      headerTES4.fileFlags |= FileFlag::nif;
     } else if (dir.starts_with("sound/")) {
-      headerTES4.fileFlags |= flags::file::WAV | flags::file::MP3;
+      headerTES4.fileFlags |= FileFlag::wav | FileFlag::mp3;
     } else if (ext == ".xml") {
-      headerTES4.fileFlags |= flags::file::XML | flags::file::MISC;
+      headerTES4.fileFlags |= FileFlag::xml | FileFlag::misc;
     } else if (ext == ".wav" || ext == ".fuz") {
-      headerTES4.fileFlags |= flags::file::WAV;
+      headerTES4.fileFlags |= FileFlag::wav;
     } else if (ext == ".lip" || ext == ".mp3" || ext == ".ogg") {
-      headerTES4.fileFlags |= flags::file::MP3;
+      headerTES4.fileFlags |= FileFlag::mp3;
     } else if (ext == ".txt" || ext == ".htm" || ext == ".bat" || ext == ".scc") {
-      headerTES4.fileFlags |= flags::file::TXT;
+      headerTES4.fileFlags |= FileFlag::txt;
     } else if (ext == ".spt") {
-      headerTES4.fileFlags |= flags::file::SPT;
+      headerTES4.fileFlags |= FileFlag::spt;
     } else if (ext == ".fnt" || ext == ".tex") {
-      headerTES4.fileFlags |= flags::file::FNT;
+      headerTES4.fileFlags |= FileFlag::fnt;
     } else {
-      headerTES4.fileFlags |= flags::file::MISC;
+      headerTES4.fileFlags |= FileFlag::misc;
     }
 
     // determine archive flags
@@ -723,7 +719,7 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
     // packed scripts can't be added to objects in the SSE CK if the archive was packed
     // without the "RetainNames" flag (the scripts aren't shown in the script adding window)
     if (ext == ".pex") {
-      headerTES4.flags |= flags::archive::RETAINNAME;
+      headerTES4.flags |= ArchiveFlag::retainName;
     }
   }
 
@@ -795,28 +791,28 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
 
   // misc file flag is not in Skyrim SE
   if (m_archiveFile.getType() == SSE) {
-    headerTES4.fileFlags &= ~flags::file::MISC;
+    headerTES4.fileFlags &= ~FileFlag::misc;
   }
   // embedded names in texture-only archives
   // except Skyrim SE: crashing engine bug if texture is uncompressed and file name is embedded
-  if (headerTES4.fileFlags == flags::file::DDS && m_archiveFile.getType() != SSE) {
-    headerTES4.flags |= flags::archive::EMBEDNAME;
+  if (headerTES4.fileFlags == FileFlag::dds && m_archiveFile.getType() != SSE) {
+    headerTES4.flags |= ArchiveFlag::embedName;
   }
   // startupstr flag in archives with meshes
-  if ((headerTES4.fileFlags & flags::file::NIF) != 0) {
-    headerTES4.flags |= flags::archive::STARTUPSTR;
+  if ((headerTES4.fileFlags & FileFlag::nif) != 0) {
+    headerTES4.flags |= ArchiveFlag::startupStr;
   }
   // retain the name flag in archives with sounds
-  if ((headerTES4.fileFlags & flags::file::WAV) != 0) {
-    headerTES4.flags |= flags::archive::RETAINNAME;
+  if ((headerTES4.fileFlags & FileFlag::wav) != 0) {
+    headerTES4.flags |= ArchiveFlag::retainName;
   }
   // txt, xml and fnt file flags are exclusive for Oblivion
   if (m_archiveFile.getType() != TES4) {
-    headerTES4.fileFlags &= ~(flags::file::XML | flags::file::TXT | flags::file::FNT);
+    headerTES4.fileFlags &= ~(FileFlag::xml | FileFlag::txt | FileFlag::fnt);
   }
   // set the compression flag if needed
   if (m_compressed) {
-    headerTES4.flags |= flags::archive::COMPRESS;
+    headerTES4.flags |= ArchiveFlag::compress;
   }
 }
 
@@ -824,71 +820,67 @@ void Bsa::BsaImpl::createArchiveFO4(std::vector<std::filesystem::path>& fileList
   if (fileList.empty()) {
     throw runtime_error("Archive requires predefined files list");
   }
-  try {
-    // sort files alphabetically
-    sort(execution::par_unseq, fileList.begin(), fileList.end(), sortPaths);
+  // sort files alphabetically
+  sort(execution::par_unseq, fileList.begin(), fileList.end(), sortPaths);
 
-    getHeaderFO4().fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
-    m_files.reserve(fileList.size());
-    for (const auto& file : fileList) {
-      if (!file.has_parent_path()) {
-        throw runtime_error("File is missing the folder part: "s + file.string());
-      }
-
-      fs::path name = file.filename().stem();
-      string ext    = file.extension().string();
-      // remove leading '.'
-      if (ext[0] == '.') {
-        ext.erase(0, 1);
-      }
-
-      FileFO4 fileFO4;
-      fileFO4.name     = file.string();
-      fileFO4.dirHash  = createHashFO4(file.parent_path());
-      fileFO4.nameHash = createHashFO4(name);
-      fileFO4.ext      = stringToMagic(toLower(ext));
-      fileFO4.unknown  = iFileFO4Unknown;
-      m_files.emplace_back(fileFO4);
-
-      addToFileMap(file, &get<FileFO4>(m_files.back()));
+  getHeaderFO4().fileCount = gsl_lite::narrow<uint32_t>(fileList.size());
+  m_files.reserve(fileList.size());
+  for (const auto& file : fileList) {
+    if (!file.has_parent_path()) {
+      throw runtime_error("File is missing the folder part: "s + file.string());
     }
 
-    m_dataOffset = sizeof(Magic4) + sizeof(m_version);
-
-    switch (m_archiveFile.getType()) {
-    case FO4:
-    case FO4dds:
-      m_dataOffset += sizeof(HeaderFO4);
-      break;
-    case SF:
-      m_dataOffset += sizeof(HeaderSF);
-      break;
-    case SFdds:
-      m_dataOffset += sizeof(HeaderSFdds);
-      break;
-    default:
-      throw runtime_error(
-          format("createArchiveFO4 was called with wrong archive type {}", static_cast<int>(m_archiveFile.getType())));
+    fs::path name = file.filename().stem();
+    string ext    = file.extension().string();
+    // remove leading '.'
+    if (ext[0] == '.') {
+      ext.erase(0, 1);
     }
 
-    // file records have fixed length in a general archive
-    if (m_archiveFile.getType() == FO4 || m_archiveFile.getType() == SF) {
-      m_dataOffset += sizes::fileRecordGNRL * m_files.size();
+    FileFO4 fileFO4;
+    fileFO4.name     = file.string();
+    fileFO4.dirHash  = createHashFO4(file.parent_path());
+    fileFO4.nameHash = createHashFO4(name);
+    fileFO4.ext      = stringToMagic(toLower(ext));
+    fileFO4.unknown  = iFileFO4Unknown;
+    m_files.emplace_back(fileFO4);
+
+    addToFileMap(file, &get<FileFO4>(m_files.back()));
+  }
+
+  m_dataOffset = sizeof(Magic4) + sizeof(m_version);
+
+  switch (m_archiveFile.getType()) {
+  case FO4:
+  case FO4dds:
+    m_dataOffset += sizeof(HeaderFO4);
+    break;
+  case SF:
+    m_dataOffset += sizeof(HeaderSF);
+    break;
+  case SFdds:
+    m_dataOffset += sizeof(HeaderSFdds);
+    break;
+  default:
+    throw runtime_error(
+        format("createArchiveFO4 was called with wrong archive type {}", static_cast<int>(m_archiveFile.getType())));
+  }
+
+  // file records have fixed length in a general archive
+  if (m_archiveFile.getType() == FO4 || m_archiveFile.getType() == SF) {
+    m_dataOffset += sizes::fileRecordGNRL * m_files.size();
+  }
+
+  // variable file record length depending on DDS chunks number
+  else if (m_archiveFile.getType() == FO4dds || m_archiveFile.getType() == SFdds) {
+    if (m_ddsBasePath.empty()) {
+      throw runtime_error("DDS Archive requires setting a DDS Base Path");
     }
 
-    // variable file record length depending on DDS chunks number
-    else if (m_archiveFile.getType() == FO4dds || m_archiveFile.getType() == SFdds) {
-      if (m_ddsBasePath.empty()) {
-        throw runtime_error("DDS Archive requires setting a DDS Base Path");
-      }
-
-      for (auto& file : fileList) {
-        DDSInfo ddsInfo = getDDSInfo(file);
-        m_dataOffset += sizes::fileRecordDDS + sizes::texChunk * getDDSMipChunkCount(ddsInfo);
-      }
+    for (auto& file : fileList) {
+      DDSInfo ddsInfo = getDDSInfo(file);
+      m_dataOffset += sizes::fileRecordDDS + sizes::texChunk * getDDSMipChunkCount(ddsInfo);
     }
-  } catch (...) {
-    throw;
   }
 }
 
@@ -906,12 +898,12 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     createArchiveTES3(fileList);
     break;
   case TES4: {
-    m_version                = headerVersions::TES4;
-    m_magic                  = magic::BSA;
-    m_header                 = HeaderTES4{};
-    auto& headerTES4         = get<HeaderTES4>(m_header);
-    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES | flags::archive::EMBEDNAME |
-                               flags::archive::XMEM | flags::archive::UNKNOWN10;
+    m_version        = to_underlying(HeaderVersion::TES4);
+    m_magic          = magic::BSA;
+    m_header         = HeaderTES4{};
+    auto& headerTES4 = get<HeaderTES4>(m_header);
+    headerTES4.flags = ArchiveFlag::pathNames | ArchiveFlag::fileNames | ArchiveFlag::embedName | ArchiveFlag::xmem |
+                       ArchiveFlag::unknown10;
     headerTES4.fileFlags     = 0;
     headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
     m_compressionType        = zlib;
@@ -920,11 +912,11 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     break;
   }
   case FO3: {
-    m_version                = headerVersions::FO3;
+    m_version                = to_underlying(HeaderVersion::FO3);
     m_magic                  = magic::BSA;
     m_header                 = HeaderTES4{};
     auto& headerTES4         = get<HeaderTES4>(m_header);
-    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
+    headerTES4.flags         = ArchiveFlag::pathNames | ArchiveFlag::fileNames;
     headerTES4.fileFlags     = 0;
     headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
     m_compressionType        = zlib;
@@ -933,11 +925,11 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     break;
   }
   case SSE: {
-    m_version                = headerVersions::SSE;
+    m_version                = to_underlying(HeaderVersion::SSE);
     m_magic                  = magic::BSA;
     m_header                 = HeaderTES4{};
     auto& headerTES4         = get<HeaderTES4>(m_header);
-    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
+    headerTES4.flags         = ArchiveFlag::pathNames | ArchiveFlag::fileNames;
     headerTES4.fileFlags     = 0;
     headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
     m_compressionType        = lz4Frame;
@@ -950,7 +942,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     HeaderFO4 header;
     header.magic      = magic::GNRL;
     m_header          = header;
-    m_version         = headerVersions::FO4v1;
+    m_version         = to_underlying(HeaderVersion::FO4v1);
     m_compressionType = zlib;
 
     createArchiveFO4(fileList);
@@ -961,7 +953,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     HeaderFO4 header;
     header.magic      = magic::DX10;
     m_header          = header;
-    m_version         = headerVersions::FO4v1;
+    m_version         = to_underlying(HeaderVersion::FO4v1);
     m_compressionType = zlib;
 
     createArchiveFO4(fileList);
@@ -972,7 +964,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     HeaderSF header;
     header.fo4Header.magic = magic::GNRL;
     m_header               = header;
-    m_version              = headerVersions::SF;
+    m_version              = to_underlying(HeaderVersion::SF);
     m_compressionType      = zlib;
 
     createArchiveFO4(fileList);
@@ -983,7 +975,7 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
     HeaderSFdds header;
     header.fo4Header.magic = magic::DX10;
     m_header               = header;
-    m_version              = headerVersions::SFdds;
+    m_version              = to_underlying(HeaderVersion::SFdds);
     m_compressionType      = lz4Block;
 
     createArchiveFO4(fileList);
@@ -1286,63 +1278,59 @@ void Bsa::BsaImpl::addFile(const std::filesystem::path& filePath, const Buffer& 
     lock.lock();
   }
 
-  try {
-    switch (m_archiveFile.getType()) {
-    case TES3: {
-      auto file = findFileRecord(filePath);
-      if (holds_alternative<nullptr_t>(file)) {
-        throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
-      }
-      packData(file, filePath, dataHash, data.data(), data.size(), false);
-      break;
+  switch (m_archiveFile.getType()) {
+  case TES3: {
+    auto file = findFileRecord(filePath);
+    if (holds_alternative<nullptr_t>(file)) {
+      throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
     }
-    case TES4:
-    case FO3:
-    case SSE: {
-      auto file = findFileRecord(filePath);
-      if (holds_alternative<nullptr_t>(file)) {
-        throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
-      }
-      packData(file, filePath, dataHash, data.data(), data.size(), get<FileTES4*>(file)->compress(getCompressed()));
-      break;
+    packData(file, filePath, dataHash, data.data(), data.size(), false);
+    break;
+  }
+  case TES4:
+  case FO3:
+  case SSE: {
+    auto file = findFileRecord(filePath);
+    if (holds_alternative<nullptr_t>(file)) {
+      throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
     }
-    case FO4:
-    case SF: {
-      auto file = findFileRecord(filePath);
-      if (holds_alternative<nullptr_t>(file)) {
-        throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
-      }
-
-      auto* fileFO4 = get<FileFO4*>(file);
-
-      fileFO4->offset = m_archiveFile.tell();
-      fileFO4->size   = narrow<uint32_t>(data.size());
-
-      packData(fileFO4, fileFO4->name, dataHash, data.data(), data.size(), fileFO4->compress(getCompressed()));
-      break;
+    packData(file, filePath, dataHash, data.data(), data.size(), get<FileTES4*>(file)->compress(getCompressed()));
+    break;
+  }
+  case FO4:
+  case SF: {
+    auto file = findFileRecord(filePath);
+    if (holds_alternative<nullptr_t>(file)) {
+      throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
     }
 
-    case FO4dds:
-    case SFdds: {
-      auto file = findFileRecord(filePath);
-      if (holds_alternative<nullptr_t>(file)) {
-        throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
-      }
+    auto* fileFO4 = get<FileFO4*>(file);
 
-      auto* fileFO4 = get<FileFO4*>(file);
+    fileFO4->offset = m_archiveFile.tell();
+    fileFO4->size   = narrow<uint32_t>(data.size());
 
-      try {
-        addFileDDS(fileFO4, data);
-      } catch (...) {
-        throw;
-      }
-      break;
+    packData(fileFO4, fileFO4->name, dataHash, data.data(), data.size(), fileFO4->compress(getCompressed()));
+    break;
+  }
+
+  case FO4dds:
+  case SFdds: {
+    auto file = findFileRecord(filePath);
+    if (holds_alternative<nullptr_t>(file)) {
+      throw runtime_error(format("File \"{}\" not found in files table", filePath.string()));
     }
-    [[unlikely]] case none:
-      throw runtime_error("Archive type cannot be None when adding files");
+
+    auto* fileFO4 = get<FileFO4*>(file);
+
+    try {
+      addFileDDS(fileFO4, data);
+    } catch (...) {
+      throw;
     }
-  } catch (...) {
-    throw;
+    break;
+  }
+  [[unlikely]] case none:
+    throw runtime_error("Archive type cannot be None when adding files");
   }
 }
 
@@ -1537,8 +1525,8 @@ ArchiveType Bsa::BsaImpl::getArchiveType() const noexcept {
   return m_archiveFile.getType();
 }
 
-uint32_t Bsa::BsaImpl::getVersion() const noexcept {
-  return m_version;
+HeaderVersion Bsa::BsaImpl::getVersion() const noexcept {
+  return static_cast<HeaderVersion>(m_version);
 }
 
 bool Bsa::BsaImpl::fileExists(const filesystem::path& filePath) noexcept {
@@ -1809,17 +1797,17 @@ Buffer Bsa::BsaImpl::extractFileData(const FileRecord_t& fileRecord) noexcept(fa
     const auto* fileTES4 = get<FileTES4*>(fileRecord);
     seek(fileTES4->offset);
     uint32_t size     = fileTES4->size;
-    bool isCompressed = (size & flags::file::SIZE_COMPRESS) != 0U;
+    bool isCompressed = (size & FileFlag::compressed) != 0U;
     if (isCompressed) {
-      size &= ~flags::file::SIZE_COMPRESS;
+      size &= ~FileFlag::compressed;
     }
     const auto& header = get<HeaderTES4>(m_header);
-    if ((header.flags & flags::archive::COMPRESS) != 0U) {
+    if ((header.flags & ArchiveFlag::compress) != 0U) {
       isCompressed = !isCompressed;
     }
 
     // skip embedded file name + length prefix
-    if ((type == FO3 || type == SSE) && ((header.flags & flags::archive::EMBEDNAME) != 0U)) {
+    if ((type == FO3 || type == SSE) && (header.flags & ArchiveFlag::embedName) != 0U) {
       const auto length = gsl_lite::narrow<uint32_t>(read<bString>().length);
       size -= length + 1;
     }
@@ -2140,7 +2128,7 @@ void Bsa::BsaImpl::packData(const FileRecord_t& fileRecord, const std::filesyste
     const auto type = m_archiveFile.getType();
 
     // embedded name for Fallout 3/NV/Skyrim/Skyrim SE
-    if ((type == FO3 || type == SSE) && (get<HeaderTES4>(m_header).flags & flags::archive::EMBEDNAME) != 0) {
+    if ((type == FO3 || type == SSE) && (get<HeaderTES4>(m_header).flags & ArchiveFlag::embedName) != 0) {
       write(filePath);
     }
 
@@ -2181,7 +2169,7 @@ void Bsa::BsaImpl::packData(const FileRecord_t& fileRecord, const std::filesyste
       // the compress flag in Size inverts compression status from the header
       // set it if archive's compression doesn't match the file's compression
       if (m_compressed ^ compress) {
-        file->size |= flags::file::SIZE_COMPRESS;
+        file->size |= FileFlag::compressed;
       }
       break;
     }
@@ -2478,29 +2466,25 @@ void Bsa::BsaImpl::create(const std::filesystem::path& archivePath, ArchiveType 
               settings.multithreaded);
   bsa.setCompressionLevel(settings.compressionLevel);
 
-  try {
-    if (settings.multithreaded) {
-      vector<string> exceptions;
-      mutex mtx;
-      for_each(execution::par, files.begin(), files.end(), [&](const auto& file) {
-        try {
-          bsa.addFile(inputDirectory, inputDirectory / file);
-        } catch (const runtime_error& ex) {
-          // std::terminate is called if exceptions are not caught inside for_each
-          scoped_lock guard(mtx);
-          exceptions.emplace_back(ex.what());
-        }
-      });
-      if (!exceptions.empty()) {
-        throw runtime_error("Error: "s + exceptions[0]);
-      }
-    } else {
-      for (const auto& file : files) {
+  if (settings.multithreaded) {
+    vector<string> exceptions;
+    mutex mtx;
+    for_each(execution::par, files.begin(), files.end(), [&](const auto& file) {
+      try {
         bsa.addFile(inputDirectory, inputDirectory / file);
+      } catch (const runtime_error& ex) {
+        // std::terminate is called if exceptions are not caught inside for_each
+        scoped_lock guard(mtx);
+        exceptions.emplace_back(ex.what());
       }
+    });
+    if (!exceptions.empty()) {
+      throw runtime_error("Error: "s + exceptions[0]);
     }
-  } catch (...) {
-    throw;
+  } else {
+    for (const auto& file : files) {
+      bsa.addFile(inputDirectory, inputDirectory / file);
+    }
   }
 
   bsa.save();

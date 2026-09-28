@@ -89,7 +89,7 @@ ArchiveType Bsa::getArchiveType() const noexcept {
   return m_impl->getArchiveType();
 }
 
-uint32_t Bsa::getVersion() const noexcept {
+HeaderVersion Bsa::getVersion() const noexcept {
   return m_impl->getVersion();
 }
 

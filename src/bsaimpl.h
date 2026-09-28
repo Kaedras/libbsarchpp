@@ -39,7 +39,7 @@ public:
   [[nodiscard]] bool fileExists(const std::filesystem::path& filePath) noexcept;
   [[nodiscard]] std::filesystem::path getFileName() const noexcept;
   [[nodiscard]] ArchiveType getArchiveType() const noexcept;
-  [[nodiscard]] uint32_t getVersion() const noexcept;
+  [[nodiscard]] HeaderVersion getVersion() const noexcept;
   [[nodiscard]] std::string getArchiveFormatName() const noexcept;
   [[nodiscard]] uint32_t getFileCount() const noexcept;
   [[nodiscard]] int64_t getCreatedArchiveSize() const noexcept;

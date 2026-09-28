@@ -1,13 +1,17 @@
 #pragma once
 
+#include "enums.h"
 #include "stringencoding.h"
 #include "types.h"
 
+#include <bit>
 #include <cstring>
 #include <filesystem>
 
 template <typename T, typename... Types>
 inline constexpr bool is_none_of = (!std::same_as<T, Types> && ...);
+
+static_assert(std::endian::native == std::endian::little);
 
 namespace libbsarchpp {
 using std::string_literals::operator""s;

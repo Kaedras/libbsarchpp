@@ -82,51 +82,6 @@ namespace magic {
 inline constexpr uint32_t iFileFO4Unknown = 0x00100100;
 inline constexpr uint32_t FileFO4Footer   = 0xBAADF00D;
 
-// header versions
-namespace headerVersions {
-  inline constexpr uint32_t TES4    = 0x67;  // Oblivion
-  inline constexpr uint32_t FO3     = 0x68;  // FO3, FNV, TES5
-  inline constexpr uint32_t SSE     = 0x69;  // SSE
-  inline constexpr uint32_t FO4v1   = 0x01;  // FO4
-  inline constexpr uint32_t SF      = 0x02;  // SF
-  inline constexpr uint32_t SFdds   = 0x03;  // SFdds
-  inline constexpr uint32_t FO4NGv7 = 0x07;  // FO4NG
-  inline constexpr uint32_t FO4NGv8 = 0x08;  // FO4NG2
-}  // namespace headerVersions
-
-namespace flags {
-  namespace archive {
-    // archive flags
-    inline constexpr uint32_t PATHNAMES =
-        0x0001;  // Include Directory Names. This bit is set in all official BSA files.
-    inline constexpr uint32_t FILENAMES  = 0x0002;  // Include File Names. This bit is set in all official BSA files.
-    inline constexpr uint32_t COMPRESS   = 0x0004;  // Compressed Archive.
-    inline constexpr uint32_t RETAINDIR  = 0x0008;  // Retain Directory Names.
-    inline constexpr uint32_t RETAINNAME = 0x0010;  // Retain File Names.
-    inline constexpr uint32_t RETAINFOFF = 0x0020;  // Retain File Name Offsets.
-    inline constexpr uint32_t XBOX360    = 0x0040;  // Xbox360 archive.
-    inline constexpr uint32_t STARTUPSTR = 0x0080;  // Retain Strings During Startup.
-    inline constexpr uint32_t EMBEDNAME =
-        0x0100;  // File data blocks begin with a string containing the full file path.
-    inline constexpr uint32_t XMEM      = 0x0200;  // XMem Codec. This is an Xbox 360 only compression algorithm.
-    inline constexpr uint32_t UNKNOWN10 = 0x0400;
-  }  // namespace archive
-  namespace file {
-    // file flags
-    inline constexpr uint32_t NIF  = 0x0001;
-    inline constexpr uint32_t DDS  = 0x0002;
-    inline constexpr uint32_t XML  = 0x0004;
-    inline constexpr uint32_t WAV  = 0x0008;
-    inline constexpr uint32_t MP3  = 0x0010;
-    inline constexpr uint32_t TXT  = 0x0020;  // TXT, HTML, BAT, SCC
-    inline constexpr uint32_t SPT  = 0x0040;
-    inline constexpr uint32_t FNT  = 0x0080;  // TEX, FNT
-    inline constexpr uint32_t MISC = 0x0100;  // CTL and others
-
-    inline constexpr uint32_t SIZE_COMPRESS = 0x40000000;  // Whether the file is compressed
-  }  // namespace file
-}  // namespace flags
-
 inline constexpr std::array<uint32_t, 256> crc32table{
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832,
     0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
