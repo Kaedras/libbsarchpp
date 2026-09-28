@@ -2129,6 +2129,12 @@ void Bsa::BsaImpl::packData(const FileRecord_t& fileRecord, const std::filesyste
 
     // embedded name for Fallout 3/NV/Skyrim/Skyrim SE
     if ((type == FO3 || type == SSE) && (get<HeaderTES4>(m_header).flags & ArchiveFlag::embedName) != 0) {
+      try {
+        write(gsl_lite::narrow<uint8_t>(getWin1252Length(filePath)));
+      } catch (const gsl_lite::narrowing_error&) {
+        throw runtime_error("Cannot write '" + filePath.string() +
+                            "' into the archive because the file name is too long");
+      }
       write(filePath);
     }
 
