@@ -238,14 +238,38 @@ ArchiveType Bsa::BsaImpl::getArchiveType(const std::filesystem::path& archivePat
   ArchiveIO file(archivePath);
   file.open(ArchiveIO::mode::read);
 
-  auto magic = file.read<uint32_t>();
-  switch (magic) {
-  case magic::TES3:
+  // magic
+  if (file.read<uint32_t>() == magic::TES3) {
     return TES3;
-  case magic::BSA:
+  }
+
+  // version
+  switch (file.read<uint32_t>()) {
+  case headerVersions::TES4:
     return TES4;
-  case magic::BTDX:
-    return FO4;
+  case headerVersions::FO3:
+    return FO3;
+  case headerVersions::SSE:
+    return SSE;
+
+  case headerVersions::FO4v1:
+  case headerVersions::FO4NGv7:
+  case headerVersions::FO4NGv8:
+    switch (const auto magic = file.read<uint32_t>()) {
+    case magic::GNRL:
+      return FO4;
+    case magic::DX10:
+      return FO4dds;
+    default:
+      throw runtime_error("Unknown or invalid FO4 archive subtype " + magicToString(magic));
+    }
+
+  case headerVersions::SF:
+    if (const auto magic = file.read<uint32_t>(); magic == magic::GNRL) {
+      return SF;
+    } else {
+      throw runtime_error("Unknown or invalid SF archive subtype " + magicToString(magic));
+    }
   default:
     throw runtime_error("invalid file");
   }
