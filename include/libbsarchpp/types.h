@@ -37,14 +37,11 @@ struct bzString {
   std::filesystem::path data;
 };
 
-// Null-terminated string
-using zString = std::string;
-
 struct FileTES3 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  zString name;
+  std::filesystem::path name;
 };
 
 struct FileTES4 {

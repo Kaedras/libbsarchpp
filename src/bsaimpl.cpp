@@ -406,7 +406,7 @@ void Bsa::BsaImpl::readArchiveTes3() noexcept(false) {
   // read names
   for (auto& _file : m_files) {
     auto& file = get<FileTES3>(_file);
-    file.name  = read<zString>();
+    file.name  = read<std::filesystem::path>();
     addToFileMap(file.name, &file);
   }
   // read hashes
@@ -633,7 +633,7 @@ void Bsa::BsaImpl::createArchiveTES3(std::vector<std::filesystem::path>& fileLis
     FileTES3 fileTES3;
     fileTES3.hash = hashMap.at(file);
     fileTES3.name = toLower(file.string());
-    len += fileTES3.name.size() + 1;
+    len += getWin1252Length(fileTES3.name) + 1;
     m_files.emplace_back(fileTES3);
 
     addToFileMap(file, &get<FileTES3>(m_files.back()));
@@ -1553,7 +1553,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
       if (file.offset == 0) {
-        throw runtime_error("Archived file has no data: "s + file.name);
+        throw runtime_error("Archived file has no data: "s + file.name.string());
       }
     }
 
@@ -1578,6 +1578,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
     // Filename records
     for (const auto& file : m_files) {
       write(get<FileTES3>(file).name);
+      write<uint8_t>(0);
     }
     // Hash table
     for (const auto& _file : m_files) {
@@ -2318,7 +2319,7 @@ Bsa::BsaImpl::getFileList(const std::filesystem::path& directoryName) const noex
     result.reserve(m_files.size());
     for (const auto& _file : m_files) {
       const auto& file = get<FileTES3>(_file);
-      if (directory.empty() || toLower(file.name).starts_with(folderLower)) {
+      if (directory.empty() || toLower(file.name.string()).starts_with(folderLower)) {
         result.emplace_back(file.name);
       }
     }

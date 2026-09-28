@@ -178,21 +178,6 @@ inline wString ArchiveIO::read() noexcept(false) {
 }
 
 template <>
-inline zString ArchiveIO::read() noexcept(false) {
-  zString str;
-  char c = 1;
-  while (c != 0) {
-    c = read<char>();
-    if (!isascii(c)) {
-      throw std::runtime_error(std::to_string(c) + " is not an ASCII character");
-    }
-    str += c;
-  }
-  str.pop_back();
-  return str;
-}
-
-template <>
 inline std::filesystem::path ArchiveIO::read() noexcept(false) {
   std::vector<uint8_t> data;
   uint8_t value = 1;
@@ -232,17 +217,6 @@ template <>
 inline void ArchiveIO::write(const wString& data) noexcept(false) {
   write(data.length);
   write(data.data);
-}
-
-template <>
-inline void ArchiveIO::write(const zString& data) noexcept(false) {
-  for (char c : data) {
-    if (c == '/' && m_useBackslashes) {
-      c = '\\';
-    }
-    write(c);
-  }
-  write('\0');
 }
 
 }  // namespace libbsarchpp
