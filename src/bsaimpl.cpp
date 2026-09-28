@@ -442,7 +442,7 @@ void Bsa::BsaImpl::readArchiveTes4() noexcept(false) {
   // read file names
   for (auto& folder : m_files) {
     for (auto& file : get<FolderTES4>(folder).files) {
-      file.name = read<bzString>();
+      file.name = read<fs::path>();
     }
   }
 }
@@ -730,12 +730,12 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
       m_files.emplace_back(folderTES4);
 
       // calculate folder names length
-      headerTES4.folderNamesLength +=
-          gsl_lite::narrow<uint32_t>(folderTES4.name.length + 1);  // + terminator only, length prefix is not counted
+      headerTES4.folderNamesLength += gsl_lite::narrow<uint32_t>(folderTES4.name.length);
     }
     FileTES4 fileTES4;
     fileTES4.hash = fileHash;
-    fileTES4.name = toLower(file.filename().string());
+    auto lcPath   = toLower(pathToWin1252(file.filename()));
+    fileTES4.name = win1252ToPath(lcPath);
 
     auto& last = get<FolderTES4>(m_files.back());
     last.files.emplace_back(fileTES4);
@@ -743,7 +743,7 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
 
     headerTES4.fileCount++;
     // calculate file names length
-    headerTES4.fileNamesLength += gsl_lite::narrow<uint32_t>(fileTES4.name.length + 1);
+    headerTES4.fileNamesLength += gsl_lite::narrow<uint32_t>(getWin1252Length(fileTES4.name) + 1);
   }
   headerTES4.folderCount = gsl_lite::narrow<uint32_t>(m_files.size());
 
@@ -762,7 +762,7 @@ void Bsa::BsaImpl::createArchiveTES4(std::vector<std::filesystem::path>& fileLis
     auto& folder  = get<FolderTES4>(_folder);
     folder.offset = m_dataOffset;
     // add folder name length
-    m_dataOffset += folder.name.length + 2;  // + length prefix + terminator
+    m_dataOffset += folder.name.length + 1;  // + length prefix
     // add file records length
     m_dataOffset += 16 * folder.files.size();
   }
@@ -873,113 +873,110 @@ Bsa::BsaImpl::BsaImpl(const std::filesystem::path& archivePath, ArchiveType type
                       bool shareData, bool multithreaded) noexcept(false)
     : m_existingArchive(false), m_ddsBasePath(std::move(ddsBasePath)), m_compressed(compressed), m_shareData(shareData),
       m_multithreaded(multithreaded) {
-  try {
-    switch (type) {
-    case TES3:
-      m_magic  = magic::TES3;
-      m_header = HeaderTES3{};
+  m_archiveFile.setType(type);
+  switch (type) {
+  case TES3:
+    m_magic  = magic::TES3;
+    m_header = HeaderTES3{};
 
-      createArchiveTES3(fileList);
-      break;
-    case TES4: {
-      m_version                = headerVersions::TES4;
-      m_magic                  = magic::BSA;
-      m_header                 = HeaderTES4{};
-      auto& headerTES4         = get<HeaderTES4>(m_header);
-      headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES | flags::archive::EMBEDNAME |
-                                 flags::archive::XMEM | flags::archive::UNKNOWN10;
-      headerTES4.fileFlags     = 0;
-      headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
-      m_compressionType        = zlib;
+    createArchiveTES3(fileList);
+    break;
+  case TES4: {
+    m_version                = headerVersions::TES4;
+    m_magic                  = magic::BSA;
+    m_header                 = HeaderTES4{};
+    auto& headerTES4         = get<HeaderTES4>(m_header);
+    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES | flags::archive::EMBEDNAME |
+                               flags::archive::XMEM | flags::archive::UNKNOWN10;
+    headerTES4.fileFlags     = 0;
+    headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
+    m_compressionType        = zlib;
 
-      createArchiveTES4(fileList);
-      break;
-    }
-    case FO3: {
-      m_version                = headerVersions::FO3;
-      m_magic                  = magic::BSA;
-      m_header                 = HeaderTES4{};
-      auto& headerTES4         = get<HeaderTES4>(m_header);
-      headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
-      headerTES4.fileFlags     = 0;
-      headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
-      m_compressionType        = zlib;
-
-      createArchiveTES4(fileList);
-      break;
-    }
-    case SSE: {
-      m_version                = headerVersions::SSE;
-      m_magic                  = magic::BSA;
-      m_header                 = HeaderTES4{};
-      auto& headerTES4         = get<HeaderTES4>(m_header);
-      headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
-      headerTES4.fileFlags     = 0;
-      headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
-      m_compressionType        = lz4Frame;
-
-      createArchiveTES4(fileList);
-      break;
-    }
-    case FO4: {
-      m_magic = magic::BTDX;
-      HeaderFO4 header;
-      header.magic      = magic::GNRL;
-      m_header          = header;
-      m_version         = headerVersions::FO4v1;
-      m_compressionType = zlib;
-
-      createArchiveFO4(fileList);
-      break;
-    }
-    case FO4dds: {
-      m_magic = magic::BTDX;
-      HeaderFO4 header;
-      header.magic      = magic::DX10;
-      m_header          = header;
-      m_version         = headerVersions::FO4v1;
-      m_compressionType = zlib;
-
-      createArchiveFO4(fileList);
-      break;
-    }
-    case SF: {
-      m_magic = magic::BTDX;
-      HeaderSF header;
-      header.fo4Header.magic = magic::GNRL;
-      m_header               = header;
-      m_version              = headerVersions::SF;
-      m_compressionType      = zlib;
-
-      createArchiveFO4(fileList);
-      break;
-    }
-    case SFdds: {
-      m_magic = magic::BTDX;
-      HeaderSFdds header;
-      header.fo4Header.magic = magic::DX10;
-      m_header               = header;
-      m_version              = headerVersions::SFdds;
-      m_compressionType      = lz4Block;
-
-      createArchiveFO4(fileList);
-      break;
-    }
-    [[unlikely]] default:
-      throw runtime_error("Unsupported archive type");
-    }
-
-    create_directories(archivePath.parent_path());
-    m_archiveFile.open(archivePath, ArchiveIO::mode::write);
-    m_archiveFile.setType(type);
-    m_fileName = archivePath;
-
-    // reserve space for the header
-    Buffer buffer(m_dataOffset, 0);
-    m_archiveFile.write(buffer);
-  } catch (...) {
-    throw;
+    createArchiveTES4(fileList);
+    break;
   }
+  case FO3: {
+    m_version                = headerVersions::FO3;
+    m_magic                  = magic::BSA;
+    m_header                 = HeaderTES4{};
+    auto& headerTES4         = get<HeaderTES4>(m_header);
+    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
+    headerTES4.fileFlags     = 0;
+    headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
+    m_compressionType        = zlib;
+
+    createArchiveTES4(fileList);
+    break;
+  }
+  case SSE: {
+    m_version                = headerVersions::SSE;
+    m_magic                  = magic::BSA;
+    m_header                 = HeaderTES4{};
+    auto& headerTES4         = get<HeaderTES4>(m_header);
+    headerTES4.flags         = flags::archive::PATHNAMES | flags::archive::FILENAMES;
+    headerTES4.fileFlags     = 0;
+    headerTES4.foldersOffset = sizeof(Magic4) + sizeof(m_version) + sizeof(HeaderTES4);
+    m_compressionType        = lz4Frame;
+
+    createArchiveTES4(fileList);
+    break;
+  }
+  case FO4: {
+    m_magic = magic::BTDX;
+    HeaderFO4 header;
+    header.magic      = magic::GNRL;
+    m_header          = header;
+    m_version         = headerVersions::FO4v1;
+    m_compressionType = zlib;
+
+    createArchiveFO4(fileList);
+    break;
+  }
+  case FO4dds: {
+    m_magic = magic::BTDX;
+    HeaderFO4 header;
+    header.magic      = magic::DX10;
+    m_header          = header;
+    m_version         = headerVersions::FO4v1;
+    m_compressionType = zlib;
+
+    createArchiveFO4(fileList);
+    break;
+  }
+  case SF: {
+    m_magic = magic::BTDX;
+    HeaderSF header;
+    header.fo4Header.magic = magic::GNRL;
+    m_header               = header;
+    m_version              = headerVersions::SF;
+    m_compressionType      = zlib;
+
+    createArchiveFO4(fileList);
+    break;
+  }
+  case SFdds: {
+    m_magic = magic::BTDX;
+    HeaderSFdds header;
+    header.fo4Header.magic = magic::DX10;
+    m_header               = header;
+    m_version              = headerVersions::SFdds;
+    m_compressionType      = lz4Block;
+
+    createArchiveFO4(fileList);
+    break;
+  }
+  [[unlikely]] default:
+    throw runtime_error("Unsupported archive type");
+  }
+
+  create_directories(archivePath.parent_path());
+  m_archiveFile.open(archivePath, ArchiveIO::mode::write);
+  m_archiveFile.setType(type);
+  m_fileName = archivePath;
+
+  // reserve space for the header
+  Buffer buffer(m_dataOffset, 0);
+  m_archiveFile.write(buffer);
 }
 
 Bsa::BsaImpl::BsaImpl(const filesystem::path& archivePath, ArchiveType type,
@@ -1486,7 +1483,7 @@ void Bsa::BsaImpl::iterateFiles(const FileIterationFunction& function, void* dat
     for (auto& _folder : m_files) {
       auto& folder = get<FolderTES4>(_folder);
       for (auto& file : folder.files) {
-        if (function(folder.name.data / file.name.data, &file, &folder, data)) {
+        if (function(folder.name.data / file.name, &file, &folder, data)) {
           break;
         }
       }
@@ -1587,8 +1584,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
       const auto& folder = get<FolderTES4>(_folder);
       for (const auto& file : folder.files) {
         if (file.offset == 0) {
-          throw runtime_error("Archived file has no data: "s + folder.name.data.string() + "/"s +
-                              file.name.data.string());
+          throw runtime_error("Archived file has no data: "s + folder.name.data.string() + "/"s + file.name.string());
         }
       }
     }
@@ -1625,6 +1621,7 @@ void Bsa::BsaImpl::save() noexcept(false) {
       const auto& folder = get<FolderTES4>(_folder);
       for (const auto& file : folder.files) {
         write(file.name);
+        write('\0');
       }
     }
     break;
@@ -2316,7 +2313,7 @@ Bsa::BsaImpl::getFileList(const std::filesystem::path& directoryName) const noex
       const auto& folder = get<FolderTES4>(_file);
       if (directory.empty() || toLower(folder.name.data.string()).starts_with(folderLower)) {
         for (const auto& fileTES4 : folder.files) {
-          result.emplace_back(folder.name.data / fileTES4.name.data);
+          result.emplace_back(folder.name.data / fileTES4.name);
         }
       }
     }
@@ -2394,7 +2391,7 @@ HeaderFO4& Bsa::BsaImpl::getHeaderFO4() noexcept(false) {
 
 void Bsa::BsaImpl::extract(const filesystem::path& archivePath, const filesystem::path& outputDirectory,
                            const bool multithreaded) noexcept(false) {
-  Bsa bsa(archivePath, true);
+  BsaImpl bsa(archivePath, true);
   auto files = bsa.getFileList();
 
   if (multithreaded) {

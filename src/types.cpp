@@ -150,7 +150,7 @@ bool FileFO4::compress(bool globalCompress) const noexcept {
 
 bzString& bzString::operator=(const std::filesystem::path& path) {
   data   = path;
-  length = getWin1252Length(path);
+  length = getWin1252Length(path) + 1;
 
   return *this;
 }

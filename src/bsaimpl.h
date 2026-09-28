@@ -35,7 +35,7 @@ public:
   void extractFile(const std::filesystem::path& filePath, const std::filesystem::path& saveAs) noexcept(false);
   void iterateFiles(const FileIterationFunction& function, void* data) noexcept;
   [[nodiscard]] std::vector<std::filesystem::path>
-  getFileList(const std::filesystem::path& directoryName) const noexcept;
+  getFileList(const std::filesystem::path& directoryName = {}) const noexcept;
   [[nodiscard]] bool fileExists(const std::filesystem::path& filePath) noexcept;
   [[nodiscard]] std::filesystem::path getFileName() const noexcept;
   [[nodiscard]] ArchiveType getArchiveType() const noexcept;

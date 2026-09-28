@@ -59,7 +59,7 @@ struct wString {
   std::filesystem::path data;
 };
 
-// Null-terminated ASCII string
+// Null-terminated string
 using zString = std::string;
 
 PACKED(struct DDS_PIXELFORMAT {
@@ -139,7 +139,7 @@ struct FileTES4 {
   uint64_t hash   = 0;
   uint32_t size   = 0;
   uint32_t offset = 0;
-  bzString name;
+  std::filesystem::path name;
   PackingCompression_t packingCompression = PackingCompression_t::global;
   [[nodiscard]] bool compress(bool globalCompress) const noexcept;  // compress when packing into a new archive
 };

@@ -184,7 +184,20 @@ inline zString ArchiveIO::read() noexcept(false) {
     }
     str += c;
   }
+  str.pop_back();
   return str;
+}
+
+template <>
+inline std::filesystem::path ArchiveIO::read() noexcept(false) {
+  std::vector<uint8_t> data;
+  uint8_t value = 1;
+  while (value != 0) {
+    value = read<uint8_t>();
+    data.push_back(value);
+  }
+  data.pop_back();
+  return win1252ToPath(data);
 }
 
 template <>
@@ -206,7 +219,7 @@ inline void ArchiveIO::write(const bString& data) noexcept(false) {
 
 template <>
 inline void ArchiveIO::write(const bzString& data) noexcept(false) {
-  write(data.length + 1);
+  write(data.length);
   write(data.data);
   write('\0');
 }
